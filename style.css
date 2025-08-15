@@ -12,6 +12,11 @@
     color: white;
     border: none;
     padding: 10px 20px;
-    border-radius: 5px;
     cursor: pointer;
+}
+
+.search_bar {
+    width: 80%;
+    padding: 10px;
+    border: none;
 }

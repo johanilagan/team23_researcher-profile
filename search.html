@@ -7,15 +7,100 @@
         <link rel="stylesheet" href="style.css"> 
     </head>
     <body style="background-color: #9e9e9e;">
-        <div class="d-flex justify-content-center">
-            <div class="search_bar">
-                <form action="/search.html">
-                    <div class="input-group">
-                        <input type="text" placeholder="Search..." class="form-control">
-                        <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
-                    </div>
-                </form>
+        <div class="container mt-3">
+            <div class="d-flex align-items-center">
+                <nav class="navbar navbar-light bg-light p-0 me-2" style="background: none !important; border: none;">
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                </nav>
+                <div class="flex-grow-1">
+                    <form action="/search.html">
+                        <div class="input-group">
+                            <input type="text" placeholder="Search..." class="form-control">
+                            <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
+
+        <div class="container mt-4">
+            <div class="row g-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="row g-0 align-items-center">
+                            <div class="col-auto">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541" class="img-fluid rounded-circle" alt="Result Image" style="width: 80px; height: 80px; object-fit: cover;">
+                            </div>
+                            <div class="col">
+                                <div class="card-body">
+                                    <h5 class="card-title">Result 1</h5>
+                                    <p class="card-text">Description</p>
+                                </div>
+                            </div>
+                        </div>  
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="card">
+                        <div class="row g-0 align-items-center">
+                            <div class="col-auto">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541" class="img-fluid rounded-circle" alt="Result Image" style="width: 80px; height: 80px; object-fit: cover;">
+                            </div>
+                            <div class="col">
+                                <div class="card-body">
+                                    <h5 class="card-title">Result 2</h5>
+                                    <p class="card-text">Description</p>
+                                </div>
+                            </div>
+                        </div>  
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="card">
+                        <div class="row g-0 align-items-center">
+                            <div class="col-auto">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541" class="img-fluid rounded-circle" alt="Result Image" style="width: 80px; height: 80px; object-fit: cover;">
+                            </div>
+                            <div class="col">
+                                <div class="card-body">
+                                    <h5 class="card-title">Result 3</h5>
+                                    <p class="card-text">Description</p>
+                                </div>
+                            </div>
+                        </div>  
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="card">
+                        <div class="row g-0 align-items-center">
+                            <div class="col-auto">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541" class="img-fluid rounded-circle" alt="Result Image" style="width: 80px; height: 80px; object-fit: cover;">
+                            </div>
+                            <div class="col">
+                                <div class="card-body">
+                                    <h5 class="card-title">Result 4</h5>
+                                    <p class="card-text">Description</p>
+                                </div>
+                            </div>
+                        </div>  
+                    </div>
+                </div>
+            </div>
+        </div>
+        <nav aria-label="Search results pages">
+            <ul class="pagination justify-content-center mt-4">
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item"><a class="page-link" href="#"><span aria-hidden="true">&raquo;</span></a></li>
+            </ul>
+        </nav>
     </body>
 </html>

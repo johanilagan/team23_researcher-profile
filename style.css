@@ -603,3 +603,391 @@ body {
 .login-page .signup_link p a:hover {
     text-decoration: underline;
 }
+
+/* Footer Styles */
+.footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    margin-top: auto;
+}
+
+.footer h5, .footer h6 {
+    color: #495057;
+    font-weight: 600;
+}
+
+.footer a {
+    color: #6c757d;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.footer a:hover {
+    color: #495057;
+}
+
+.footer a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: #667eea;
+    transition: width 0.3s ease;
+}
+
+.footer a:hover::after {
+    width: 100%;
+}
+
+/* Main Content */
+.main-content {
+    min-height: calc(100vh - 200px);
+    padding-bottom: 2rem;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.hero-image {
+    opacity: 0.8;
+}
+
+/* Feature Cards */
+.feature-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.feature-icon {
+    color: #667eea;
+}
+
+/* Search Section */
+.search-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+/* Login/Register Forms */
+.login_bubble {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .hero-section .display-4 {
+        font-size: 2rem;
+    }
+    
+    .feature-card {
+        margin-bottom: 1rem;
+    }
+    
+    .login_bubble {
+        padding: 1.5rem;
+    }
+}
+
+/* Help Centre Styles */
+.help-category-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.help-category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.help-icon {
+    color: #667eea;
+}
+
+.support-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 15px;
+}
+
+/* Contact Page Styles */
+.contact-info-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.contact-info-card:hover {
+    transform: translateY(-3px);
+}
+
+.contact-icon {
+    color: #667eea;
+}
+
+.contact-form-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.faq-links-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 15px;
+}
+
+.office-info {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Privacy Policy Styles */
+.privacy-content {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.privacy-content section {
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 2rem;
+}
+
+.privacy-content section:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.privacy-content h2 {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.privacy-content h4 {
+    color: #495057;
+    font-weight: 600;
+}
+
+.privacy-content ul {
+    padding-left: 1.5rem;
+}
+
+.privacy-content li {
+    margin-bottom: 0.5rem;
+    color: #555;
+}
+
+.contact-info {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 15px;
+}
+
+.quick-actions {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 15px;
+}
+
+/* Accordion Styles */
+.accordion-item {
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.accordion-button {
+    background: white;
+    border: none;
+    color: #2c3e50;
+    font-weight: 600;
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.accordion-button:hover {
+    background-color: #f8f9fa;
+}
+
+.accordion-button:not(.collapsed) {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.accordion-button:focus {
+    box-shadow: none;
+    border-color: #667eea;
+}
+
+.accordion-body {
+    background: #f8f9fa;
+    color: #555;
+    line-height: 1.6;
+    padding: 1.25rem;
+}
+
+/* Ensure accordion collapse works properly */
+.accordion-collapse {
+    transition: height 0.3s ease;
+}
+
+/* Remove these display overrides as they interfere with Bootstrap's collapse functionality */
+/* .accordion-collapse.show {
+    display: block;
+}
+
+.accordion-collapse:not(.show) {
+    display: none;
+} */
+
+/* Form Enhancements */
+.form-control:focus,
+.form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.form-check-input:checked {
+    background-color: #667eea;
+    border-color: #667eea;
+}
+
+/* Button Enhancements */
+.btn-lg {
+    padding: 0.875rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* User Dropdown Menu Enhancements */
+.user-menu .dropdown-menu {
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    border-radius: 15px;
+    padding: 0.5rem 0;
+    min-width: 220px;
+}
+
+.user-menu .dropdown-item {
+    padding: 0.75rem 1.5rem;
+    color: #495057;
+    transition: all 0.3s ease;
+    border: none;
+    background: transparent;
+}
+
+.user-menu .dropdown-item:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    transform: translateX(5px);
+}
+
+.user-menu .dropdown-item i {
+    width: 20px;
+    margin-right: 0.75rem;
+    text-align: center;
+}
+
+.user-menu .dropdown-divider {
+    margin: 0.5rem 0;
+    border-color: #e9ecef;
+}
+
+/* Username display enhancement */
+#username {
+    font-weight: 600;
+    margin-left: 0.5rem;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* User dropdown button enhancement */
+.user-menu .btn-outline-light {
+    border: 2px solid rgba(255,255,255,0.8);
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.user-menu .btn-outline-light:hover {
+    background-color: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,1);
+    transform: translateY(-1px);
+}
+
+/* Logout Section Styling */
+.logout-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-top: 1px solid #dee2e6;
+}
+
+.logout-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.logout-card h4 {
+    color: #495057;
+    font-weight: 600;
+}
+
+.logout-card .btn-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    border: none;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.logout-card .btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
+}
+
+/* Responsive adjustments for new pages */
+@media (max-width: 768px) {
+    .privacy-content {
+        padding: 1.5rem;
+    }
+    
+    .contact-form-card {
+        padding: 1.5rem;
+    }
+    
+    .help-category-card {
+        margin-bottom: 1rem;
+    }
+    
+    .contact-info-card {
+        margin-bottom: 1rem;
+    }
+    
+    .logout-card {
+        padding: 1.5rem;
+    }
+}

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | Research'D</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Boxicons -->
+    <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="homepage.html">
+                <i class="fas fa-graduation-cap"></i> Research'D
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="homepage.html">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="search.html">
+                            <i class="fas fa-search"></i> Search
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="profile_page.html">
+                            <i class="fas fa-user"></i> Profile
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="navbar-nav">
+                    <!-- Authentication buttons - shown when not logged in -->
+                    <div class="auth-buttons" id="auth-buttons">
+                        <a href="login.html" class="btn btn-outline-light btn-sm me-2">
+                            <i class="fas fa-sign-in-alt"></i> Sign In
+                        </a>
+                        <a href="register.html" class="btn btn-light btn-sm">
+                            <i class="fas fa-user-plus"></i> Register
+                        </a>
+                    </div>
+                    
+                    <!-- User menu - shown when logged in -->
+                    <div class="user-menu d-none" id="user-menu">
+                        <div class="dropdown">
+                            <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle"></i> <span id="username">User</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" href="homepage.html"><i class="fas fa-home"></i> Home</a></li>
+                                <li><a class="dropdown-item" href="profile_page.html"><i class="fas fa-user"></i> My Profile</a></li>
+                                <li><a class="dropdown-item" href="search.html"><i class="fas fa-search"></i> Search Researchers</a></li>
+                                <li><a class="dropdown-item" href="help_centre.html"><i class="fas fa-question-circle"></i> Help Centre</a></li>
+                                <li><a class="dropdown-item" href="contact.html"><i class="fas fa-envelope"></i> Contact Support</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" onclick="signOut()"><i class="fas fa-sign-out-alt"></i> Sign Out</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Privacy Policy Header -->
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <h1 class="display-4 fw-bold text-primary mb-4">
+                        <i class="fas fa-shield-alt me-3"></i>Privacy Policy
+                    </h1>
+                    <p class="lead text-muted">How we collect, use, and protect your personal information</p>
+                    <p class="text-muted">Last updated: January 15, 2024</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Privacy Policy Content -->
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="privacy-content">
+                        
+                        <!-- Introduction -->
+                        <section class="mb-5">
+                            <h2 class="h3 text-primary mb-3">Introduction</h2>
+                            <p>Research'D ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our academic networking platform.</p>
+                            <p>By using Research'D, you agree to the collection and use of information in accordance with this policy.</p>
+                        </section>
+
+                        <!-- Information We Collect -->
+                        <section class="mb-5">
+                            <h2 class="h3 text-primary mb-3">Information We Collect</h2>
+                            
+                            <h4 class="h5 mb-3">Personal Information</h4>
+                            <ul class="mb-4">
+                                <li>Name and contact information (email, phone number)</li>
+                                <li>Professional details (institution, title, department)</li>
+                                <li>Research interests and expertise areas</li>
+                                <li>Profile pictures and biographical information</li>
+                                <li>Publication records and research outputs</li>
+                            </ul>
+
+                            <h4 class="h5 mb-3">Usage Information</h4>
+                            <ul class="mb-4">
+                                <li>Search queries and browsing patterns</li>
+                                <li>Profile views and interaction data</li>
+                                <li>Communication with other researchers</li>
+                                <li>Platform usage statistics</li>
+                            </ul>
+
+                            <h4 class="h5 mb-3">Technical Information</h4>
+                            <ul>
+                                <li>IP addresses and device information</li>
+                                <li>Browser type and version</li>
+                                <li>Operating system and platform</li>
+                                <li>Cookies and similar technologies</li>
+                            </ul>
+                        </section>
+
+                        <!-- How We Use Your Information -->
+                        <section class="mb-5">
+                            <h2 class="h3 text-primary mb-3">How We Use Your Information</h2>
+                            <p>We use the collected information for the following purposes:</p>
+                            <ul>
+                                <li>Providing and maintaining our academic networking platform</li>
+                                <li>Enabling researcher discovery and collaboration</li>
+                                <li>Personalizing your experience and recommendations</li>
+                                <li>Communicating with you about platform updates</li>
+                                <li>Improving our services and user experience</li>
+                                <li>Ensuring platform security and preventing fraud</li>
+                                <li>Complying with legal obligations</li>
+                            </ul>
+                        </section>
+
+                        <!-- Information Sharing -->
+                        <section class="mb-5">
+                            <h2 class="h3 text-primary mb-3">Information Sharing and Disclosure</h2>
+                            <p>We do not sell, trade, or otherwise transfer your personal information to third parties without your consent, except in the following circumstances:</p>
+                            
+                            <h4 class="h5 mb-3">Public Profile Information</h4>
+                            <p>Your public profile information (name, institution, research interests, publications) is visible to other researchers on the platform to facilitate academic networking.</p>
+                            
+                            <h4 class="h5 mb-3">Service Providers</h4>
+                            <p>We may share information with trusted third-party service providers who assist us in operating our platform, conducting business, or servicing you.</p>
+                            
+                            <h4 class="h5 mb-3">Legal Requirements</h4>
+                            <p>We may disclose your information if required by law or in response to valid legal requests.</p>
+                        </section>
+
+                        <!-- Data Security -->
+                        <section class="mb-5">
+                            <h2 class="h3 text-primary mb-3">Data Security</h2>
+                            <p>We implement appropriate security measures to protect your personal information:</p>
+                            <ul>
+                                <li>Encryption of data in transit and at rest</li>
+                                <li>Regular security assessments and updates</li>
+                                <li>Access controls and authentication measures</li>
+                                <li>Secure data centers and infrastructure</li>
+                                <li>Employee training on data protection</li>
+                            </ul>
+                            <p>However, no method of transmission over the internet is 100% secure, and we cannot guarantee absolute security.</p>
+                        </section>
+
+                        <!-- Your Rights -->
+                        <section class="mb-5">
+                            <h2 class="h3 text-primary mb-3">Your Rights and Choices</h2>
+                            <p>You have the following rights regarding your personal information:</p>
+                            <ul>
+                                <li><strong>Access:</strong> Request a copy of your personal data</li>
+                                <li><strong>Correction:</strong> Update or correct inaccurate information</li>
+                                <li><strong>Deletion:</strong> Request deletion of your personal data</li>
+                                <li><strong>Portability:</strong> Request transfer of your data</li>
+                                <li><strong>Objection:</strong> Object to certain processing activities</li>
+                                <li><strong>Withdrawal:</strong> Withdraw consent for data processing</li>
+                            </ul>
+                            <p>To exercise these rights, please contact us using the information provided below.</p>
+                        </section>
+
+                        <!-- Cookies -->
+                        <section class="mb-5">
+                            <h2 class="h3 text-primary mb-3">Cookies and Tracking Technologies</h2>
+                            <p>We use cookies and similar technologies to enhance your experience:</p>
+                            <ul>
+                                <li><strong>Essential Cookies:</strong> Required for basic platform functionality</li>
+                                <li><strong>Analytics Cookies:</strong> Help us understand how users interact with our platform</li>
+                                <li><strong>Preference Cookies:</strong> Remember your settings and preferences</li>
+                                <li><strong>Marketing Cookies:</strong> Deliver relevant content and advertisements</li>
+                            </ul>
+                            <p>You can control cookie settings through your browser preferences.</p>
+                        </section>
+
+                        <!-- Data Retention -->
+                        <section class="mb-5">
+                            <h2 class="h3 text-primary mb-3">Data Retention</h2>
+                            <p>We retain your personal information for as long as necessary to:</p>
+                            <ul>
+                                <li>Provide our services to you</li>
+                                <li>Comply with legal obligations</li>
+                                <li>Resolve disputes and enforce agreements</li>
+                                <li>Improve our platform and services</li>
+                            </ul>
+                            <p>When you delete your account, we will remove your personal information within 30 days, except where retention is required by law.</p>
+                        </section>
+
+                        <!-- International Transfers -->
+                        <section class="mb-5">
+                            <h2 class="h3 text-primary mb-3">International Data Transfers</h2>
+                            <p>Your information may be transferred to and processed in countries other than your own. We ensure that such transfers comply with applicable data protection laws and implement appropriate safeguards.</p>
+                        </section>
+
+                        <!-- Children's Privacy -->
+                        <section class="mb-5">
+                            <h2 class="h3 text-primary mb-3">Children's Privacy</h2>
+                            <p>Research'D is not intended for use by individuals under the age of 16. We do not knowingly collect personal information from children under 16. If you believe we have collected such information, please contact us immediately.</p>
+                        </section>
+
+                        <!-- Changes to Policy -->
+                        <section class="mb-5">
+                            <h2 class="h3 text-primary mb-3">Changes to This Privacy Policy</h2>
+                            <p>We may update this Privacy Policy from time to time. We will notify you of any changes by:</p>
+                            <ul>
+                                <li>Posting the new Privacy Policy on this page</li>
+                                <li>Sending you an email notification</li>
+                                <li>Displaying a notice on our platform</li>
+                            </ul>
+                            <p>Your continued use of Research'D after any changes constitutes acceptance of the updated policy.</p>
+                        </section>
+
+                        <!-- Contact Information -->
+                        <section class="mb-5">
+                            <h2 class="h3 text-primary mb-3">Contact Us</h2>
+                            <p>If you have any questions about this Privacy Policy or our data practices, please contact us:</p>
+                            <div class="contact-info p-4 bg-light rounded">
+                                <p class="mb-2"><strong>Email:</strong> privacy@researched.com</p>
+                                <p class="mb-2"><strong>Phone:</strong> +1 (555) 123-4567</p>
+                                <p class="mb-2"><strong>Address:</strong> Research'D Headquarters, 123 Innovation Drive, Tech City, TC 12345, United States</p>
+                                <p class="mb-0"><strong>Data Protection Officer:</strong> dpo@researched.com</p>
+                            </div>
+                        </section>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <div class="quick-actions p-4 bg-light rounded">
+                        <h4 class="mb-3">Need Help?</h4>
+                        <p class="text-muted mb-4">Have questions about your privacy or data? Our support team is here to help.</p>
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="contact.html" class="btn btn-primary">
+                                <i class="fas fa-envelope me-2"></i>Contact Support
+                            </a>
+                            <a href="help_centre.html" class="btn btn-outline-primary">
+                                <i class="fas fa-question-circle me-2"></i>Help Centre
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer mt-auto py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Research'D</h5>
+                    <p class="text-muted">Connecting researchers and fostering academic collaboration worldwide.</p>
+                </div>
+                <div class="col-md-3">
+                    <h6>Quick Links</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="homepage.html" class="text-muted">Home</a></li>
+                        <li><a href="search.html" class="text-muted">Search</a></li>
+                        <li><a href="profile_page.html" class="text-muted">Profile</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h6>Support</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="help_centre.html" class="text-muted">Help Centre</a></li>
+                        <li><a href="contact.html" class="text-muted">Contact Us</a></li>
+                        <li><a href="privacy.html" class="text-muted">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p class="text-muted mb-0">&copy; 2024 Research'D. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Check authentication status
+        function checkAuthStatus() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const username = localStorage.getItem('username') || 'User';
+            
+            if (isLoggedIn) {
+                document.getElementById('auth-buttons').classList.add('d-none');
+                document.getElementById('user-menu').classList.remove('d-none');
+                document.getElementById('username').textContent = username;
+            } else {
+                document.getElementById('auth-buttons').classList.remove('d-none');
+                document.getElementById('user-menu').classList.add('d-none');
+            }
+        }
+
+        // Sign out function
+        function signOut() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('username');
+            window.location.href = 'homepage.html';
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthStatus();
+        });
+    </script>
+</body>
+</html>

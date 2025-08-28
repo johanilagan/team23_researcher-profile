@@ -12,9 +12,24 @@ def home():
     return render_template("homepage.html")
 
 @main.route("/profile")
-@login_required
 def profile():
-    return render_template("profile_page.html", username=current_user.username)
+    return render_template("profile_page.html")
+
+@main.route("/search")
+def search():
+    return render_template("search.html")
+
+@main.route("/help")
+def help():
+    return render_template("help_centre.html")
+
+@main.route("/contact")
+def contact():
+    return render_template("contact.html")
+
+@main.route("/privacy")
+def privacy():
+    return render_template("privacy.html")
 
 @auth.route("/login", methods=["GET", "POST"])
 def login():

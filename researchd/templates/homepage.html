@@ -15,13 +15,13 @@
     <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
     
     <!-- Custom CSS -->
-        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     </head>
     <body>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="homepage.html">
+            <a class="navbar-brand" href="{{ url_for('main.home') }}">
                 <i class="fas fa-graduation-cap"></i> Research'D
             </a>
             
@@ -32,7 +32,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="homepage.html">
+                        <a class="nav-link active" href="{{ url_for('main.home') }}">
                             <i class="fas fa-home"></i> Home
                         </a>
                     </li>
@@ -42,7 +42,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="profile_page.html">
+                        <a class="nav-link" href="{{ url_for('main.profile') }}">
                             <i class="fas fa-user"></i> Profile
                         </a>
                     </li>
@@ -51,10 +51,10 @@
                 <div class="navbar-nav">
                     <!-- Authentication buttons - shown when not logged in -->
                     <div class="auth-buttons" id="auth-buttons">
-                        <a href="login.html" class="btn btn-outline-light btn-sm me-2">
+                        <a class="nav-link" href="{{ url_for('auth.login') }}">
                             <i class="fas fa-sign-in-alt"></i> Sign In
                         </a>
-                        <a href="register.html" class="btn btn-light btn-sm">
+                        <a class="nav-link" href="{{ url_for('auth.register') }}">
                             <i class="fas fa-user-plus"></i> Register
                         </a>
                     </div>

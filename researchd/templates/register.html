@@ -21,7 +21,7 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href=href="{{ url_for('main.home') }}">
+            <a class="navbar-brand" href="{{ url_for('main.home') }}">
                 <i class="fas fa-graduation-cap"></i> Research'D
             </a>
             
@@ -32,7 +32,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href=href="{{ url_for('main.home') }}">
+                        <a class="nav-link" href="{{ url_for('main.home') }}">
                             <i class="fas fa-home"></i> Home
                         </a>
                     </li>
@@ -66,7 +66,7 @@
                                 <i class="fas fa-user-circle"></i> <span id="username">User</span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item" href=href="{{ url_for('main.home') }}"><i class="fas fa-home"></i> Home</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('main.home') }}"><i class="fas fa-home"></i> Home</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('main.profile') }}"><i class="fas fa-user"></i> My Profile</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('main.search') }}"><i class="fas fa-search"></i> Search Researchers</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('main.help') }}"><i class="fas fa-question-circle"></i> Help Centre</a></li>
@@ -136,7 +136,7 @@
                 <div class="col-md-3">
                     <h6>Quick Links</h6>
                     <ul class="list-unstyled">
-                        <li><a href=href="{{ url_for('main.home') }}" class="text-muted">Home</a></li>
+                        <li><a href="{{ url_for('main.home') }}" class="text-muted">Home</a></li>
                         <li><a href="{{ url_for('main.search') }}" class="text-muted">Search</a></li>
                         <li><a href="{{ url_for('main.profile') }}" class="text-muted">Profile</a></li>
                     </ul>

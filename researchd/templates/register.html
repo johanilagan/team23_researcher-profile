@@ -37,12 +37,12 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="search.html">
+                        <a class="nav-link" href="{{ url_for('main.search') }}">
                             <i class="fas fa-search"></i> Search
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="profile_page.html">
+                        <a class="nav-link" href="{{ url_for('main.profile') }}">
                             <i class="fas fa-user"></i> Profile
                         </a>
                     </li>
@@ -51,10 +51,10 @@
                 <div class="navbar-nav">
                     <!-- Authentication buttons - shown when not logged in -->
                     <div class="auth-buttons" id="auth-buttons">
-                        <a href="login.html" class="btn btn-outline-light btn-sm me-2">
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-sm me-2">
                             <i class="fas fa-sign-in-alt"></i> Sign In
                         </a>
-                        <a href="register.html" class="btn btn-light btn-sm active">
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-sm active">
                             <i class="fas fa-user-plus"></i> Register
                         </a>
                     </div>
@@ -67,10 +67,10 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li><a class="dropdown-item" href=href="{{ url_for('main.home') }}"><i class="fas fa-home"></i> Home</a></li>
-                                <li><a class="dropdown-item" href="profile_page.html"><i class="fas fa-user"></i> My Profile</a></li>
-                                <li><a class="dropdown-item" href="search.html"><i class="fas fa-search"></i> Search Researchers</a></li>
-                                <li><a class="dropdown-item" href="help_centre.html"><i class="fas fa-question-circle"></i> Help Centre</a></li>
-                                <li><a class="dropdown-item" href="contact.html"><i class="fas fa-envelope"></i> Contact Support</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('main.profile') }}"><i class="fas fa-user"></i> My Profile</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('main.search') }}"><i class="fas fa-search"></i> Search Researchers</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('main.help') }}"><i class="fas fa-question-circle"></i> Help Centre</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('main.contact') }}"><i class="fas fa-envelope"></i> Contact Support</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="#"><i class="fas fa-cog"></i> Settings</a></li>
                                 <li><hr class="dropdown-divider"></li>
@@ -116,7 +116,7 @@
 
                             <div class="signup_link text-center">
                                 <p class="mb-0">Already have an account?</p>
-                                <a href="login.html" class="text-decoration-none">Sign in here</a>
+                                <a href="{{ url_for('auth.login') }}" class="text-decoration-none">Sign in here</a>
                             </div>
                         </form>
                     </div>
@@ -137,16 +137,16 @@
                     <h6>Quick Links</h6>
                     <ul class="list-unstyled">
                         <li><a href=href="{{ url_for('main.home') }}" class="text-muted">Home</a></li>
-                        <li><a href="search.html" class="text-muted">Search</a></li>
-                        <li><a href="profile_page.html" class="text-muted">Profile</a></li>
+                        <li><a href="{{ url_for('main.search') }}" class="text-muted">Search</a></li>
+                        <li><a href="{{ url_for('main.profile') }}" class="text-muted">Profile</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3">
                     <h6>Support</h6>
                     <ul class="list-unstyled">
-                        <li><a href="help_centre.html" class="text-muted">Help Centre</a></li>
-                        <li><a href="contact.html" class="text-muted">Contact Us</a></li>
-                        <li><a href="privacy.html" class="text-muted">Privacy Policy</a></li>
+                        <li><a href="{{ url_for('main.help') }}" class="text-muted">Help Centre</a></li>
+                        <li><a href="{{ url_for('main.contact') }}" class="text-muted">Contact Us</a></li>
+                        <li><a href="{{ url_for('main.privacy') }}" class="text-muted">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>
@@ -181,7 +181,7 @@
         function signOut() {
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('username');
-            window.location.href = 'homepage.html';
+            window.location.href = "{{ url_for('main.home') }}";
         }
 
         // Handle registration form submission
@@ -217,7 +217,7 @@
                 console.log('username:', localStorage.getItem('username'));
                 
                 // Redirect to homepage
-                window.location.href = 'homepage.html';
+                window.location.href = "{{ url_for('main.home') }}";
             } else {
                 console.log('Validation failed');
             }

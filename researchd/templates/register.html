@@ -96,12 +96,21 @@
                         
                         <form id="register-form" action="" method="POST">
                             <div class="input mb-3">
-                                <input type="text" placeholder="Username" required class="form-control">
-                                <i class='bx bx-user'></i> 
+                                <input type="text" placeholder="First Name" required class="form-control">
+                            </div>
+                            <div class="input mb-3">
+                                <input type="text" placeholder="Last Name" required class="form-control">
                             </div>
                             <div class="input mb-3">
                                 <input type="email" placeholder="Email" required class="form-control">
                                 <i class='bx bx-envelope'></i> 
+                            </div>
+                            <div class="input mb-3">
+                                <input type="text" placeholder="Institution" required class="form-control">
+                                <i class='bx bx-buildings'></i>
+                            </div>
+                            <div class="input mb-3">
+                                <input type="text" placeholder="Position" required class="form-control">
                             </div>
                             <div class="input mb-3">
                                 <input type="password" placeholder="Password" required class="form-control">
@@ -165,12 +174,12 @@
         // Check authentication status
         function checkAuthStatus() {
             const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-            const username = localStorage.getItem('username') || 'User';
+            const email = localStorage.getItem('username') || 'User';
             
             if (isLoggedIn) {
                 document.getElementById('auth-buttons').classList.add('d-none');
                 document.getElementById('user-menu').classList.remove('d-none');
-                document.getElementById('username').textContent = username;
+                document.getElementById('username').textContent = email.split('@')[0];
             } else {
                 document.getElementById('auth-buttons').classList.remove('d-none');
                 document.getElementById('user-menu').classList.add('d-none');
@@ -189,28 +198,47 @@
             e.preventDefault();
             
             // Get form data
-            const username = this.querySelector('input[type="text"]').value;
+            const firstName = this.querySelectorAll('input[type="text"]')[0].value;
+            const lastName = this.querySelectorAll('input[type="text"]')[1].value;
+            const institution = this.querySelectorAll('input[type="text"]')[2].value;
+            const position = this.querySelectorAll('input[type="text"]')[3].value;
             const email = this.querySelector('input[type="email"]').value;
             const password = this.querySelectorAll('input[type="password"]')[0].value;
             const confirmPassword = this.querySelectorAll('input[type="password"]')[1].value;
+
             
-            console.log('Registration form submitted');
-            console.log('Username:', username);
-            console.log('Email:', email);
-            console.log('Password length:', password.length);
-            console.log('Confirm password length:', confirmPassword.length);
+            console.log("First Name:", firstName);
+            console.log("Last Name:", lastName);
+            console.log("Institution:", institution);
+            console.log("Position:", position);
+            console.log("Email:", email);
             
             // Simple validation
-            if (username && email && password && confirmPassword) {
+             if (firstName && lastName && institution && position && email && password && confirmPassword) {
                 if (password !== confirmPassword) {
-                    alert('Passwords do not match!');
+                    alert("Passwords do not match!");
+                    return;
+                }
+
+                if (!/^\S+@\S+\.\S+$/.test(email)) {
+                    alert('Please enter a valid email.');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    alert('Password should be at least 6 characters.');
                     return;
                 }
                 
                 console.log('Validation passed, setting authentication');
                 // Store registration data (in real app, this would be sent to server)
                 localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('username', username);
+                localStorage.setItem('username', email);
+                localStorage.setItem("firstName", firstName);
+                localStorage.setItem("lastName", lastName);
+                localStorage.setItem("institution", institution);
+                localStorage.setItem("position", position);
+
                 
                 console.log('Authentication set in localStorage');
                 console.log('isLoggedIn:', localStorage.getItem('isLoggedIn'));

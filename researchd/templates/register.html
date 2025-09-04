@@ -21,7 +21,7 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href=href="{{ url_for('main.home') }}">
+            <a class="navbar-brand" href="{{ url_for('main.home') }}">
                 <i class="fas fa-graduation-cap"></i> Research'D
             </a>
             
@@ -32,7 +32,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href=href="{{ url_for('main.home') }}">
+                        <a class="nav-link" href="{{ url_for('main.home') }}">
                             <i class="fas fa-home"></i> Home
                         </a>
                     </li>
@@ -89,29 +89,83 @@
             <div class="row justify-content-center">
                 <div class="col-md-6 col-lg-5">
                     <div class="login_bubble">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                        
                         <div class="text-center mb-4">
                             <h1 class="h2">Join Research'D</h1>
                             <p class="text-muted">Create your account to start connecting with researchers</p>
                         </div>
                         
-                        <form id="register-form" action="" method="POST">
+                        <form id="register-form" action="{{ url_for('auth.register') }}" method="POST">
+                            {{ form.hidden_tag() }}
+
+                            <!-- First Name Field -->
                             <div class="input mb-3">
-                                <input type="text" placeholder="Username" required class="form-control">
-                                <i class='bx bx-user'></i> 
+                                {{ form.first_name(class="form-control", placeholder="First Name", required=True) }}
+                                <i class='bx bx-user'></i>
+                                {% for error in form.first_name.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
                             </div>
+
+                            <!-- Last Name Field -->
                             <div class="input mb-3">
-                                <input type="email" placeholder="Email" required class="form-control">
-                                <i class='bx bx-envelope'></i> 
+                                {{ form.last_name(class="form-control", placeholder="Last Name", required=True) }}
+                                <i class='bx bx-user'></i>
+                                {% for error in form.last_name.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
                             </div>
+
+                            <!-- Email -->
                             <div class="input mb-3">
-                                <input type="password" placeholder="Password" required class="form-control">
-                                <i class='bx bx-lock'></i> 
+                                {{ form.email(class="form-control", placeholder="Email", required=True) }}
+                                <i class="bx bx-envelope"></i>
+                                {% for error in form.email.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
                             </div>
+
+                            <!-- Password -->
                             <div class="input mb-3">
-                                <input type="password" placeholder="Confirm Password" required class="form-control">
-                                <i class='bx bx-lock'></i> 
+                                {{ form.password(class="form-control", placeholder="Password", required=True) }}
+                                <i class='bx bx-lock'></i>
+                                {% for error in form.password.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
                             </div>
-                            
+
+                            <!-- Confirm Password -->
+                            <div class="input mb-3">
+                                {{ form.confirm_password(class="form-control", placeholder="Confirm Password", required=True) }}
+                                <i class='bx bx-lock'></i>
+                                {% for error in form.confirm_password.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Institution -->
+                            <div class="input mb-3">
+                                {{ form.institution(class="form-control", placeholder="Institution") }}
+                                <i class='bx bx-buildings'></i>
+                            </div>
+
+                            <!-- Position -->
+                            <div class="input mb-3">
+                                {{ form.position(class="form-control", placeholder="Position") }}
+                                <i class='bx bx-briefcase'></i>
+                            </div>
+
+                            <!-- Submit button -->
                             <button type="submit" class="btn btn-primary w-100 mb-3">Create Account</button>
 
                             <div class="signup_link text-center">
@@ -136,7 +190,7 @@
                 <div class="col-md-3">
                     <h6>Quick Links</h6>
                     <ul class="list-unstyled">
-                        <li><a href=href="{{ url_for('main.home') }}" class="text-muted">Home</a></li>
+                        <li><a href="{{ url_for('main.home') }}" class="text-muted">Home</a></li>
                         <li><a href="{{ url_for('main.search') }}" class="text-muted">Search</a></li>
                         <li><a href="{{ url_for('main.profile') }}" class="text-muted">Profile</a></li>
                     </ul>
@@ -183,45 +237,6 @@
             localStorage.removeItem('username');
             window.location.href = "{{ url_for('main.home') }}";
         }
-
-        // Handle registration form submission
-        document.getElementById('register-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Get form data
-            const username = this.querySelector('input[type="text"]').value;
-            const email = this.querySelector('input[type="email"]').value;
-            const password = this.querySelectorAll('input[type="password"]')[0].value;
-            const confirmPassword = this.querySelectorAll('input[type="password"]')[1].value;
-            
-            console.log('Registration form submitted');
-            console.log('Username:', username);
-            console.log('Email:', email);
-            console.log('Password length:', password.length);
-            console.log('Confirm password length:', confirmPassword.length);
-            
-            // Simple validation
-            if (username && email && password && confirmPassword) {
-                if (password !== confirmPassword) {
-                    alert('Passwords do not match!');
-                    return;
-                }
-                
-                console.log('Validation passed, setting authentication');
-                // Store registration data (in real app, this would be sent to server)
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('username', username);
-                
-                console.log('Authentication set in localStorage');
-                console.log('isLoggedIn:', localStorage.getItem('isLoggedIn'));
-                console.log('username:', localStorage.getItem('username'));
-                
-                // Redirect to homepage
-                window.location.href = "{{ url_for('main.home') }}";
-            } else {
-                console.log('Validation failed');
-            }
-        });
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {

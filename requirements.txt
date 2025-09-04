@@ -4,3 +4,4 @@ Flask-WTF
 WTForms
 email-validator
 Werkzeug
+flask_login

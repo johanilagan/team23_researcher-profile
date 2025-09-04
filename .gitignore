@@ -1,0 +1,34 @@
+# Python bytecode files
+*.pyc
+__pycache__/
+
+# SQLite database file
+*.sqlite
+*.db
+
+# Environment variables
+.env
+
+# Virtual environment folder (change if yours is named differently)
+venv/
+env/
+.venv/
+
+# Flask instance folder
+instance/
+
+# VSCode / IDE settings
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Node / frontend (if you have a frontend build)
+node_modules/
+dist/
+build/

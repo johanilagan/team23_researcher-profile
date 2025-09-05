@@ -1,14 +1,20 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+import os
+from sqlalchemy import inspect
 
 db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
-    app.config["SECRET_KEY"] = "supersecretkey"
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///researchd.sqlite"
+    app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "devkey")
+    
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "researchd.sqlite")
+
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["DEBUG"] = True
 
     db.init_app(app)
 
@@ -30,5 +36,7 @@ def create_app():
 
     with app.app_context():
         db.create_all()
+        inspector = inspect(db.engine)
+        print("Tables created:", inspector.get_table_names())
 
     return app

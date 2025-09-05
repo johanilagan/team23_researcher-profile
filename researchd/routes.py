@@ -35,7 +35,7 @@ def privacy():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        user = User.query.filter_by(email=form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user)
             flash("Login successful!", "success")
@@ -47,10 +47,25 @@ def login():
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data)
+        # check if email already exists
+        existing_user = User.query.filter_by(email=form.email.data).first()
+        if existing_user:
+            flash("Email already registered. Please login.", "warning")
+            return redirect(url_for("auth.register"))
+        
+        # create new user
+        user = User(
+            email=form.email.data,
+            first_name=form.first_name.data,
+            last_name=form.last_name.data,
+            institution=form.institution.data,
+            position=form.position.data
+        )
         user.set_password(form.password.data)
+
         db.session.add(user)
         db.session.commit()
+
         flash("Account created! Please login.", "success")
         return redirect(url_for("auth.login"))
     return render_template("register.html", form=form)

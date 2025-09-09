@@ -12,8 +12,9 @@ def home():
     return render_template("homepage.html")
 
 @main.route("/profile")
+@login_required
 def profile():
-    return render_template("profile_page.html")
+    return render_template("profile_page.html", user=current_user)
 
 @main.route("/search")
 def search():

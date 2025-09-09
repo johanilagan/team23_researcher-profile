@@ -90,9 +90,9 @@
                 </div>
                 <div class="col-md-9">
                     <div class="profile-info">
-                        <h1 id="researcher-name">Dr. Jane Smith</h1>
-                        <p class="title" id="researcher-title">Associate Professor of Computer Science</p>
-                        <p class="institution" id="researcher-institution">University of Technology</p>
+                        <h1 id="researcher-name">{{ user.first_name }} {{ user.last_name }}</h1>
+                        <p class="title" id="researcher-title">{{ user.position }}</p>
+                        <p class="institution" id="researcher-institution">{{ user.institution }}</p>
                         <p class="bio" id="researcher-bio">Leading researcher in artificial intelligence and machine learning with over 15 years of experience in developing innovative algorithms for data analysis.</p>
                         
                         <!-- Social Media Links -->

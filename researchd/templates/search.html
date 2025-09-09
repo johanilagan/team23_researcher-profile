@@ -41,23 +41,33 @@
                             <i class="fas fa-search"></i> Search
                         </a>
                     </li>
+                    {% if current_user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('main.profile') }}">
                             <i class="fas fa-user"></i> Profile
                         </a>
                     </li>
+                    {% else %}
+                    
+                    {% endif %}
                 </ul>
                 
                 <div class="navbar-nav">
                     <!-- Authentication buttons - shown when not logged in -->
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('auth.logout') }}" class="btn btn-danger btn-lg">
+                                <i class="fas fa-sign-out-alt me-2"></i>Sign Out
+                            </a>
+                    {% else %}
                     <div class="auth-buttons" id="auth-buttons">
-                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-sm me-2">
+                        <a class="btn btn-outline-light btn-sm me-2" href="{{ url_for('auth.login') }}">
                             <i class="fas fa-sign-in-alt"></i> Sign In
                         </a>
-                        <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-sm">
+                        <a class="btn btn-light btn-sm" href="{{ url_for('auth.register') }}">
                             <i class="fas fa-user-plus"></i> Register
                         </a>
                     </div>
+                    {% endif %}
                     
                     <!-- User menu - shown when logged in -->
                     <div class="user-menu d-none" id="user-menu">

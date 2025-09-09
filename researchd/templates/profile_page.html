@@ -41,14 +41,9 @@
                 
                 <div class="navbar-nav">
                     <!-- Authentication buttons - shown when not logged in -->
-                    <div class="auth-buttons" id="auth-buttons">
-                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-sm me-2">
-                            <i class="fas fa-sign-in-alt"></i> Sign In
-                        </a>
-                        <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-sm">
-                            <i class="fas fa-user-plus"></i> Register
-                        </a>
-                    </div>
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-danger btn-lg">
+                                <i class="fas fa-sign-out-alt me-2"></i>Sign Out
+                    </a>
                     
                     <!-- User menu - shown when logged in -->
                     <div class="user-menu d-none" id="user-menu">

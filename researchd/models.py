@@ -22,11 +22,15 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    
+    def get_id(self):
+        return str(self.uid)
 
 
 class Profile(db.Model):
+    __tablename__ = "profiles"
     pid = db.Column(db.Integer, primary_key=True)
-    uid = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, unique=True, index=True)
+    uid = db.Column(db.Integer, db.ForeignKey('user.uid'), nullable=False, unique=True, index=True)
     
     name = db.Column(db.String(150))
     title = db.Column(db.String(150))
@@ -49,7 +53,7 @@ class Profile(db.Model):
 
 class Education(db.Model):
     eid = db.Column(db.Integer, primary_key=True)  # EducationID
-    pid = db.Column(db.Integer, db.ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    pid = db.Column(db.Integer, db.ForeignKey("profiles.pid", ondelete="CASCADE"), nullable=False, index=True)
 
     degree = db.Column(db.String(150), nullable=False)
     institution = db.Column(db.String(150), nullable=False)
@@ -61,7 +65,7 @@ class Education(db.Model):
 
 class Experience(db.Model):
     exid = db.Column(db.Integer, primary_key=True)  # ExperienceID
-    pid = db.Column(db.Integer, db.ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    pid = db.Column(db.Integer, db.ForeignKey("profiles.pid", ondelete="CASCADE"), nullable=False, index=True)
 
     role = db.Column(db.String(150), nullable=False)
     institution = db.Column(db.String(150), nullable=False)
@@ -75,7 +79,7 @@ class File(db.Model):
     __tablename__ = "files"
 
     fid = db.Column(db.Integer, primary_key=True)  # FileID
-    pid = db.Column(db.Integer, db.ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    pid = db.Column(db.Integer, db.ForeignKey("profiles.pid", ondelete="CASCADE"), nullable=False, index=True)
 
     file_name = db.Column(db.String(255), nullable=False)
     file_type = db.Column(db.String(50))          # e.g., 'pdf', 'png'
@@ -91,7 +95,7 @@ class Photo(db.Model):
     __tablename__ = "photos"
 
     photoid = db.Column(db.Integer, primary_key=True)  # PhotoID
-    pid = db.Column(db.Integer, db.ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    pid = db.Column(db.Integer, db.ForeignKey("profiles.pid", ondelete="CASCADE"), nullable=False, index=True)
 
     file_path = db.Column(db.String(500), nullable=False)
     caption = db.Column(db.String(255))
@@ -104,7 +108,7 @@ class Social(db.Model):
     __tablename__ = "socials"
 
     sid = db.Column(db.Integer, primary_key=True)  # SocialID
-    pid = db.Column(db.Integer, db.ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    pid = db.Column(db.Integer, db.ForeignKey("profiles.pid", ondelete="CASCADE"), nullable=False, index=True)
 
     platform = db.Column(db.String(50), nullable=False)  # 'LinkedIn', 'Twitter', etc.
     url = db.Column(db.String(500), nullable=False)
@@ -116,7 +120,7 @@ class Publication(db.Model):
     __tablename__ = "publications"
 
     pubid = db.Column(db.Integer, primary_key=True)  # PublicationID
-    pid = db.Column(db.Integer, db.ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    pid = db.Column(db.Integer, db.ForeignKey("profiles.pid", ondelete="CASCADE"), nullable=False, index=True)
 
     title = db.Column(db.String(300), nullable=False)
     journal = db.Column(db.String(200))
@@ -125,7 +129,7 @@ class Publication(db.Model):
     url = db.Column(db.String(500))
 
     # Optional link to a stored File (e.g., the uploaded PDF)
-    fid = db.Column(db.Integer, db.ForeignKey("files.id", ondelete="SET NULL"), nullable=True)
+    fid = db.Column(db.Integer, db.ForeignKey("files.fid", ondelete="SET NULL"), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
 
     profile = db.relationship("Profile", back_populates="publications")

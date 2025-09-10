@@ -1,6 +1,9 @@
 from researchd import create_app
+from researchd.seed import seed
 
 app = create_app()
+
+app.cli.add_command(seed)
 
 if __name__ == "__main__":
     with app.app_context():

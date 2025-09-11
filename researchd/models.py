@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
 class User(UserMixin, db.Model):
-    uid = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(150), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
     is_active = db.Column(db.Boolean, default = True)
@@ -24,13 +24,13 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
     
     def get_id(self):
-        return str(self.uid)
+        return str(self.id)
 
 
 class Profile(db.Model):
     __tablename__ = "profiles"
     pid = db.Column(db.Integer, primary_key=True)
-    uid = db.Column(db.Integer, db.ForeignKey('user.uid'), nullable=False, unique=True, index=True)
+    uid = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, unique=True, index=True)
     
     name = db.Column(db.String(150))
     title = db.Column(db.String(150))

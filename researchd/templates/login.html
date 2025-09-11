@@ -33,8 +33,11 @@
                         </div>
 
                         <!-- Password -->
-                        <div class="mb-3">
-                            {{ form.password(class="form-control", placeholder="Password", required=True) }}
+                        <div class="input mb-3">
+                            <div class="password-container">
+                                {{ form.password(class="form-control", placeholder="Password", required=True, id="password") }}
+                                <i class='bxr bx-eye-slash toggle-eye' onclick="togglePassword('password')"></i>
+                            </div>
                             {% for error in form.password.errors %}
                                 <div class="text-danger">{{ error }}</div>
                             {% endfor %}
@@ -47,4 +50,22 @@
             </div>
         </div>
     </div>
+
+<script>
+// Simple password toggle function
+function togglePassword(fieldId) {
+    const passwordField = document.getElementById(fieldId);
+    const eye = passwordField.parentElement.querySelector('.toggle-eye');
+
+    if (passwordField.type === "password") {
+        passwordField.type = "text";
+        eye.classList.remove('bx-eye-slash');
+        eye.classList.add('bx-eye');
+    } else {
+        passwordField.type = "password";
+        eye.classList.remove('bx-eye');
+        eye.classList.add('bx-eye-slash');
+    }
+}
+</script>
 {% endblock %}

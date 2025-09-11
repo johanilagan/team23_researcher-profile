@@ -55,16 +55,38 @@
 
                             <!-- Password -->
                             <div class="input mb-3">
-                                {{ form.password(class="form-control", placeholder="Password", required=True) }}
-                                <i class='bx bx-lock'></i>
+                                <div class="password-container">
+                                    {{ form.password(class="form-control", placeholder="Password", required=True, id="password") }}
+                                    <i class='bxr bx-eye-slash toggle-eye' onclick="togglePassword('password')"></i>
+                                </div>
                                 {% for error in form.password.errors %}
                                     <div class="text-danger">{{ error }}</div>
                                 {% endfor %}
                             </div>
+                            
+                            <!-- Password Requirements -->
+                            <div class="password-requirements mb-3" id="password-requirements">
+                                <div class="requirement" id="req-length">
+                                    <i class='bx bx-x'></i>
+                                    <span>Minimum 6 characters</span>
+                                </div>
+                                <div class="requirement" id="req-uppercase">
+                                    <i class='bx bx-x'></i>
+                                    <span>At least 1 uppercase letter</span>
+                                </div>
+                                <div class="requirement" id="req-number">
+                                    <i class='bx bx-x'></i>
+                                    <span>At least 1 number</span>
+                                </div>
+                                <div class="requirement" id="req-special">
+                                    <i class='bx bx-x'></i>
+                                    <span>At least 1 special character</span>
+                                </div>
+                            </div>
 
                             <!-- Confirm Password -->
                             <div class="input mb-3">
-                                {{ form.confirm_password(class="form-control", placeholder="Confirm Password", required=True) }}
+                                {{ form.confirm_password(class="form-control", placeholder="Confirm Password", required=True, id="confirm-password") }}
                                 <i class='bx bx-lock'></i>
                                 {% for error in form.confirm_password.errors %}
                                     <div class="text-danger">{{ error }}</div>
@@ -95,4 +117,74 @@
                 </div>
             </div>
         </div>
+
+<script>
+// Simple password toggle function
+function togglePassword(fieldId) {
+    const passwordField = document.getElementById(fieldId);
+    const eye = passwordField.parentElement.querySelector('.toggle-eye');
+
+    if (passwordField.type === "password") {
+        passwordField.type = "text";
+        eye.classList.remove('bx-eye-slash');
+        eye.classList.add('bx-eye');
+    } else {
+        passwordField.type = "password";
+        eye.classList.remove('bx-eye');
+        eye.classList.add('bx-eye-slash');
+    }
+}
+
+// Password requirements functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordField = document.getElementById('password');
+    const passwordRequirements = document.getElementById('password-requirements');
+
+    // Password requirements validation
+    function checkPasswordRequirements(password) {
+        const requirements = {
+            length: password.length >= 6,
+            uppercase: /[A-Z]/.test(password),
+            number: /\d/.test(password),
+            special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
+        };
+
+        return requirements;
+    }
+
+    function updatePasswordRequirements(password) {
+        const requirements = checkPasswordRequirements(password);
+        
+        // Update each requirement indicator
+        document.getElementById('req-length').innerHTML = 
+            `<i class='bx ${requirements.length ? 'bx-check' : 'bx-x'}'></i><span>Minimum 6 characters</span>`;
+        
+        document.getElementById('req-uppercase').innerHTML = 
+            `<i class='bx ${requirements.uppercase ? 'bx-check' : 'bx-x'}'></i><span>At least 1 uppercase letter</span>`;
+        
+        document.getElementById('req-number').innerHTML = 
+            `<i class='bx ${requirements.number ? 'bx-check' : 'bx-x'}'></i><span>At least 1 number</span>`;
+        
+        document.getElementById('req-special').innerHTML = 
+            `<i class='bx ${requirements.special ? 'bx-check' : 'bx-x'}'></i><span>At least 1 special character</span>`;
+    }
+
+    // Show/hide password requirements based on focus
+    passwordField.addEventListener('focus', function() {
+        passwordRequirements.style.display = 'block';
+    });
+
+    passwordField.addEventListener('blur', function() {
+        // Keep requirements visible if password has content
+        if (this.value.length === 0) {
+            passwordRequirements.style.display = 'none';
+        }
+    });
+
+    // Real-time password validation
+    passwordField.addEventListener('input', function() {
+        updatePasswordRequirements(this.value);
+    });
+});
+</script>
 {% endblock %}

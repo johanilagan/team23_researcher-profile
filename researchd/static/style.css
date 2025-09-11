@@ -550,6 +550,7 @@ body {
     top: 50%;
     transform: translateY(-50%);
     color: #aaa;
+    z-index: 5;
 }
 
 .input {
@@ -991,6 +992,84 @@ body {
     box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
 }
 
+/* Password Requirements Styles */
+.password-requirements {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-top: 0.5rem;
+    display: none;
+    border: 1px solid #e9ecef;
+}
+
+.password-requirements.show {
+    display: block;
+}
+
+.requirement {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #6c757d;
+    transition: color 0.3s ease;
+}
+
+.requirement:last-child {
+    margin-bottom: 0;
+}
+
+.requirement i {
+    margin-right: 0.75rem;
+    font-size: 1rem;
+    width: 16px;
+    text-align: center;
+}
+
+.requirement .bx-check {
+    color: #28a745;
+}
+
+.requirement .bx-x {
+    color: #dc3545;
+}
+
+
+/* Password container styling */
+.password-container {
+    position: relative;
+    width: 100%;
+}
+
+.password-container input {
+    padding-right: 35px; /* space for the eye icon */
+    width: 100%;
+}
+
+/* Password toggle eye icon */
+.toggle-eye {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 20px;
+    user-select: none;
+    z-index: 10;
+    transition: all 0.3s ease;
+    color: #667eea;
+    padding: 4px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.toggle-eye:hover {
+    color: #667eea;
+    transform: translateY(-50%) scale(1.1);
+    background: rgba(102, 126, 234, 0.1);
+}
+
 /* Responsive adjustments for new pages */
 @media (max-width: 768px) {
     .privacy-content {
@@ -1011,5 +1090,13 @@ body {
     
     .logout-card {
         padding: 1.5rem;
+    }
+    
+    .password-requirements {
+        padding: 0.75rem;
+    }
+    
+    .requirement {
+        font-size: 0.85rem;
     }
 }

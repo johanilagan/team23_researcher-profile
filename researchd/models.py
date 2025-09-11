@@ -16,6 +16,8 @@ class User(UserMixin, db.Model):
     profile_pic_url = db.Column(db.String(255), nullable=True)
     institution = db.Column(db.String(150), nullable=True)
     position = db.Column(db.String(100), nullable=True)
+    profile_pic = db.Column(db.String(255), nullable=True)
+
     
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

@@ -24,7 +24,7 @@ def seed():
 
     # Creates sample profile
     profile = Profile(
-        uid = user.uid,
+        user_id = user.id,
         name = "Alice Smith",
         title = "Professor of Biology",
         institution = "Example University",

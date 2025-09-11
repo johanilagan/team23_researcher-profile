@@ -18,8 +18,8 @@ def my_profile():
 
 @main.route("/profile/<int:researcher_id>")
 def researcher_profile(researcher_id):
-    researcher = User.query.filter_by(uid=researcher_id).first_or_404()
-    is_owner = current_user.is_authenticated and current_user.uid == researcher.uid
+    researcher = User.query.filter_by(id=researcher_id).first_or_404()
+    is_owner = current_user.is_authenticated and current_user.id == researcher.id
     return render_template("profile_page.html", researcher=researcher, is_owner=is_owner)
 
 @main.route("/search")

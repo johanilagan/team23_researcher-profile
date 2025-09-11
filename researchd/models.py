@@ -41,6 +41,7 @@ class Profile(db.Model):
     bio = db.Column(db.Text)
     pfp = db.Column(db.String(255))  # profile picture URL
     location = db.Column(db.String(150))
+    research_interests = db.Column(db.Text)  # comma-separated research interests
     
     user = db.relationship('User', backref=db.backref('profile', uselist=False))
 

@@ -65,6 +65,27 @@
             </div>
         </div>
 
+        <!-- Research Interests -->
+        <div class="interests-section">
+            <div class="section-header">
+                <h2>Research Interests</h2>
+                {% if is_owner %}
+                <button class="btn btn-outline-primary btn-sm" onclick="editInterests()" id="edit-interests-btn">Edit</button>
+                {% endif %}
+            </div>
+            <div class="interests-tags" id="research-interests">
+                {% if researcher.profile and researcher.profile.research_interests and researcher.profile.research_interests.strip() %}
+                    {% for interest in researcher.profile.research_interests.split(',') %}
+                        {% if interest.strip() %}
+                            <span class="interest-tag">{{ interest.strip() }}</span>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <span class="interest-tag">No interests selected yet</span>
+                {% endif %}
+            </div>
+        </div>
+
         <!-- Profile Actions -->
         {% if is_owner %}
         <div class="profile-actions">
@@ -90,21 +111,6 @@
                 <!-- Papers will be dynamically loaded here -->
             </div>
         </div>
-
-        <!-- Research Interests -->
-        <div class="interests-section">
-            <div class="section-header">
-                <h2>Research Interests</h2>
-                <button class="btn btn-outline-primary btn-sm" onclick="editInterests()">Edit</button>
-            </div>
-            <div class="interests-tags" id="research-interests">
-                <span class="interest-tag">Machine Learning</span>
-                <span class="interest-tag">Artificial Intelligence</span>
-                <span class="interest-tag">Data Science</span>
-                <span class="interest-tag">Neural Networks</span>
-                <span class="interest-tag">Computer Vision</span>
-            </div>
-        </div>
         
         <!-- Logout Section -->
         <div class="logout-section text-center py-4">
@@ -125,6 +131,45 @@
     </div>
 
     <!-- Modals -->
+
+    <!-- Custom Edit Interests Modal -->
+    <div id="editInterestsModal" class="custom-modal" style="display: none;">
+        <div class="custom-modal-overlay" onclick="closeModal()"></div>
+        <div class="custom-modal-content">
+            <div class="custom-modal-header">
+                <h5 class="custom-modal-title">Edit Research Interests</h5>
+                <button type="button" class="custom-modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="custom-modal-body">
+                <div class="mb-4">
+                    <label class="form-label">Search and add research interests:</label>
+                    <input type="text" class="form-control" id="interest-search" placeholder="Type to search through 500+ research interests across all academic disciplines...">
+                    <small class="form-text text-muted">Type to search for interests, then click to add them. Click on selected interests below to remove them.</small>
+                </div>
+                
+                <!-- Search Results -->
+                <div class="search-results mb-4" id="search-results" style="display: none;">
+                    <h6>Search Results:</h6>
+                    <div id="search-results-list" class="search-results-container">
+                        <!-- Search results will appear here -->
+                    </div>
+                </div>
+                
+                <!-- Selected Interests -->
+                <div class="selected-interests">
+                    <h6>Your Research Interests: <span id="selected-count" class="badge bg-success">0</span></h6>
+                    <div id="selected-interests-list" class="selected-interests-container">
+                        <!-- Selected interests will appear here -->
+                    </div>
+                    <small class="form-text text-muted mt-2">Click on any interest below to remove it from your profile.</small>
+                </div>
+            </div>
+            <div class="custom-modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveInterests()">Save Interests</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Add Paper Modal -->
     <div class="modal fade" id="addPaperModal" tabindex="-1">
@@ -218,8 +263,22 @@
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, initializing...');
             loadRecentPapers();
             updateStats();
+            
+            // Setup button
+            const editBtn = document.getElementById('edit-interests-btn');
+            if (editBtn) {
+                console.log('Edit button found, adding click listener');
+                editBtn.addEventListener('click', function(e) {
+                    console.log('Button clicked via event listener');
+                    e.preventDefault();
+                    editInterests();
+                });
+            } else {
+                console.log('Edit button not found');
+            }
         });
 
         // Load recent papers
@@ -332,9 +391,353 @@
             showNotification('Full papers list coming soon!', 'info');
         }
 
+        // Research interests data
+        const researchInterests = [
+            'Machine Learning', 'Artificial Intelligence', 'Data Science', 'Deep Learning',
+            'Neural Networks', 'Computer Vision', 'Natural Language Processing', 'Robotics',
+            'Algorithm Design', 'Data Mining', 'Big Data', 'Statistics', 'Probability',
+            'Optimization', 'Linear Algebra', 'Calculus', 'Discrete Mathematics',
+            'Software Engineering', 'Computer Programming', 'Database Systems', 'Information Systems',
+            'Cybersecurity', 'Cryptography', 'Network Security', 'Information Security',
+            'Human-Computer Interaction', 'User Experience Design', 'Web Development',
+            'Mobile Development', 'Cloud Computing', 'Distributed Systems', 'Operating Systems',
+            'Computer Architecture', 'Embedded Systems', 'IoT', 'Blockchain', 'Quantum Computing',
+            'Bioinformatics', 'Computational Biology', 'Digital Signal Processing',
+            'Image Processing', 'Pattern Recognition', 'Computer Graphics', 'Game Development',
+            'Virtual Reality', 'Augmented Reality', 'Mixed Reality', 'Computer Animation',
+            'Scientific Computing', 'High Performance Computing', 'Parallel Computing',
+            'Machine Translation', 'Speech Recognition', 'Text Mining', 'Information Retrieval',
+            'Recommender Systems', 'Social Network Analysis', 'Graph Theory', 'Complexity Theory',
+            'Automata Theory', 'Formal Methods', 'Software Testing', 'Quality Assurance',
+            'Project Management', 'Agile Development', 'DevOps', 'Microservices',
+            'API Development', 'RESTful Services', 'GraphQL', 'Web Services',
+            'Data Visualization', 'Business Intelligence', 'Analytics', 'Predictive Modeling',
+            'Time Series Analysis', 'Regression Analysis', 'Classification', 'Clustering',
+            'Dimensionality Reduction', 'Feature Engineering', 'Model Selection',
+            'Cross-Validation', 'Hyperparameter Tuning', 'Ensemble Methods',
+            'Reinforcement Learning', 'Transfer Learning', 'Federated Learning',
+            'Explainable AI', 'Ethical AI', 'AI Ethics', 'Fairness in AI',
+            'Bias in AI', 'AI Safety', 'Robust AI', 'Adversarial AI',
+            'Generative AI', 'Large Language Models', 'Transformers', 'BERT', 'GPT',
+            'Computer Networks', 'Internet Protocols', 'Wireless Networks', '5G',
+            'Edge Computing', 'Fog Computing', 'Serverless Computing', 'Containerization',
+            'Docker', 'Kubernetes', 'Infrastructure as Code', 'Configuration Management',
+            'Version Control', 'Git', 'Continuous Integration', 'Continuous Deployment',
+            'Monitoring', 'Logging', 'Debugging', 'Performance Optimization',
+            'Scalability', 'Reliability', 'Fault Tolerance', 'Load Balancing',
+            'Caching', 'CDN', 'Content Delivery', 'API Gateway', 'Service Mesh',
+            'Event-Driven Architecture', 'Message Queues', 'Event Streaming',
+            'Data Pipelines', 'ETL', 'Data Warehousing', 'Data Lakes',
+            'Real-time Processing', 'Stream Processing', 'Batch Processing',
+            'Data Governance', 'Data Privacy', 'GDPR', 'Compliance',
+            'Risk Management', 'Audit', 'Logging', 'Compliance Monitoring',
+            'Machine Learning Operations', 'MLOps', 'Model Deployment', 'Model Monitoring',
+            'A/B Testing', 'Experimentation', 'Statistical Testing', 'Hypothesis Testing',
+            
+            // Physical Sciences
+            'Physics', 'Quantum Physics', 'Theoretical Physics', 'Experimental Physics',
+            'Astrophysics', 'Cosmology', 'Particle Physics', 'Nuclear Physics',
+            'Materials Science', 'Nanotechnology', 'Chemistry', 'Organic Chemistry',
+            'Inorganic Chemistry', 'Physical Chemistry', 'Biochemistry', 'Chemical Engineering',
+            'Earth Sciences', 'Geology', 'Geophysics', 'Astronomy', 'Planetary Science',
+            'Environmental Science', 'Climate Change', 'Ecology', 'Conservation Biology',
+            
+            // Life Sciences & Medicine
+            'Biology', 'Molecular Biology', 'Cell Biology', 'Genetics', 'Genomics',
+            'Neuroscience', 'Psychology', 'Medicine', 'Clinical Research', 'Public Health',
+            'Cancer Research', 'Pharmacology', 'Epidemiology', 'Biomedical Engineering',
+            'Nutrition Science', 'Agricultural Science', 'Veterinary Science',
+            
+            // Mathematics & Statistics
+            'Mathematics', 'Pure Mathematics', 'Applied Mathematics', 'Algebra',
+            'Geometry', 'Calculus', 'Probability Theory', 'Mathematical Statistics',
+            'Optimization Theory', 'Game Theory', 'Mathematical Modeling',
+            
+            // Engineering
+            'Engineering', 'Mechanical Engineering', 'Civil Engineering', 'Electrical Engineering',
+            'Aerospace Engineering', 'Environmental Engineering', 'Materials Engineering',
+            'Renewable Energy', 'Robotics Engineering', 'Biotechnology',
+            
+            // Social Sciences
+            'Sociology', 'Political Science', 'International Relations', 'Economics',
+            'Anthropology', 'Archaeology', 'Geography', 'Urban Planning',
+            'Criminology', 'Criminal Justice', 'Public Policy',
+            
+            // Humanities
+            'History', 'Literature', 'Philosophy', 'Linguistics', 'Art', 'Music',
+            'Religious Studies', 'Cultural Studies', 'Media Studies',
+            
+            // Education
+            'Education', 'Educational Psychology', 'Learning Sciences', 'Curriculum Studies',
+            'Educational Technology', 'Higher Education', 'Teacher Education',
+            
+            // Business & Management
+            'Business Administration', 'Management', 'Marketing', 'Finance',
+            'Entrepreneurship', 'International Business', 'Human Resource Management',
+            
+            // Law & Legal Studies
+            'Law', 'Constitutional Law', 'Criminal Law', 'International Law',
+            'Intellectual Property Law', 'Environmental Law', 'Legal Studies',
+            
+            // Research Methods & Skills
+            'Research Methodology', 'Experimental Design', 'Survey Design',
+            'Qualitative Research', 'Quantitative Research', 'Mixed Methods Research',
+            'Academic Writing', 'Technical Writing', 'Grant Writing', 'Teaching',
+            'Presentation Skills', 'Public Speaking', 'Mentoring', 'Collaboration',
+            'Project Management', 'Innovation', 'Creativity', 'Problem Solving',
+            'Critical Thinking', 'Analytical Skills', 'Research Skills',
+            'Literature Review', 'Funding', 'Communication', 'Leadership'
+        ];
+
+        let selectedInterests = [];
+        let availableInterests = [...researchInterests];
+
+        // Test function - can be called from browser console
+        function testModal() {
+            console.log('Testing modal...');
+            const modalElement = document.getElementById('editInterestsModal');
+            if (modalElement) {
+                console.log('Modal element found');
+                modalElement.style.display = 'flex';
+                console.log('Modal should be showing');
+            } else {
+                console.error('Modal element not found');
+            }
+        }
+
+        // Show custom modal
+        function showModal() {
+            const modal = document.getElementById('editInterestsModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            }
+        }
+
+        // Close custom modal
+        function closeModal() {
+            const modal = document.getElementById('editInterestsModal');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto'; // Restore scrolling
+            }
+        }
+
         // Edit interests
         function editInterests() {
-            showNotification('Interest editing feature coming soon!', 'info');
+            console.log('Edit interests clicked');
+            
+            try {
+                // Get current interests from the page
+                const currentInterests = [];
+                const interestTags = document.querySelectorAll('#research-interests .interest-tag');
+                interestTags.forEach(tag => {
+                    const interest = tag.textContent.trim();
+                    // Skip the placeholder text
+                    if (interest !== 'No interests selected yet') {
+                        currentInterests.push(interest);
+                    }
+                });
+                
+                console.log('Current interests from page:', currentInterests);
+                
+                selectedInterests = [...currentInterests];
+                availableInterests = researchInterests.filter(interest => 
+                    !selectedInterests.includes(interest)
+                );
+                
+                console.log('Selected interests:', selectedInterests);
+                console.log('Available interests count:', availableInterests.length);
+                
+                updateInterestsDisplay();
+                
+                // Clear search input
+                const searchInput = document.getElementById('interest-search');
+                if (searchInput) {
+                    searchInput.value = '';
+                }
+                
+                initializeSearch();
+                
+                // Show modal
+                showModal();
+                console.log('Modal should be showing now');
+                
+            } catch (error) {
+                console.error('Error in editInterests:', error);
+                alert('Error opening interests editor: ' + error.message);
+            }
+        }
+
+        // Update interests display in modal
+        function updateInterestsDisplay() {
+            console.log('Updating interests display');
+            const selectedContainer = document.getElementById('selected-interests-list');
+            
+            if (!selectedContainer) {
+                console.error('Selected container not found');
+                return;
+            }
+            
+            // Clear selected container
+            selectedContainer.innerHTML = '';
+            
+            console.log('Adding selected interests:', selectedInterests.length);
+            // Add selected interests
+            selectedInterests.forEach(interest => {
+                const tag = document.createElement('span');
+                tag.className = 'interest-tag selected-tag';
+                tag.textContent = interest;
+                tag.onclick = () => removeInterest(interest);
+                selectedContainer.appendChild(tag);
+            });
+            
+            // Update counter
+            const counter = document.getElementById('selected-count');
+            if (counter) {
+                counter.textContent = selectedInterests.length;
+            }
+        }
+
+        // Update search results
+        function updateSearchResults(searchTerm) {
+            const searchResultsDiv = document.getElementById('search-results');
+            const searchResultsList = document.getElementById('search-results-list');
+            
+            if (!searchResultsDiv || !searchResultsList) {
+                console.error('Search results elements not found');
+                return;
+            }
+            
+            // Clear previous results
+            searchResultsList.innerHTML = '';
+            
+            if (searchTerm.length < 2) {
+                searchResultsDiv.style.display = 'none';
+                return;
+            }
+            
+            // Filter interests based on search term
+            const filteredInterests = researchInterests.filter(interest => 
+                interest.toLowerCase().includes(searchTerm.toLowerCase()) &&
+                !selectedInterests.includes(interest)
+            );
+            
+            if (filteredInterests.length === 0) {
+                searchResultsDiv.style.display = 'none';
+                return;
+            }
+            
+            // Show search results
+            searchResultsDiv.style.display = 'block';
+            
+            // Add filtered interests
+            filteredInterests.slice(0, 20).forEach(interest => { // Limit to 20 results
+                const tag = document.createElement('span');
+                tag.className = 'interest-tag available-tag';
+                tag.textContent = interest;
+                tag.onclick = () => addInterest(interest);
+                searchResultsList.appendChild(tag);
+            });
+            
+            if (filteredInterests.length > 20) {
+                const moreTag = document.createElement('span');
+                moreTag.className = 'interest-tag more-results';
+                moreTag.textContent = `... and ${filteredInterests.length - 20} more`;
+                moreTag.style.fontStyle = 'italic';
+                moreTag.style.opacity = '0.7';
+                searchResultsList.appendChild(moreTag);
+            }
+        }
+
+        // Add interest
+        function addInterest(interest) {
+            console.log('Adding interest:', interest);
+            if (!selectedInterests.includes(interest)) {
+                selectedInterests.push(interest);
+                updateInterestsDisplay();
+                
+                // Update search results to remove the added interest
+                const searchInput = document.getElementById('interest-search');
+                if (searchInput) {
+                    updateSearchResults(searchInput.value);
+                }
+            }
+        }
+
+        // Remove interest
+        function removeInterest(interest) {
+            console.log('Removing interest:', interest);
+            selectedInterests = selectedInterests.filter(i => i !== interest);
+            updateInterestsDisplay();
+            
+            // Update search results to show the removed interest again
+            const searchInput = document.getElementById('interest-search');
+            if (searchInput) {
+                updateSearchResults(searchInput.value);
+            }
+        }
+
+        // Save interests
+        function saveInterests() {
+            console.log('Saving interests:', selectedInterests);
+            
+            // Update the page display
+            const interestsContainer = document.getElementById('research-interests');
+            interestsContainer.innerHTML = '';
+            
+            if (selectedInterests.length === 0) {
+                const tag = document.createElement('span');
+                tag.className = 'interest-tag';
+                tag.textContent = 'No interests selected yet';
+                interestsContainer.appendChild(tag);
+            } else {
+                selectedInterests.forEach(interest => {
+                    const tag = document.createElement('span');
+                    tag.className = 'interest-tag';
+                    tag.textContent = interest;
+                    interestsContainer.appendChild(tag);
+                });
+            }
+            
+            // Send to server
+            const interestsString = selectedInterests.join(',');
+            console.log('Sending to server:', interestsString);
+            
+            fetch('/update-interests', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    interests: interestsString
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Server response:', data);
+                if (data.success) {
+                    showNotification('Research interests updated successfully!', 'success');
+                    closeModal();
+                } else {
+                    showNotification('Error updating interests. Please try again.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error updating interests. Please try again.', 'error');
+            });
+        }
+
+        // Initialize search functionality when modal is shown
+        function initializeSearch() {
+            const searchInput = document.getElementById('interest-search');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value;
+                    updateSearchResults(searchTerm);
+                });
+            }
         }
 
         // Show notification

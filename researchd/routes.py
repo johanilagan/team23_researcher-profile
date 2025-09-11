@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_user, login_required, logout_user, current_user
 from .forms import LoginForm, RegisterForm, EditProfileForm
 from .models import User, Profile, Social
@@ -23,6 +23,8 @@ def my_profile():
         profile = Profile(user_id=user.id)
         db.session.add(profile)
         db.session.commit()
+    
+    print(f"Loading profile for user {user.id}, interests: {profile.research_interests}")
     
     return render_template("profile_page.html", researcher=user, is_owner=True)
 
@@ -149,6 +151,33 @@ def edit_profile():
             form.github_url.data = socials.get('GitHub', '')
     
     return render_template("edit_profile.html", form=form)
+
+@main.route("/update-interests", methods=["POST"])
+@login_required
+def update_interests():
+    try:
+        data = request.get_json()
+        interests = data.get('interests', '')
+        
+        print(f"Updating interests for user {current_user.id}: {interests}")
+        
+        # Get or create profile
+        profile = Profile.query.filter_by(user_id=current_user.id).first()
+        if not profile:
+            profile = Profile(user_id=current_user.id)
+            db.session.add(profile)
+        
+        # Update research interests
+        profile.research_interests = interests
+        db.session.commit()
+        
+        print(f"Interests saved successfully: {profile.research_interests}")
+        return jsonify({'success': True})
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error updating interests: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)})
 
 @auth.route("/login", methods=["GET", "POST"])
 def login():

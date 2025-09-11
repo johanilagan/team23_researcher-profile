@@ -42,7 +42,7 @@ class Profile(db.Model):
     pfp = db.Column(db.String(255))  # profile picture URL
     location = db.Column(db.String(150))
     
-    user = db.relationship('User', backref=db.backref('profile'))
+    user = db.relationship('User', backref=db.backref('profile', uselist=False))
 
     # collections
     educations = db.relationship("Education", back_populates="profile", cascade="all, delete-orphan", passive_deletes=True)

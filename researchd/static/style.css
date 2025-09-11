@@ -124,7 +124,17 @@ body {
 .institution {
     color: #7f8c8d;
     font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.location {
+    color: #95a5a6;
+    font-size: 1rem;
     margin-bottom: 1rem;
+}
+
+.location i {
+    color: #e74c3c;
 }
 
 .bio {

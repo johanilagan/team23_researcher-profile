@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, login_required, logout_user, current_user
-from .forms import LoginForm, RegisterForm
-from .models import User
+from .forms import LoginForm, RegisterForm, EditProfileForm
+from .models import User, Profile, Social
 from . import db
 
 auth = Blueprint("auth", __name__)
@@ -14,12 +14,34 @@ def home():
 @main.route("/profile")
 @login_required
 def my_profile():
-    return render_template("profile_page.html", researcher=current_user, is_owner=True)
+    # Get fresh user data with profile
+    user = User.query.get(current_user.id)
+    
+    # Ensure profile exists for current user
+    profile = Profile.query.filter_by(user_id=user.id).first()
+    if not profile:
+        profile = Profile(user_id=user.id)
+        db.session.add(profile)
+        db.session.commit()
+    
+    return render_template("profile_page.html", researcher=user, is_owner=True)
 
 @main.route("/profile/<int:researcher_id>")
 def researcher_profile(researcher_id):
-    researcher = User.query.filter_by(id=researcher_id).first_or_404()
+    researcher = User.query.get(researcher_id)
+    if not researcher:
+        from flask import abort
+        abort(404)
+    
     is_owner = current_user.is_authenticated and current_user.id == researcher.id
+    
+    # Ensure profile exists for the researcher
+    profile = Profile.query.filter_by(user_id=researcher.id).first()
+    if not profile:
+        profile = Profile(user_id=researcher.id)
+        db.session.add(profile)
+        db.session.commit()
+    
     return render_template("profile_page.html", researcher=researcher, is_owner=is_owner)
 
 @main.route("/search")
@@ -50,6 +72,83 @@ def contact():
 @main.route("/privacy")
 def privacy():
     return render_template("privacy.html")
+
+@main.route("/edit-profile", methods=["GET", "POST"])
+@login_required
+def edit_profile():
+    form = EditProfileForm()
+    
+    if form.validate_on_submit():
+        try:
+            # Update User table fields
+            current_user.first_name = form.first_name.data
+            current_user.last_name = form.last_name.data
+            current_user.institution = form.institution.data
+            current_user.position = form.position.data
+            
+            # Get or create Profile record
+            profile = Profile.query.filter_by(user_id=current_user.id).first()
+            if not profile:
+                profile = Profile(user_id=current_user.id)
+                db.session.add(profile)
+            
+            # Update Profile table fields
+            profile.name = f"{form.first_name.data} {form.last_name.data}"
+            profile.institution = form.institution.data
+            profile.bio = form.bio.data
+            profile.location = form.location.data
+            
+            # Update social media links
+            social_platforms = {
+                'LinkedIn': form.linkedin_url.data,
+                'Twitter': form.twitter_url.data,
+                'Instagram': form.instagram_url.data,
+                'GitHub': form.github_url.data
+            }
+            
+            for platform, url in social_platforms.items():
+                if url:  # Only add if URL is provided
+                    social = Social.query.filter_by(pid=profile.pid, platform=platform).first()
+                    if social:
+                        social.url = url
+                    else:
+                        social = Social(pid=profile.pid, platform=platform, url=url)
+                        db.session.add(social)
+                else:
+                    # Remove social link if URL is empty
+                    social = Social.query.filter_by(pid=profile.pid, platform=platform).first()
+                    if social:
+                        db.session.delete(social)
+            
+            db.session.commit()
+            flash("Profile updated successfully!", "success")
+            return redirect(url_for("main.my_profile"))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash("An error occurred while updating your profile. Please try again.", "danger")
+    
+    # Pre-populate form with current data
+    if request.method == "GET":
+        form.first_name.data = current_user.first_name
+        form.last_name.data = current_user.last_name
+        form.institution.data = current_user.institution
+        form.position.data = current_user.position
+        
+        # Get profile data
+        profile = Profile.query.filter_by(user_id=current_user.id).first()
+        if profile:
+            form.bio.data = profile.bio
+            form.location.data = profile.location
+            
+            # Get social media links
+            socials = {s.platform: s.url for s in profile.socials}
+            form.linkedin_url.data = socials.get('LinkedIn', '')
+            form.twitter_url.data = socials.get('Twitter', '')
+            form.instagram_url.data = socials.get('Instagram', '')
+            form.github_url.data = socials.get('GitHub', '')
+    
+    return render_template("edit_profile.html", form=form)
 
 @auth.route("/login", methods=["GET", "POST"])
 def login():

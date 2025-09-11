@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile - Academic Network{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">
+                        <i class="fas fa-user-edit me-2"></i>Edit Profile
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('main.edit_profile') }}">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Basic Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-user me-2"></i>Basic Information
+                                </h5>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.first_name.label(class="form-label") }}
+                                    {{ form.first_name(class="form-control") }}
+                                    {% if form.first_name.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.first_name.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.last_name.label(class="form-label") }}
+                                    {{ form.last_name(class="form-control") }}
+                                    {% if form.last_name.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.last_name.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.institution.label(class="form-label") }}
+                                    {{ form.institution(class="form-control") }}
+                                    {% if form.institution.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.institution.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.position.label(class="form-label") }}
+                                    {{ form.position(class="form-control") }}
+                                    {% if form.position.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.position.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.location.label(class="form-label") }}
+                            {{ form.location(class="form-control") }}
+                            {% if form.location.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.location.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            {{ form.bio.label(class="form-label") }}
+                            {{ form.bio(class="form-control", rows="4", placeholder="Tell us about yourself, your research interests, and professional background...") }}
+                            {% if form.bio.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.bio.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">Maximum 1000 characters</div>
+                        </div>
+                        
+                        <!-- Social Media Links -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-share-alt me-2"></i>Social Media Links
+                                </h5>
+                                <p class="text-muted">Add your social media profiles to help others connect with you.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.linkedin_url.label(class="form-label") }}
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="fab fa-linkedin text-primary"></i>
+                                        </span>
+                                        {{ form.linkedin_url(class="form-control", placeholder="https://linkedin.com/in/yourprofile") }}
+                                    </div>
+                                    {% if form.linkedin_url.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.linkedin_url.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.twitter_url.label(class="form-label") }}
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="fab fa-twitter text-info"></i>
+                                        </span>
+                                        {{ form.twitter_url(class="form-control", placeholder="https://twitter.com/yourhandle") }}
+                                    </div>
+                                    {% if form.twitter_url.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.twitter_url.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.instagram_url.label(class="form-label") }}
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="fab fa-instagram text-danger"></i>
+                                        </span>
+                                        {{ form.instagram_url(class="form-control", placeholder="https://instagram.com/yourhandle") }}
+                                    </div>
+                                    {% if form.instagram_url.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.instagram_url.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.github_url.label(class="form-label") }}
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="fab fa-github text-dark"></i>
+                                        </span>
+                                        {{ form.github_url(class="form-control", placeholder="https://github.com/yourusername") }}
+                                    </div>
+                                    {% if form.github_url.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.github_url.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ url_for('main.my_profile') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Cancel
+                            </a>
+                            <div>
+                                <button type="button" class="btn btn-outline-secondary me-2" onclick="resetForm()">
+                                    <i class="fas fa-undo me-2"></i>Reset
+                                </button>
+                                {{ form.submit(class="btn btn-primary") }}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function resetForm() {
+        if (confirm('Are you sure you want to reset all changes? This will restore the original values.')) {
+            document.querySelector('form').reset();
+        }
+    }
+    
+    // Character counter for bio
+    document.addEventListener('DOMContentLoaded', function() {
+        const bioTextarea = document.querySelector('textarea[name="bio"]');
+        if (bioTextarea) {
+            const maxLength = 1000;
+            const counter = document.createElement('div');
+            counter.className = 'form-text text-end';
+            counter.textContent = `${bioTextarea.value.length}/${maxLength}`;
+            bioTextarea.parentNode.appendChild(counter);
+            
+            bioTextarea.addEventListener('input', function() {
+                counter.textContent = `${this.value.length}/${maxLength}`;
+                if (this.value.length > maxLength) {
+                    counter.classList.add('text-danger');
+                } else {
+                    counter.classList.remove('text-danger');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

@@ -21,24 +21,44 @@
                 <div class="col-md-9">
                     <div class="profile-info">
                         <h1 id="researcher-name">{{ researcher.first_name }} {{ researcher.last_name }}</h1>
-                        <p class="title" id="researcher-title">{{ researcher.position }}</p>
-                        <p class="institution" id="researcher-institution">{{ researcher.institution }}</p>
-                        <p class="bio" id="researcher-bio">Leading researcher in artificial intelligence and machine learning with over 15 years of experience in developing innovative algorithms for data analysis.</p>
+                        <p class="title" id="researcher-title">{{ researcher.position or 'Position not specified' }}</p>
+                        <p class="institution" id="researcher-institution">{{ researcher.institution or 'Institution not specified' }}</p>
+                        {% if researcher.profile and researcher.profile.location %}
+                        <p class="location" id="researcher-location">
+                            <i class="fas fa-map-marker-alt me-1"></i>{{ researcher.profile.location }}
+                        </p>
+                        {% endif %}
+                        <p class="bio" id="researcher-bio">
+                            {% if researcher.profile and researcher.profile.bio %}
+                                {{ researcher.profile.bio }}
+                            {% else %}
+                                No bio available. Click "Edit Profile" to add your bio.
+                            {% endif %}
+                        </p>
                         
                         <!-- Social Media Links -->
                         <div class="social-links">
-                            <a href="#" class="social-link linkedin" id="linkedin-link">
-                                <i class="fab fa-linkedin"></i> LinkedIn
-                            </a>
-                            <a href="#" class="social-link twitter" id="twitter-link">
-                                <i class="fab fa-twitter"></i> Twitter
-                            </a>
-                            <a href="#" class="social-link instagram" id="instagram-link">
-                                <i class="fab fa-instagram"></i> Instagram
-                            </a>
-                            <a href="#" class="social-link github" id="github-link">
-                                <i class="fab fa-github"></i> GitHub
-                            </a>
+                            {% if researcher.profile %}
+                                {% for social in researcher.profile.socials %}
+                                    {% if social.platform == 'LinkedIn' %}
+                                        <a href="{{ social.url }}" class="social-link linkedin" target="_blank">
+                                            <i class="fab fa-linkedin"></i> LinkedIn
+                                        </a>
+                                    {% elif social.platform == 'Twitter' %}
+                                        <a href="{{ social.url }}" class="social-link twitter" target="_blank">
+                                            <i class="fab fa-twitter"></i> Twitter
+                                        </a>
+                                    {% elif social.platform == 'Instagram' %}
+                                        <a href="{{ social.url }}" class="social-link instagram" target="_blank">
+                                            <i class="fab fa-instagram"></i> Instagram
+                                        </a>
+                                    {% elif social.platform == 'GitHub' %}
+                                        <a href="{{ social.url }}" class="social-link github" target="_blank">
+                                            <i class="fab fa-github"></i> GitHub
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -48,9 +68,9 @@
         <!-- Profile Actions -->
         {% if is_owner %}
         <div class="profile-actions">
-            <button class="btn btn-primary" onclick="editProfile()">
+            <a href="{{ url_for('main.edit_profile') }}" class="btn btn-primary">
                 <i class="fas fa-edit"></i> Edit Profile
-            </button>
+            </a>
             <button class="btn btn-success" onclick="addNewPaper()">
                 <i class="fas fa-plus"></i> Add New Paper
             </button>
@@ -105,63 +125,6 @@
     </div>
 
     <!-- Modals -->
-    <!-- Edit Profile Modal -->
-    <div class="modal fade" id="editProfileModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit Profile</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="edit-profile-form">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Full Name</label>
-                                    <input type="text" class="form-control" id="edit-name" value="Dr. Jane Smith">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Title</label>
-                                    <input type="text" class="form-control" id="edit-title" value="Associate Professor of Computer Science">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Institution</label>
-                                    <input type="text" class="form-control" id="edit-institution" value="University of Technology">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">LinkedIn</label>
-                                    <input type="url" class="form-control" id="edit-linkedin" placeholder="https://linkedin.com/in/...">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Twitter</label>
-                                    <input type="url" class="form-control" id="edit-twitter" placeholder="https://twitter.com/...">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Instagram</label>
-                                    <input type="url" class="form-control" id="edit-instagram" placeholder="https://instagram.com/...">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">GitHub</label>
-                                    <input type="url" class="form-control" id="edit-github" placeholder="https://github.com/...">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Bio</label>
-                            <textarea class="form-control" id="edit-bio" rows="4">Leading researcher in artificial intelligence and machine learning with over 15 years of experience in developing innovative algorithms for data analysis.</textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Add Paper Modal -->
     <div class="modal fade" id="addPaperModal" tabindex="-1">
@@ -310,42 +273,6 @@
             }
         }
 
-        // Edit profile
-        function editProfile() {
-            const modal = new bootstrap.Modal(document.getElementById('editProfileModal'));
-            modal.show();
-        }
-
-        // Save profile changes
-        function saveProfile() {
-            const name = document.getElementById('edit-name').value;
-            const title = document.getElementById('edit-title').value;
-            const institution = document.getElementById('edit-institution').value;
-            const bio = document.getElementById('edit-bio').value;
-            const linkedin = document.getElementById('edit-linkedin').value;
-            const twitter = document.getElementById('edit-twitter').value;
-            const instagram = document.getElementById('edit-instagram').value;
-            const github = document.getElementById('edit-github').value;
-
-            // Update the profile display
-            document.getElementById('researcher-name').textContent = name;
-            document.getElementById('researcher-title').textContent = title;
-            document.getElementById('researcher-institution').textContent = institution;
-            document.getElementById('researcher-bio').textContent = bio;
-
-            // Update social links
-            if (linkedin) document.getElementById('linkedin-link').href = linkedin;
-            if (twitter) document.getElementById('twitter-link').href = twitter;
-            if (instagram) document.getElementById('instagram-link').href = instagram;
-            if (github) document.getElementById('github-link').href = github;
-
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('editProfileModal'));
-            modal.hide();
-
-            // Show success message
-            showNotification('Profile updated successfully!', 'success');
-        }
 
         // Add new paper
         function addNewPaper() {

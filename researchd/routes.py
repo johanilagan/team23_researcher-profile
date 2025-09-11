@@ -13,12 +13,31 @@ def home():
 
 @main.route("/profile")
 @login_required
-def profile():
-    return render_template("profile_page.html", user=current_user)
+def my_profile():
+    return render_template("profile_page.html", researcher=current_user, is_owner=True)
+
+@main.route("/profile/<int:researcher_id>")
+def researcher_profile(researcher_id):
+    researcher = User.query.filter_by(uid=researcher_id).first_or_404()
+    is_owner = current_user.is_authenticated and current_user.uid == researcher.uid
+    return render_template("profile_page.html", researcher=researcher, is_owner=is_owner)
 
 @main.route("/search")
 def search():
-    return render_template("search.html")
+    q = request.args.get("q", "").strip()
+    
+    # Basic query: adjust to your ORM/search logic
+    if q:
+        results = User.query.filter(
+            (User.first_name.ilike(f"%{q}%")) |
+            (User.last_name.ilike(f"%{q}%")) |
+            (User.institution.ilike(f"%{q}%")) |
+            (User.position.ilike(f"%{q}%"))
+        ).all()
+    else:
+        results = User.query.all()  # show all users if no query
+
+    return render_template("search.html", results=results, q=q)
 
 @main.route("/help")
 def help():

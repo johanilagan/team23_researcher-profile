@@ -44,7 +44,7 @@
 
                     {% if current_user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.profile') }}">
+                        <a class="nav-link" href="{{ url_for('main.my_profile') }}">
                             <i class="fas fa-user"></i> Profile
                         </a>
                     </li>
@@ -78,7 +78,7 @@
                                 <i class="fas fa-user-circle"></i> <span id="username">User</span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item" href="{{ url_for('main.profile') }}"><i class="fas fa-user"></i> My Profile</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('main.my_profile') }}"><i class="fas fa-user"></i> My Profile</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('main.search') }}"><i class="fas fa-search"></i> Search Researchers</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('main.help') }}"><i class="fas fa-question-circle"></i> Help Centre</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('main.contact') }}"><i class="fas fa-envelope"></i> Contact Support</a></li>
@@ -202,7 +202,7 @@
                     <ul class="list-unstyled">
                         <li><a href="{{ url_for('main.home') }}" class="text-muted">Home</a></li>
                         <li><a href="{{ url_for('main.search') }}" class="text-muted">Search</a></li>
-                        <li><a href="{{ url_for('main.profile') }}" class="text-muted">Profile</a></li>
+                        <li><a href="{{ url_for('main.my_profile') }}" class="text-muted">Profile</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3">

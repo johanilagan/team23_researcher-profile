@@ -33,7 +33,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="{{ url_for('main.profile') }}">
+                        <a class="nav-link active" href="{{ url_for('main.my_profile') }}">
                             <i class="fas fa-user"></i> Profile
                         </a>
                     </li>
@@ -86,9 +86,9 @@
                 </div>
                 <div class="col-md-9">
                     <div class="profile-info">
-                        <h1 id="researcher-name">{{ user.first_name }} {{ user.last_name }}</h1>
-                        <p class="title" id="researcher-title">{{ user.position }}</p>
-                        <p class="institution" id="researcher-institution">{{ user.institution }}</p>
+                        <h1 id="researcher-name">{{ researcher.first_name }} {{ researcher.last_name }}</h1>
+                        <p class="title" id="researcher-title">{{ researcher.position }}</p>
+                        <p class="institution" id="researcher-institution">{{ researcher.institution }}</p>
                         <p class="bio" id="researcher-bio">Leading researcher in artificial intelligence and machine learning with over 15 years of experience in developing innovative algorithms for data analysis.</p>
                         
                         <!-- Social Media Links -->
@@ -112,6 +112,7 @@
         </div>
 
         <!-- Profile Actions -->
+        {% if is_owner %}
         <div class="profile-actions">
             <button class="btn btn-primary" onclick="editProfile()">
                 <i class="fas fa-edit"></i> Edit Profile
@@ -123,6 +124,7 @@
                 <i class="fas fa-file-alt"></i> Manage Papers
             </button>
         </div>
+        {% endif %}
 
         <!-- Recent Papers -->
         <div class="papers-section">
@@ -537,7 +539,7 @@
                     <ul class="list-unstyled">
                         <li><a href="{{ url_for('main.home') }}" class="text-muted">Home</a></li>
                         <li><a href="{{ url_for('main.search') }}" class="text-muted">Search</a></li>
-                        <li><a href="{{ url_for('main.profile') }}" class="text-muted">Profile</a></li>
+                        <li><a href="{{ url_for('main.my_profile') }}" class="text-muted">Profile</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3">

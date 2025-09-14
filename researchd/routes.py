@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, current_app
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.utils import secure_filename
-from .forms import LoginForm, RegisterForm, EditProfileForm, UploadPaperForm
+from .forms import LoginForm, RegisterForm, EditProfileForm, UploadPaperForm, EditPaperForm
 from .models import User, Profile, Social, Publication, File
 from . import db
 import os
@@ -287,6 +287,110 @@ def my_papers():
     
     papers = Publication.query.filter_by(pid=profile.pid).order_by(Publication.created_at.desc()).all()
     return render_template("my_papers.html", papers=papers)
+
+@main.route("/edit-paper/<int:paper_id>", methods=["GET", "POST"])
+@login_required
+def edit_paper(paper_id):
+    """Edit an existing paper"""
+    # Get the paper and verify ownership
+    profile = Profile.query.filter_by(user_id=current_user.id).first()
+    if not profile:
+        flash("Profile not found", "error")
+        return redirect(url_for("main.my_papers"))
+    
+    paper = Publication.query.filter_by(pubid=paper_id, pid=profile.pid).first()
+    if not paper:
+        flash("Paper not found or access denied", "error")
+        return redirect(url_for("main.my_papers"))
+    
+    form = EditPaperForm()
+    
+    # Debug: Print form errors if validation fails
+    if request.method == "POST" and not form.validate_on_submit():
+        print("Form validation failed!")
+        for field, errors in form.errors.items():
+            print(f"Field '{field}': {errors}")
+        flash("Please check the form for errors and try again.", "danger")
+    
+    if form.validate_on_submit():
+        try:
+            # Update paper fields
+            paper.title = form.title.data
+            paper.authors = form.authors.data
+            paper.journal = form.journal.data
+            paper.year = form.year.data
+            paper.publication_date = form.publication_date.data
+            paper.doi = form.doi.data
+            paper.url = form.url.data
+            paper.abstract = form.abstract.data
+            paper.keywords = form.keywords.data
+            
+            # Handle file upload if provided
+            if form.paper_file.data:
+                file = form.paper_file.data
+                if file and file.filename:
+                    # Create uploads directory if it doesn't exist
+                    upload_dir = os.path.join(current_app.root_path, 'static', 'uploads')
+                    os.makedirs(upload_dir, exist_ok=True)
+                    
+                    # Generate secure filename
+                    filename = secure_filename(file.filename)
+                    # Add timestamp to avoid conflicts
+                    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_')
+                    filename = timestamp + filename
+                    filepath = os.path.join(upload_dir, filename)
+                    
+                    # Save file
+                    file.save(filepath)
+                    
+                    # Get file size
+                    file_size = os.path.getsize(filepath)
+                    
+                    # Delete old file if it exists
+                    if paper.file:
+                        old_file_path = os.path.join(upload_dir, paper.file.file_path)
+                        if os.path.exists(old_file_path):
+                            os.remove(old_file_path)
+                        db.session.delete(paper.file)
+                    
+                    # Create new File record
+                    new_file = File(
+                        pid=profile.pid,
+                        file_name=file.filename,
+                        file_type='pdf',
+                        file_size=file_size,
+                        file_path=filename  # Store relative path
+                    )
+                    db.session.add(new_file)
+                    db.session.flush()  # Get the file ID
+                    
+                    # Update paper to link to new file
+                    paper.fid = new_file.fid
+            
+            db.session.commit()
+            flash("Paper updated successfully!", "success")
+            return redirect(url_for("main.my_papers"))
+            
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error updating paper: {str(e)}")
+            import traceback
+            traceback.print_exc()  # Print full traceback for debugging
+            flash(f"An error occurred while updating your paper: {str(e)}", "danger")
+    
+    # Pre-populate form with current data
+    if request.method == "GET":
+        form.title.data = paper.title
+        form.authors.data = paper.authors
+        form.journal.data = paper.journal
+        form.year.data = paper.year
+        form.publication_date.data = paper.publication_date
+        form.doi.data = paper.doi
+        form.url.data = paper.url
+        form.abstract.data = paper.abstract
+        form.keywords.data = paper.keywords
+    
+    return render_template("edit_paper.html", form=form, paper=paper)
 
 @main.route("/download/<filename>")
 @login_required

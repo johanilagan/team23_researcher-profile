@@ -92,12 +92,12 @@
             <a href="{{ url_for('main.edit_profile') }}" class="btn btn-primary">
                 <i class="fas fa-edit"></i> Edit Profile
             </a>
-            <button class="btn btn-success" onclick="addNewPaper()">
-                <i class="fas fa-plus"></i> Add New Paper
-            </button>
-            <button class="btn btn-info" onclick="managePapers()">
-                <i class="fas fa-file-alt"></i> Manage Papers
-            </button>
+            <a href="{{ url_for('main.upload_paper') }}" class="btn btn-success">
+                <i class="fas fa-plus"></i> Upload New Paper
+            </a>
+            <a href="{{ url_for('main.my_papers') }}" class="btn btn-info">
+                <i class="fas fa-file-alt"></i> View My Papers
+            </a>
         </div>
         {% endif %}
 
@@ -105,10 +105,55 @@
         <div class="papers-section">
             <div class="section-header">
                 <h2>Recent Papers</h2>
-                <button class="btn btn-outline-primary btn-sm" onclick="viewAllPapers()">View All</button>
+                {% if publications %}
+                <a href="{{ url_for('main.my_papers') }}" class="btn btn-outline-primary btn-sm">View All</a>
+                {% endif %}
             </div>
             <div class="papers-grid" id="recent-papers">
-                <!-- Papers will be dynamically loaded here -->
+                {% if publications %}
+                    {% for publication in publications %}
+                    <div class="paper-card">
+                        <h3>{{ publication.title[:60] }}{% if publication.title|length > 60 %}...{% endif %}</h3>
+                        {% if publication.authors %}
+                        <p class="authors">{{ publication.authors[:80] }}{% if publication.authors|length > 80 %}...{% endif %}</p>
+                        {% endif %}
+                        {% if publication.journal and publication.year %}
+                        <p class="venue">{{ publication.journal }} ({{ publication.year }})</p>
+                        {% elif publication.year %}
+                        <p class="venue">{{ publication.year }}</p>
+                        {% endif %}
+                        {% if publication.abstract %}
+                        <p class="abstract">{{ publication.abstract[:150] }}{% if publication.abstract|length > 150 %}...{% endif %}</p>
+                        {% endif %}
+                        <div class="paper-actions">
+                            {% if publication.file %}
+                            <a href="{{ url_for('main.download_file', filename=publication.file.file_path) }}" 
+                               class="btn btn-sm btn-outline-primary" target="_blank">
+                                <i class="fas fa-download me-1"></i>Download PDF
+                            </a>
+                            {% endif %}
+                            {% if publication.url %}
+                            <a href="{{ publication.url }}" class="btn btn-sm btn-outline-secondary" target="_blank">
+                                <i class="fas fa-external-link-alt me-1"></i>View Online
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-papers">
+                        <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No papers uploaded yet</h5>
+                        {% if is_owner %}
+                        <p class="text-muted">Start sharing your research by uploading your first paper!</p>
+                        <a href="{{ url_for('main.upload_paper') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Upload Your First Paper
+                        </a>
+                        {% else %}
+                        <p class="text-muted">This researcher hasn't uploaded any papers yet.</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
             </div>
         </div>
         
@@ -233,39 +278,11 @@
 
 {% block extra_js %}
     <script>
-        // Sample papers data
-        const samplePapers = [
-            {
-                title: "Advanced Neural Network Architectures for Image Recognition",
-                authors: "Smith, J., Johnson, A., Williams, B.",
-                year: 2023,
-                venue: "International Conference on Computer Vision",
-                citations: 45,
-                abstract: "This paper presents novel neural network architectures..."
-            },
-            {
-                title: "Machine Learning Approaches to Big Data Analysis",
-                authors: "Smith, J., Brown, C.",
-                year: 2022,
-                venue: "Journal of Machine Learning Research",
-                citations: 32,
-                abstract: "We explore various machine learning techniques..."
-            },
-            {
-                title: "Deep Learning Applications in Natural Language Processing",
-                authors: "Smith, J., Davis, E., Wilson, F.",
-                year: 2021,
-                venue: "Neural Information Processing Systems",
-                citations: 67,
-                abstract: "This research investigates the application of deep learning..."
-            }
-        ];
+        // User publications are now loaded dynamically from the server
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Page loaded, initializing...');
-            loadRecentPapers();
-            updateStats();
             
             // Setup button
             const editBtn = document.getElementById('edit-interests-btn');
@@ -281,45 +298,9 @@
             }
         });
 
-        // Load recent papers
-        function loadRecentPapers() {
-            const papersContainer = document.getElementById('recent-papers');
-            papersContainer.innerHTML = '';
-            
-            samplePapers.forEach(paper => {
-                const paperCard = createPaperCard(paper);
-                papersContainer.appendChild(paperCard);
-            });
-        }
+        // Papers are now loaded dynamically from the server via Jinja2 templates
 
-        // Create paper card
-        function createPaperCard(paper) {
-            const card = document.createElement('div');
-            card.className = 'paper-card';
-            card.innerHTML = `
-                <h3>${paper.title}</h3>
-                <p class="authors">${paper.authors}</p>
-                <p class="venue">${paper.venue} (${paper.year})</p>
-                <p class="citations"><i class="fas fa-quote-left"></i> ${paper.citations} citations</p>
-                <p class="abstract">${paper.abstract}</p>
-                <div class="paper-actions">
-                    <button class="btn btn-sm btn-outline-primary">View Details</button>
-                    <button class="btn btn-sm btn-outline-secondary">Download PDF</button>
-                </div>
-            `;
-            return card;
-        }
-
-        // Update statistics
-        function updateStats() {
-            const papersCountEl = document.getElementById('papers-count');
-            const citationsCountEl = document.getElementById('citations-count');
-            if (papersCountEl) papersCountEl.textContent = samplePapers.length;
-            if (citationsCountEl) {
-                const totalCitations = samplePapers.reduce((sum, paper) => sum + paper.citations, 0);
-                citationsCountEl.textContent = totalCitations.toLocaleString();
-            }
-        }
+        // Statistics are now handled by the server-rendered template
 
         // Change profile picture
         function changeProfilePic(input) {
@@ -333,52 +314,9 @@
         }
 
 
-        // Add new paper
+        // Paper management functions now redirect to dedicated upload page
         function addNewPaper() {
-            const modal = new bootstrap.Modal(document.getElementById('addPaperModal'));
-            modal.show();
-        }
-
-        // Submit paper
-        function submitPaper() {
-            const title = document.getElementById('paper-title').value;
-            const authors = document.getElementById('paper-authors').value;
-            const year = document.getElementById('paper-year').value;
-            const venue = document.getElementById('paper-venue').value;
-            const doi = document.getElementById('paper-doi').value;
-            const abstract = document.getElementById('paper-abstract').value;
-            const keywords = document.getElementById('paper-keywords').value;
-
-            if (!title || !authors || !year) {
-                showNotification('Please fill in all required fields.', 'error');
-                return;
-            }
-
-            // Create new paper object
-            const newPaper = {
-                title: title,
-                authors: authors,
-                year: parseInt(year),
-                venue: venue,
-                doi: doi,
-                abstract: abstract,
-                keywords: keywords,
-                citations: 0
-            };
-
-            // Add to papers array
-            samplePapers.unshift(newPaper);
-
-            // Reload papers and update stats
-            loadRecentPapers();
-            updateStats();
-
-            // Close modal and reset form
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addPaperModal'));
-            modal.hide();
-            document.getElementById('add-paper-form').reset();
-
-            showNotification('Paper added successfully!', 'success');
+            window.location.href = "{{ url_for('main.upload_paper') }}";
         }
 
         // Manage papers
@@ -388,7 +326,7 @@
 
         // View all papers
         function viewAllPapers() {
-            showNotification('Full papers list coming soon!', 'info');
+            window.location.href = "{{ url_for('main.my_papers') }}";
         }
 
         // Research interests data

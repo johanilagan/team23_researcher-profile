@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField, URLField
-from wtforms.validators import InputRequired, Length, Email, EqualTo, Optional
+from flask_wtf.file import FileField, FileAllowed
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, URLField, DateField, IntegerField
+from wtforms.validators import InputRequired, Length, Email, EqualTo, Optional, NumberRange
 
 class LoginForm(FlaskForm):
     email = StringField("Email", validators=[InputRequired(), Email(), Length(max=150)])
@@ -35,3 +36,23 @@ class EditProfileForm(FlaskForm):
     github_url = URLField("GitHub URL", validators=[Optional()])
     
     submit = SubmitField("Save Changes")
+
+class UploadPaperForm(FlaskForm):
+    title = StringField("Paper Title", validators=[InputRequired(), Length(min=1, max=300)])
+    authors = TextAreaField("Authors", validators=[InputRequired(), Length(min=1, max=1000)], 
+                           render_kw={"placeholder": "Enter author names separated by commas (e.g., John Smith, Jane Doe, etc.)"})
+    journal = StringField("Journal/Conference", validators=[Optional(), Length(max=200)])
+    publication_date = DateField("Publication Date", validators=[Optional()])
+    year = IntegerField("Publication Year", validators=[Optional(), NumberRange(min=1900, max=2030)])
+    doi = StringField("DOI", validators=[Optional(), Length(max=120)], 
+                     render_kw={"placeholder": "e.g., 10.1234/example.doi"})
+    url = URLField("External URL", validators=[Optional()], 
+                  render_kw={"placeholder": "Link to paper on journal website or preprint server"})
+    abstract = TextAreaField("Abstract", validators=[Optional(), Length(max=2000)], 
+                            render_kw={"rows": 5, "placeholder": "Brief summary of the paper (optional)"})
+    keywords = StringField("Keywords", validators=[Optional(), Length(max=500)], 
+                          render_kw={"placeholder": "Enter keywords separated by commas"})
+    paper_file = FileField("Upload Paper (PDF)", validators=[
+        InputRequired(), FileAllowed(['pdf'], 'Only PDF files are allowed!')
+    ])
+    submit = SubmitField("Upload Paper")

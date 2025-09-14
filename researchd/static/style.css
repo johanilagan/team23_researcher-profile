@@ -1381,3 +1381,26 @@ body {
         padding: 0.25rem;
     }
 }
+
+/* No Papers Section */
+.no-papers {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 2px dashed #dee2e6;
+    margin: 2rem 0;
+}
+
+.no-papers i {
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+.no-papers h5 {
+    margin-bottom: 0.5rem;
+}
+
+.no-papers p {
+    margin-bottom: 1.5rem;
+}

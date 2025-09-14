@@ -126,10 +126,14 @@ class Publication(db.Model):
     pid = db.Column(db.Integer, db.ForeignKey("profiles.pid", ondelete="CASCADE"), nullable=False, index=True)
 
     title = db.Column(db.String(300), nullable=False)
+    authors = db.Column(db.Text)  # Comma-separated list of authors
     journal = db.Column(db.String(200))
     year = db.Column(db.Integer)
+    publication_date = db.Column(db.Date)  # Exact publication date
     doi = db.Column(db.String(120), index=True)
     url = db.Column(db.String(500))
+    abstract = db.Column(db.Text)  # Paper abstract
+    keywords = db.Column(db.String(500))  # Comma-separated keywords
 
     # Optional link to a stored File (e.g., the uploaded PDF)
     fid = db.Column(db.Integer, db.ForeignKey("files.fid", ondelete="SET NULL"), nullable=True)

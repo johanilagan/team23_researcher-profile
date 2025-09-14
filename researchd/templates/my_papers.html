@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}My Papers - Academic Network{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-file-alt me-2"></i>My Research Papers
+                </h2>
+                <a href="{{ url_for('main.upload_paper') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Upload New Paper
+                </a>
+            </div>
+            
+            {% if papers %}
+                <div class="row">
+                    {% for paper in papers %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fas fa-file-pdf text-danger me-2"></i>
+                                    {{ paper.title[:80] }}{% if paper.title|length > 80 %}...{% endif %}
+                                </h5>
+                                
+                                {% if paper.authors %}
+                                <p class="card-text">
+                                    <strong>Authors:</strong><br>
+                                    <small class="text-muted">{{ paper.authors[:100] }}{% if paper.authors|length > 100 %}...{% endif %}</small>
+                                </p>
+                                {% endif %}
+                                
+                                <div class="mb-2">
+                                    {% if paper.journal %}
+                                    <span class="badge bg-primary me-1">{{ paper.journal }}</span>
+                                    {% endif %}
+                                    {% if paper.year %}
+                                    <span class="badge bg-secondary me-1">{{ paper.year }}</span>
+                                    {% endif %}
+                                </div>
+                                
+                                {% if paper.abstract %}
+                                <p class="card-text">
+                                    <small class="text-muted">{{ paper.abstract[:150] }}{% if paper.abstract|length > 150 %}...{% endif %}</small>
+                                </p>
+                                {% endif %}
+                                
+                                <div class="d-flex flex-wrap gap-1 mb-3">
+                                    {% if paper.keywords %}
+                                        {% for keyword in paper.keywords.split(',')[:3] %}
+                                        <span class="badge bg-light text-dark">{{ keyword.strip() }}</span>
+                                        {% endfor %}
+                                        {% if paper.keywords.split(',')|length > 3 %}
+                                        <span class="badge bg-light text-dark">+{{ paper.keywords.split(',')|length - 3 }} more</span>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="card-footer bg-transparent">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        Uploaded {{ paper.created_at.strftime('%B %d, %Y') }}
+                                    </small>
+                                    <div>
+                                        {% if paper.file %}
+                                        <a href="{{ url_for('main.download_file', filename=paper.file.file_path) }}" 
+                                           class="btn btn-sm btn-outline-primary" target="_blank">
+                                            <i class="fas fa-download me-1"></i>PDF
+                                        </a>
+                                        {% endif %}
+                                        {% if paper.url %}
+                                        <a href="{{ paper.url }}" class="btn btn-sm btn-outline-secondary" target="_blank">
+                                            <i class="fas fa-external-link-alt me-1"></i>Link
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-file-alt fa-5x text-muted"></i>
+                    </div>
+                    <h4 class="text-muted">No papers uploaded yet</h4>
+                    <p class="text-muted">Start sharing your research by uploading your first paper!</p>
+                    <a href="{{ url_for('main.upload_paper') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Upload Your First Paper
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

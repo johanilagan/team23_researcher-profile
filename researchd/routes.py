@@ -1,8 +1,11 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, current_app
 from flask_login import login_user, login_required, logout_user, current_user
-from .forms import LoginForm, RegisterForm, EditProfileForm
-from .models import User, Profile, Social
+from werkzeug.utils import secure_filename
+from .forms import LoginForm, RegisterForm, EditProfileForm, UploadPaperForm
+from .models import User, Profile, Social, Publication, File
 from . import db
+import os
+from datetime import datetime
 
 auth = Blueprint("auth", __name__)
 main = Blueprint("main", __name__)
@@ -26,7 +29,10 @@ def my_profile():
     
     print(f"Loading profile for user {user.id}, interests: {profile.research_interests}")
     
-    return render_template("profile_page.html", researcher=user, is_owner=True)
+    # Get user's publications (papers)
+    publications = Publication.query.filter_by(pid=profile.pid).order_by(Publication.created_at.desc()).limit(3).all()
+    
+    return render_template("profile_page.html", researcher=user, is_owner=True, publications=publications)
 
 @main.route("/profile/<int:researcher_id>")
 def researcher_profile(researcher_id):
@@ -44,7 +50,10 @@ def researcher_profile(researcher_id):
         db.session.add(profile)
         db.session.commit()
     
-    return render_template("profile_page.html", researcher=researcher, is_owner=is_owner)
+    # Get researcher's publications (papers)
+    publications = Publication.query.filter_by(pid=profile.pid).order_by(Publication.created_at.desc()).limit(3).all()
+    
+    return render_template("profile_page.html", researcher=researcher, is_owner=is_owner, publications=publications)
 
 @main.route("/search")
 def search():
@@ -178,6 +187,134 @@ def update_interests():
         db.session.rollback()
         print(f"Error updating interests: {str(e)}")
         return jsonify({'success': False, 'error': str(e)})
+
+@main.route("/upload-paper", methods=["GET", "POST"])
+@login_required
+def upload_paper():
+    form = UploadPaperForm()
+    
+    # Debug: Print form errors if validation fails
+    if request.method == "POST" and not form.validate_on_submit():
+        print("Form validation failed!")
+        for field, errors in form.errors.items():
+            print(f"Field '{field}': {errors}")
+        flash("Please check the form for errors and try again.", "danger")
+    
+    if form.validate_on_submit():
+        try:
+            # Get or create profile
+            profile = Profile.query.filter_by(user_id=current_user.id).first()
+            if not profile:
+                profile = Profile(user_id=current_user.id)
+                db.session.add(profile)
+                db.session.commit()
+            
+            # Handle file upload
+            uploaded_file = None
+            if form.paper_file.data:
+                file = form.paper_file.data
+                if file and file.filename:
+                    # Create uploads directory if it doesn't exist
+                    upload_dir = os.path.join(current_app.root_path, 'static', 'uploads')
+                    os.makedirs(upload_dir, exist_ok=True)
+                    
+                    # Generate secure filename
+                    filename = secure_filename(file.filename)
+                    # Add timestamp to avoid conflicts
+                    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_')
+                    filename = timestamp + filename
+                    filepath = os.path.join(upload_dir, filename)
+                    
+                    # Save file
+                    file.save(filepath)
+                    
+                    # Get file size
+                    file_size = os.path.getsize(filepath)
+                    
+                    # Create File record
+                    uploaded_file = File(
+                        pid=profile.pid,
+                        file_name=file.filename,
+                        file_type='pdf',
+                        file_size=file_size,
+                        file_path=filename  # Store relative path
+                    )
+                    db.session.add(uploaded_file)
+                    db.session.flush()  # Get the file ID
+            
+            # Create Publication record
+            publication = Publication(
+                pid=profile.pid,
+                title=form.title.data,
+                authors=form.authors.data,
+                journal=form.journal.data,
+                year=form.year.data,
+                publication_date=form.publication_date.data,
+                doi=form.doi.data,
+                url=form.url.data,
+                abstract=form.abstract.data,
+                keywords=form.keywords.data
+            )
+            
+            # Link to uploaded file if available
+            if uploaded_file:
+                publication.fid = uploaded_file.fid
+            
+            db.session.add(publication)
+            db.session.commit()
+            
+            flash("Paper uploaded successfully!", "success")
+            return redirect(url_for("main.my_profile"))
+            
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error uploading paper: {str(e)}")
+            import traceback
+            traceback.print_exc()  # Print full traceback for debugging
+            flash(f"An error occurred while uploading your paper: {str(e)}", "danger")
+    
+    return render_template("upload_paper.html", form=form)
+
+@main.route("/papers")
+@login_required
+def my_papers():
+    """Display user's uploaded papers"""
+    profile = Profile.query.filter_by(user_id=current_user.id).first()
+    if not profile:
+        profile = Profile(user_id=current_user.id)
+        db.session.add(profile)
+        db.session.commit()
+    
+    papers = Publication.query.filter_by(pid=profile.pid).order_by(Publication.created_at.desc()).all()
+    return render_template("my_papers.html", papers=papers)
+
+@main.route("/download/<filename>")
+@login_required
+def download_file(filename):
+    """Securely serve uploaded files"""
+    try:
+        # Verify the file belongs to the current user
+        profile = Profile.query.filter_by(user_id=current_user.id).first()
+        if not profile:
+            flash("Profile not found", "error")
+            return redirect(url_for("main.my_profile"))
+        
+        file_record = File.query.filter_by(file_path=filename, pid=profile.pid).first()
+        if not file_record:
+            flash("File not found or access denied", "error")
+            return redirect(url_for("main.my_profile"))
+        
+        file_path = os.path.join(current_app.root_path, 'static', 'uploads', filename)
+        if os.path.exists(file_path):
+            return redirect(url_for('static', filename='uploads/' + filename))
+        else:
+            flash("File not found on server", "error")
+            return redirect(url_for("main.my_profile"))
+            
+    except Exception as e:
+        print(f"Error serving file: {str(e)}")
+        flash("Error accessing file", "error")
+        return redirect(url_for("main.my_profile"))
 
 @auth.route("/login", methods=["GET", "POST"])
 def login():

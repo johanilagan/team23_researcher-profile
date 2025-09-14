@@ -98,19 +98,6 @@
         </div>
     </nav>
 
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="container mt-4">
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
 
     <!-- Main Content -->
     <main class="{% block main_class %}main-content{% endblock %}">
@@ -194,26 +181,6 @@
             }
         }
 
-        // Show welcome message
-        function showWelcomeMessage(username) {
-            const welcomeDiv = document.createElement('div');
-            welcomeDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
-            welcomeDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-            welcomeDiv.innerHTML = `
-                <i class="fas fa-check-circle me-2"></i>
-                Welcome back, <strong>${username}</strong>! You're successfully logged in.
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            `;
-            
-            document.body.appendChild(welcomeDiv);
-            
-            // Auto-remove after 5 seconds
-            setTimeout(() => {
-                if (welcomeDiv.parentNode) {
-                    welcomeDiv.remove();
-                }
-            }, 5000);
-        }
 
         // Sign out function
         function signOut() {

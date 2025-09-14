@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, current_app
+from flask import Blueprint, render_template, redirect, url_for, request, jsonify, current_app
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.utils import secure_filename
 from .forms import LoginForm, RegisterForm, EditProfileForm, UploadPaperForm, EditPaperForm
@@ -132,12 +132,11 @@ def edit_profile():
                         db.session.delete(social)
             
             db.session.commit()
-            flash("Profile updated successfully!", "success")
             return redirect(url_for("main.my_profile"))
             
         except Exception as e:
             db.session.rollback()
-            flash("An error occurred while updating your profile. Please try again.", "danger")
+            pass
     
     # Pre-populate form with current data
     if request.method == "GET":
@@ -198,7 +197,7 @@ def upload_paper():
         print("Form validation failed!")
         for field, errors in form.errors.items():
             print(f"Field '{field}': {errors}")
-        flash("Please check the form for errors and try again.", "danger")
+        pass
     
     if form.validate_on_submit():
         try:
@@ -263,7 +262,6 @@ def upload_paper():
             db.session.add(publication)
             db.session.commit()
             
-            flash("Paper uploaded successfully!", "success")
             return redirect(url_for("main.my_profile"))
             
         except Exception as e:
@@ -271,7 +269,7 @@ def upload_paper():
             print(f"Error uploading paper: {str(e)}")
             import traceback
             traceback.print_exc()  # Print full traceback for debugging
-            flash(f"An error occurred while uploading your paper: {str(e)}", "danger")
+            pass
     
     return render_template("upload_paper.html", form=form)
 
@@ -295,12 +293,10 @@ def edit_paper(paper_id):
     # Get the paper and verify ownership
     profile = Profile.query.filter_by(user_id=current_user.id).first()
     if not profile:
-        flash("Profile not found", "error")
         return redirect(url_for("main.my_papers"))
     
     paper = Publication.query.filter_by(pubid=paper_id, pid=profile.pid).first()
     if not paper:
-        flash("Paper not found or access denied", "error")
         return redirect(url_for("main.my_papers"))
     
     form = EditPaperForm()
@@ -310,7 +306,7 @@ def edit_paper(paper_id):
         print("Form validation failed!")
         for field, errors in form.errors.items():
             print(f"Field '{field}': {errors}")
-        flash("Please check the form for errors and try again.", "danger")
+        pass
     
     if form.validate_on_submit():
         try:
@@ -368,7 +364,6 @@ def edit_paper(paper_id):
                     paper.fid = new_file.fid
             
             db.session.commit()
-            flash("Paper updated successfully!", "success")
             return redirect(url_for("main.my_papers"))
             
         except Exception as e:
@@ -376,7 +371,7 @@ def edit_paper(paper_id):
             print(f"Error updating paper: {str(e)}")
             import traceback
             traceback.print_exc()  # Print full traceback for debugging
-            flash(f"An error occurred while updating your paper: {str(e)}", "danger")
+            pass
     
     # Pre-populate form with current data
     if request.method == "GET":
@@ -400,24 +395,20 @@ def download_file(filename):
         # Verify the file belongs to the current user
         profile = Profile.query.filter_by(user_id=current_user.id).first()
         if not profile:
-            flash("Profile not found", "error")
             return redirect(url_for("main.my_profile"))
         
         file_record = File.query.filter_by(file_path=filename, pid=profile.pid).first()
         if not file_record:
-            flash("File not found or access denied", "error")
             return redirect(url_for("main.my_profile"))
         
         file_path = os.path.join(current_app.root_path, 'static', 'uploads', filename)
         if os.path.exists(file_path):
             return redirect(url_for('static', filename='uploads/' + filename))
         else:
-            flash("File not found on server", "error")
             return redirect(url_for("main.my_profile"))
             
     except Exception as e:
         print(f"Error serving file: {str(e)}")
-        flash("Error accessing file", "error")
         return redirect(url_for("main.my_profile"))
 
 @auth.route("/login", methods=["GET", "POST"])
@@ -427,9 +418,7 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user)
-            flash("Login successful!", "success")
             return redirect(url_for("main.home"))
-        flash("Invalid credentials", "danger")
     return render_template("login.html", form=form)
 
 @auth.route("/register", methods=["GET", "POST"])
@@ -439,7 +428,6 @@ def register():
         # check if email already exists
         existing_user = User.query.filter_by(email=form.email.data).first()
         if existing_user:
-            flash("Email already registered. Please login.", "warning")
             return redirect(url_for("auth.register"))
         
         # create new user
@@ -455,7 +443,6 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        flash("Account created! Please login.", "success")
         return redirect(url_for("auth.login"))
     return render_template("register.html", form=form)
 
@@ -463,5 +450,4 @@ def register():
 @login_required
 def logout():
     logout_user()
-    flash("You have been logged out.", "info")
     return redirect(url_for("main.home"))

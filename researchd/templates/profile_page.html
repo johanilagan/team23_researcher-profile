@@ -3,62 +3,64 @@
 {% block title %}Researcher Profile - Academic Network{% endblock %}
 
 {% block content %}
-    <div class="container mt-4">
+    <div class="container mt-4" id="profile-sections">
         <!-- Profile Header -->
         <div class="profile-header">
-            <div class="row">
-                <div class="col-md-3 text-center">
-                    <div class="profile-pic-container">
-                        <img id="profile-pic" src="https://via.placeholder.com/200x200/6c757d/ffffff?text=Profile+Pic" 
-                             alt="Profile Picture" class="profile-pic">
-                        <button class="change-pic-btn" onclick="document.getElementById('profile-pic-input').click()">
-                            <i class="fas fa-camera"></i>
-                        </button>
-                        <input type="file" id="profile-pic-input" accept="image/*" style="display: none;" 
-                               onchange="changeProfilePic(this)">
+            <div class="profile-section" data-section="profile-header">
+                <div class="row">
+                    <div class="col-md-3 text-center">
+                        <div class="profile-pic-container">
+                            <img id="profile-pic" src="https://via.placeholder.com/200x200/6c757d/ffffff?text=Profile+Pic" 
+                                alt="Profile Picture" class="profile-pic">
+                            <button class="change-pic-btn" onclick="document.getElementById('profile-pic-input').click()">
+                                <i class="fas fa-camera"></i>
+                            </button>
+                            <input type="file" id="profile-pic-input" accept="image/*" style="display: none;" 
+                                onchange="changeProfilePic(this)">
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-9">
-                    <div class="profile-info">
-                        <h1 id="researcher-name">{{ researcher.first_name }} {{ researcher.last_name }}</h1>
-                        <p class="title" id="researcher-title">{{ researcher.position or 'Position not specified' }}</p>
-                        <p class="institution" id="researcher-institution">{{ researcher.institution or 'Institution not specified' }}</p>
-                        {% if researcher.profile and researcher.profile.location %}
-                        <p class="location" id="researcher-location">
-                            <i class="fas fa-map-marker-alt me-1"></i>{{ researcher.profile.location }}
-                        </p>
-                        {% endif %}
-                        <p class="bio" id="researcher-bio">
-                            {% if researcher.profile and researcher.profile.bio %}
-                                {{ researcher.profile.bio }}
-                            {% else %}
-                                No bio available. Click "Edit Profile" to add your bio.
+                    <div class="col-md-9">
+                        <div class="profile-info">
+                            <h1 id="researcher-name">{{ researcher.first_name }} {{ researcher.last_name }}</h1>
+                            <p class="title" id="researcher-title">{{ researcher.position or 'Position not specified' }}</p>
+                            <p class="institution" id="researcher-institution">{{ researcher.institution or 'Institution not specified' }}</p>
+                            {% if researcher.profile and researcher.profile.location %}
+                            <p class="location" id="researcher-location">
+                                <i class="fas fa-map-marker-alt me-1"></i>{{ researcher.profile.location }}
+                            </p>
                             {% endif %}
-                        </p>
-                        
-                        <!-- Social Media Links -->
-                        <div class="social-links">
-                            {% if researcher.profile %}
-                                {% for social in researcher.profile.socials %}
-                                    {% if social.platform == 'LinkedIn' %}
-                                        <a href="{{ social.url }}" class="social-link linkedin" target="_blank">
-                                            <i class="fab fa-linkedin"></i> LinkedIn
-                                        </a>
-                                    {% elif social.platform == 'Twitter' %}
-                                        <a href="{{ social.url }}" class="social-link twitter" target="_blank">
-                                            <i class="fab fa-twitter"></i> Twitter
-                                        </a>
-                                    {% elif social.platform == 'Instagram' %}
-                                        <a href="{{ social.url }}" class="social-link instagram" target="_blank">
-                                            <i class="fab fa-instagram"></i> Instagram
-                                        </a>
-                                    {% elif social.platform == 'GitHub' %}
-                                        <a href="{{ social.url }}" class="social-link github" target="_blank">
-                                            <i class="fab fa-github"></i> GitHub
-                                        </a>
-                                    {% endif %}
-                                {% endfor %}
-                            {% endif %}
+                            <p class="bio" id="researcher-bio">
+                                {% if researcher.profile and researcher.profile.bio %}
+                                    {{ researcher.profile.bio }}
+                                {% else %}
+                                    No bio available. Click "Edit Profile" to add your bio.
+                                {% endif %}
+                            </p>
+                            
+                            <!-- Social Media Links -->
+                            <div class="social-links">
+                                {% if researcher.profile %}
+                                    {% for social in researcher.profile.socials %}
+                                        {% if social.platform == 'LinkedIn' %}
+                                            <a href="{{ social.url }}" class="social-link linkedin" target="_blank">
+                                                <i class="fab fa-linkedin"></i> LinkedIn
+                                            </a>
+                                        {% elif social.platform == 'Twitter' %}
+                                            <a href="{{ social.url }}" class="social-link twitter" target="_blank">
+                                                <i class="fab fa-twitter"></i> Twitter
+                                            </a>
+                                        {% elif social.platform == 'Instagram' %}
+                                            <a href="{{ social.url }}" class="social-link instagram" target="_blank">
+                                                <i class="fab fa-instagram"></i> Instagram
+                                            </a>
+                                        {% elif social.platform == 'GitHub' %}
+                                            <a href="{{ social.url }}" class="social-link github" target="_blank">
+                                                <i class="fab fa-github"></i> GitHub
+                                            </a>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -67,22 +69,24 @@
 
         <!-- Research Interests -->
         <div class="interests-section">
-            <div class="section-header">
-                <h2>Research Interests</h2>
-                {% if is_owner %}
-                <button class="btn btn-outline-primary btn-sm" onclick="editInterests()" id="edit-interests-btn">Edit</button>
-                {% endif %}
-            </div>
-            <div class="interests-tags" id="research-interests">
-                {% if researcher.profile and researcher.profile.research_interests and researcher.profile.research_interests.strip() %}
-                    {% for interest in researcher.profile.research_interests.split(',') %}
-                        {% if interest.strip() %}
-                            <span class="interest-tag">{{ interest.strip() }}</span>
-                        {% endif %}
-                    {% endfor %}
-                {% else %}
-                    <span class="interest-tag">No interests selected yet</span>
-                {% endif %}
+            <div class="profile-section" data-section="interests-section">
+                <div class="section-header">
+                    <h2>Research Interests</h2>
+                    {% if is_owner %}
+                    <button class="btn btn-outline-primary btn-sm" onclick="editInterests()" id="edit-interests-btn">Edit</button>
+                    {% endif %}
+                </div>
+                <div class="interests-tags" id="research-interests">
+                    {% if researcher.profile and researcher.profile.research_interests and researcher.profile.research_interests.strip() %}
+                        {% for interest in researcher.profile.research_interests.split(',') %}
+                            {% if interest.strip() %}
+                                <span class="interest-tag">{{ interest.strip() }}</span>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <span class="interest-tag">No interests selected yet</span>
+                    {% endif %}
+                </div>
             </div>
         </div>
 
@@ -103,57 +107,59 @@
 
         <!-- Recent Papers -->
         <div class="papers-section">
-            <div class="section-header">
-                <h2>Recent Papers</h2>
-                {% if publications %}
-                <a href="{{ url_for('main.my_papers') }}" class="btn btn-outline-primary btn-sm">View All</a>
-                {% endif %}
-            </div>
-            <div class="papers-grid" id="recent-papers">
-                {% if publications %}
-                    {% for publication in publications %}
-                    <div class="paper-card">
-                        <h3>{{ publication.title[:60] }}{% if publication.title|length > 60 %}...{% endif %}</h3>
-                        {% if publication.authors %}
-                        <p class="authors">{{ publication.authors[:80] }}{% if publication.authors|length > 80 %}...{% endif %}</p>
-                        {% endif %}
-                        {% if publication.journal and publication.year %}
-                        <p class="venue">{{ publication.journal }} ({{ publication.year }})</p>
-                        {% elif publication.year %}
-                        <p class="venue">{{ publication.year }}</p>
-                        {% endif %}
-                        {% if publication.abstract %}
-                        <p class="abstract">{{ publication.abstract[:150] }}{% if publication.abstract|length > 150 %}...{% endif %}</p>
-                        {% endif %}
-                        <div class="paper-actions">
-                            {% if publication.file %}
-                            <a href="{{ url_for('main.download_file', filename=publication.file.file_path) }}" 
-                               class="btn btn-sm btn-outline-primary" target="_blank">
-                                <i class="fas fa-download me-1"></i>Download PDF
-                            </a>
+            <div class="profile-section" data-section="papers-section">
+                <div class="section-header">
+                    <h2>Recent Papers</h2>
+                    {% if publications %}
+                    <a href="{{ url_for('main.my_papers') }}" class="btn btn-outline-primary btn-sm">View All</a>
+                    {% endif %}
+                </div>
+                <div class="papers-grid" id="recent-papers">
+                    {% if publications %}
+                        {% for publication in publications %}
+                        <div class="paper-card">
+                            <h3>{{ publication.title[:60] }}{% if publication.title|length > 60 %}...{% endif %}</h3>
+                            {% if publication.authors %}
+                            <p class="authors">{{ publication.authors[:80] }}{% if publication.authors|length > 80 %}...{% endif %}</p>
                             {% endif %}
-                            {% if publication.url %}
-                            <a href="{{ publication.url }}" class="btn btn-sm btn-outline-secondary" target="_blank">
-                                <i class="fas fa-external-link-alt me-1"></i>View Online
+                            {% if publication.journal and publication.year %}
+                            <p class="venue">{{ publication.journal }} ({{ publication.year }})</p>
+                            {% elif publication.year %}
+                            <p class="venue">{{ publication.year }}</p>
+                            {% endif %}
+                            {% if publication.abstract %}
+                            <p class="abstract">{{ publication.abstract[:150] }}{% if publication.abstract|length > 150 %}...{% endif %}</p>
+                            {% endif %}
+                            <div class="paper-actions">
+                                {% if publication.file %}
+                                <a href="{{ url_for('main.download_file', filename=publication.file.file_path) }}" 
+                                class="btn btn-sm btn-outline-primary" target="_blank">
+                                    <i class="fas fa-download me-1"></i>Download PDF
+                                </a>
+                                {% endif %}
+                                {% if publication.url %}
+                                <a href="{{ publication.url }}" class="btn btn-sm btn-outline-secondary" target="_blank">
+                                    <i class="fas fa-external-link-alt me-1"></i>View Online
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-papers">
+                            <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No papers uploaded yet</h5>
+                            {% if is_owner %}
+                            <p class="text-muted">Start sharing your research by uploading your first paper!</p>
+                            <a href="{{ url_for('main.upload_paper') }}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Upload Your First Paper
                             </a>
+                            {% else %}
+                            <p class="text-muted">This researcher hasn't uploaded any papers yet.</p>
                             {% endif %}
                         </div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="no-papers">
-                        <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
-                        <h5 class="text-muted">No papers uploaded yet</h5>
-                        {% if is_owner %}
-                        <p class="text-muted">Start sharing your research by uploading your first paper!</p>
-                        <a href="{{ url_for('main.upload_paper') }}" class="btn btn-primary">
-                            <i class="fas fa-plus me-2"></i>Upload Your First Paper
-                        </a>
-                        {% else %}
-                        <p class="text-muted">This researcher hasn't uploaded any papers yet.</p>
-                        {% endif %}
-                    </div>
-                {% endif %}
+                    {% endif %}
+                </div>
             </div>
         </div>
         
@@ -277,6 +283,7 @@
 {% endblock %}
 
 {% block extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script>
         // User publications are now loaded dynamically from the server
 
@@ -702,5 +709,24 @@
                 setTimeout(() => notification.remove(), 300);
             }, 3000);
         }
+
+        // Drag and drop??
+        document.addEventListener('DOMContentLoaded', function() {
+            new Sortable(document.getElementById('profile-sections'), {
+                animation: 150,
+                // handle: '.profile-section',
+                onEnd: function (evt) {
+                    let order = [];
+                    document.querySelectorAll('#profile-sections .profile-section').forEach(function(section) {
+                        order.push(section.getAttribute('data-section'));
+                    });
+                    fetch('/save-section-order', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({order: order})
+                    });
+                }
+            });
+        });
     </script>
 {% endblock %}

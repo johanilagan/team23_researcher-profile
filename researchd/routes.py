@@ -32,7 +32,7 @@ def my_profile():
     # Get user's publications (papers)
     publications = Publication.query.filter_by(pid=profile.pid).order_by(Publication.created_at.desc()).limit(3).all()
     
-    return render_template("profile_page.html", researcher=user, is_owner=True, publications=publications)
+    return render_template("profile_page.html", profile=profile, is_owner=True, publications=publications)
 
 @main.route("/profile/<int:researcher_id>")
 def researcher_profile(researcher_id):
@@ -53,7 +53,7 @@ def researcher_profile(researcher_id):
     # Get researcher's publications (papers)
     publications = Publication.query.filter_by(pid=profile.pid).order_by(Publication.created_at.desc()).limit(3).all()
     
-    return render_template("profile_page.html", researcher=researcher, is_owner=is_owner, publications=publications)
+    return render_template("profile_page.html", profile=profile, is_owner=is_owner, publications=publications)
 
 @main.route("/search")
 def search():
@@ -108,6 +108,9 @@ def edit_profile():
             profile.institution = form.institution.data
             profile.bio = form.bio.data
             profile.location = form.location.data
+            profile.title = form.title.data
+            profile.department = form.department.data
+
             
             # Update social media links
             social_platforms = {
@@ -150,6 +153,8 @@ def edit_profile():
         if profile:
             form.bio.data = profile.bio
             form.location.data = profile.location
+            form.title.data = profile.title
+            form.department.data = profile.department
             
             # Get social media links
             socials = {s.platform: s.url for s in profile.socials}

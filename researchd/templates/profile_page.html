@@ -714,7 +714,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             new Sortable(document.getElementById('profile-sections'), {
                 animation: 150,
-                // handle: '.profile-section',
+                handle: '.profile-section',
                 onEnd: function (evt) {
                     let order = [];
                     document.querySelectorAll('#profile-sections .profile-section').forEach(function(section) {

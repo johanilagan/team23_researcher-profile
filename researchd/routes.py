@@ -3,6 +3,7 @@ from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.utils import secure_filename
 from .forms import LoginForm, RegisterForm, EditProfileForm, UploadPaperForm, EditPaperForm
 from .models import User, Profile, Social, Publication, File
+from sqlalchemy.orm import joinedload
 from . import db
 import os
 from datetime import datetime
@@ -61,11 +62,11 @@ def search():
     
     # Basic query: adjust to your ORM/search logic
     if q:
-        results = User.query.filter(
+        results = User.query.join(Profile).options(joinedload(User.profile)).filter(
             (User.first_name.ilike(f"%{q}%")) |
             (User.last_name.ilike(f"%{q}%")) |
-            (User.institution.ilike(f"%{q}%")) |
-            (User.position.ilike(f"%{q}%"))
+            (Profile.institution.ilike(f"%{q}%")) |
+            (Profile.position.ilike(f"%{q}%"))
         ).all()
     else:
         results = User.query.all()  # show all users if no query
@@ -94,8 +95,6 @@ def edit_profile():
             # Update User table fields
             current_user.first_name = form.first_name.data
             current_user.last_name = form.last_name.data
-            current_user.institution = form.institution.data
-            current_user.position = form.position.data
             
             # Get or create Profile record
             profile = Profile.query.filter_by(user_id=current_user.id).first()
@@ -104,8 +103,8 @@ def edit_profile():
                 db.session.add(profile)
             
             # Update Profile table fields
-            profile.name = f"{form.first_name.data} {form.last_name.data}"
             profile.institution = form.institution.data
+            profile.position = form.position.data
             profile.bio = form.bio.data
             profile.location = form.location.data
             profile.title = form.title.data
@@ -145,8 +144,6 @@ def edit_profile():
     if request.method == "GET":
         form.first_name.data = current_user.first_name
         form.last_name.data = current_user.last_name
-        form.institution.data = current_user.institution
-        form.position.data = current_user.position
         
         # Get profile data
         profile = Profile.query.filter_by(user_id=current_user.id).first()
@@ -155,6 +152,8 @@ def edit_profile():
             form.location.data = profile.location
             form.title.data = profile.title
             form.department.data = profile.department
+            form.institution.data = profile.institution
+            form.position.data = profile.position
             
             # Get social media links
             socials = {s.platform: s.url for s in profile.socials}
@@ -440,12 +439,19 @@ def register():
             email=form.email.data,
             first_name=form.first_name.data,
             last_name=form.last_name.data,
-            institution=form.institution.data,
-            position=form.position.data
         )
         user.set_password(form.password.data)
 
         db.session.add(user)
+        db.session.commit()
+
+        profile = Profile(
+            user_id=user.id,
+            institution=form.institution.data,
+            position=form.position.data
+        )
+
+        db.session.add(profile)
         db.session.commit()
 
         return redirect(url_for("auth.login"))

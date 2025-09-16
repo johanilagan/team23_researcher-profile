@@ -21,7 +21,7 @@
                 <div class="col-md-9">
                     <div class="profile-info">
                         <h1 id="researcher-name">{{ profile.user.first_name }} {{ profile.user.last_name }}</h1>
-                        <p class="title" id="researcher-title">{{ profile.user.position or 'Position not specified' }}</p>
+                        <p class="title" id="researcher-title">{{ profile.position or 'Position not specified' }}</p>
                         <p class="institution" id="researcher-institution">{{ profile.institution or 'Institution not specified' }}</p>
                         {% if profile.location %}
                         <p class="location" id="researcher-location">

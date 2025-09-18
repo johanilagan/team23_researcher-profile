@@ -20,17 +20,17 @@
                 </div>
                 <div class="col-md-9">
                     <div class="profile-info">
-                        <h1 id="researcher-name">{{ researcher.first_name }} {{ researcher.last_name }}</h1>
-                        <p class="title" id="researcher-title">{{ researcher.position or 'Position not specified' }}</p>
-                        <p class="institution" id="researcher-institution">{{ researcher.institution or 'Institution not specified' }}</p>
-                        {% if researcher.profile and researcher.profile.location %}
+                        <h1 id="researcher-name">{{ profile.user.first_name }} {{ profile.user.last_name }}</h1>
+                        <p class="title" id="researcher-title">{{ profile.position or 'Position not specified' }}</p>
+                        <p class="institution" id="researcher-institution">{{ profile.institution or 'Institution not specified' }}</p>
+                        {% if profile.location %}
                         <p class="location" id="researcher-location">
-                            <i class="fas fa-map-marker-alt me-1"></i>{{ researcher.profile.location }}
+                            <i class="fas fa-map-marker-alt me-1"></i>{{ profile.location }}
                         </p>
                         {% endif %}
                         <p class="bio" id="researcher-bio">
-                            {% if researcher.profile and researcher.profile.bio %}
-                                {{ researcher.profile.bio }}
+                            {% if profile.bio %}
+                                {{ profile.bio }}
                             {% else %}
                                 No bio available. Click "Edit Profile" to add your bio.
                             {% endif %}
@@ -38,8 +38,7 @@
                         
                         <!-- Social Media Links -->
                         <div class="social-links">
-                            {% if researcher.profile %}
-                                {% for social in researcher.profile.socials %}
+                            {% for social in profile.socials %}
                                     {% if social.platform == 'LinkedIn' %}
                                         <a href="{{ social.url }}" class="social-link linkedin" target="_blank">
                                             <i class="fab fa-linkedin"></i> LinkedIn
@@ -58,7 +57,7 @@
                                         </a>
                                     {% endif %}
                                 {% endfor %}
-                            {% endif %}
+                                
                         </div>
                     </div>
                 </div>
@@ -74,8 +73,8 @@
                 {% endif %}
             </div>
             <div class="interests-tags" id="research-interests">
-                {% if researcher.profile and researcher.profile.research_interests and researcher.profile.research_interests.strip() %}
-                    {% for interest in researcher.profile.research_interests.split(',') %}
+                {% if profile.research_interests and profile.research_interests.strip() %}
+                    {% for interest in profile.research_interests.split(',') %}
                         {% if interest.strip() %}
                             <span class="interest-tag">{{ interest.strip() }}</span>
                         {% endif %}

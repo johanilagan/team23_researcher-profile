@@ -15,8 +15,6 @@ def seed():
         email = "alice@example.com",
         first_name = "Alice",
         last_name = "Smith",
-        institution = "Example University",
-        position = "Professor"
     )
     user.set_password("password123")
     db.session.add(user)
@@ -25,7 +23,6 @@ def seed():
     # Creates sample profile
     profile = Profile(
         user_id = user.id,
-        name = "Alice Smith",
         title = "Professor of Biology",
         institution = "Example University",
         department = "Biology",

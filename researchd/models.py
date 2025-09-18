@@ -13,10 +13,6 @@ class User(UserMixin, db.Model):
     # profile fields
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100), nullable=False)
-    profile_pic_url = db.Column(db.String(255), nullable=True)
-    institution = db.Column(db.String(150), nullable=True)
-    position = db.Column(db.String(100), nullable=True)
-    profile_pic = db.Column(db.String(255), nullable=True)
 
     
     def set_password(self, password):
@@ -34,7 +30,6 @@ class Profile(db.Model):
     pid = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, unique=True, index=True)
     
-    name = db.Column(db.String(150))
     title = db.Column(db.String(150))
     institution = db.Column(db.String(150))
     department = db.Column(db.String(150))

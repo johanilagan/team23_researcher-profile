@@ -289,7 +289,29 @@
 {% endblock %}
 
 {% block extra_js %}
+    {% if is_owner %}
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script>
+        // Drag and drop??
+        document.addEventListener('DOMContentLoaded', function() {
+            new Sortable(document.getElementById('profile-sections'), {
+                animation: 150,
+                handle: '.profile-section',
+                onEnd: function (evt) {
+                    let order = [];
+                    document.querySelectorAll('#profile-sections .profile-section').forEach(function(section) {
+                        order.push(section.getAttribute('data-section'));
+                    });
+                    fetch('/save-section-order', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({order: order})
+                    });
+                }
+            });
+        });
+    </script>
+    {% endif %}
     <script>
         // User publications are now loaded dynamically from the server
 
@@ -716,23 +738,5 @@
             }, 3000);
         }
 
-        // Drag and drop??
-        document.addEventListener('DOMContentLoaded', function() {
-            new Sortable(document.getElementById('profile-sections'), {
-                animation: 150,
-                handle: '.profile-section',
-                onEnd: function (evt) {
-                    let order = [];
-                    document.querySelectorAll('#profile-sections .profile-section').forEach(function(section) {
-                        order.push(section.getAttribute('data-section'));
-                    });
-                    fetch('/save-section-order', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({order: order})
-                    });
-                }
-            });
-        });
     </script>
 {% endblock %}

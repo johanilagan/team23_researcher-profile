@@ -9,7 +9,7 @@
             <div class="row">
                 <div class="col-md-3 text-center">
                     <div class="profile-pic-container">
-                        <img id="profile-pic" src="https://via.placeholder.com/200x200/6c757d/ffffff?text=Profile+Pic" 
+                        <img id="profile-pic" src="{{ url_for('static', filename='placeholder.png') }}" 
                              alt="Profile Picture" class="profile-pic">
                         <button class="change-pic-btn" onclick="document.getElementById('profile-pic-input').click()">
                             <i class="fas fa-camera"></i>

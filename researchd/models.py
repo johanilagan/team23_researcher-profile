@@ -37,6 +37,7 @@ class Profile(db.Model):
     pfp = db.Column(db.String(255))  # profile picture URL
     location = db.Column(db.String(150))
     research_interests = db.Column(db.Text)  # comma-separated research interests
+    section_order = db.Column(db.Text, nullable=True) #JSON-encoded list of section keys
     
     user = db.relationship('User', backref=db.backref('profile', uselist=False))
 

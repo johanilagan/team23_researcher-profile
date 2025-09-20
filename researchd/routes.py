@@ -1,3 +1,4 @@
+import json
 from flask import Blueprint, render_template, redirect, url_for, request, jsonify, current_app
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.utils import secure_filename
@@ -29,11 +30,23 @@ def my_profile():
         db.session.commit()
     
     print(f"Loading profile for user {user.id}, interests: {profile.research_interests}")
+
+    # Sets default order for sections
+    default_sections = ['profile-header', 'interests-section', 'papers-section']
+    if profile.section_order:
+        try:
+            section_order = json.loads(profile.section_order)
+            if not section_order:
+                section_order = default_sections
+        except Exception:
+            section_order = default_sections
+    else:
+        section_order = default_sections
     
     # Get user's publications (papers)
     publications = Publication.query.filter_by(pid=profile.pid).order_by(Publication.created_at.desc()).limit(3).all()
     
-    return render_template("profile_page.html", profile=profile, is_owner=True, publications=publications)
+    return render_template("profile_page.html", profile=profile, is_owner=True, publications=publications, section_order=section_order)
 
 @main.route("/profile/<int:researcher_id>")
 def researcher_profile(researcher_id):
@@ -50,11 +63,23 @@ def researcher_profile(researcher_id):
         profile = Profile(user_id=researcher.id)
         db.session.add(profile)
         db.session.commit()
+
+    # Sets default order for sections
+    default_sections = ['profile-header', 'interests-section', 'papers-section']
+    if profile.section_order:
+        try:
+            section_order = json.loads(profile.section_order)
+            if not section_order:
+                section_order = default_sections
+        except Exception:
+            section_order = default_sections
+    else:
+        section_order = default_sections
     
     # Get researcher's publications (papers)
     publications = Publication.query.filter_by(pid=profile.pid).order_by(Publication.created_at.desc()).limit(3).all()
     
-    return render_template("profile_page.html", profile=profile, is_owner=is_owner, publications=publications)
+    return render_template("profile_page.html", profile=profile, is_owner=is_owner, publications=publications, section_order=section_order)
 
 @main.route("/search")
 def search():
@@ -462,3 +487,17 @@ def register():
 def logout():
     logout_user()
     return redirect(url_for("main.home"))
+
+@main.route("/save-section-order", methods=["POST"])
+@login_required
+def save_section_order():
+    data = request.get_json()
+    order = data.get("order")
+    if not order or not isinstance(order, list):
+        return jsonify({"success": False, "error": "Invalid order data"}), 400
+    profile = Profile.query.filter_by(user_id=current_user.id).first()
+    if not profile:
+        return jsonify({"success": False, "error": "Profile not found"}), 404
+    profile.section_order = json.dumps(order)
+    db.session.commit()
+    return jsonify({"success": True})

@@ -96,7 +96,7 @@
         {% elif section == 'papers-section' %}
 
         <!-- Recent Papers -->
-        <div class="papers-section" style="display:none;">
+        <div class="papers-section" id="papers-section" style="display:none;">
             <div class="profile-section" data-section="papers-section">
                 <div class="section-header">
                     <h2>Recent Papers</h2>
@@ -167,6 +167,12 @@
             <a href="{{ url_for('main.my_papers') }}" class="btn btn-info">
                 <i class="fas fa-file-alt"></i> View My Papers
             </a>
+            <button class="btn btn-primary" onclick="addSection('buttons_section')">Add Section</button>
+
+        </div>
+        <div id="buttons_section">
+            <button class="btn btn-primary" onclick="addSection('papers-section')">add papers section</button>
+            <button class="btn btn-primary" onclick="addSection('interests-section')">add intrests section</button>
         </div>
         {% endif %}
 
@@ -287,7 +293,6 @@
             </div>
         </div>
     </div>
-    <button onclick="addSection('interests-section')">add interests section</button>
     <script>
         function addSection(sect) {
             // Grab the template section

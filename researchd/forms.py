@@ -28,6 +28,8 @@ class EditProfileForm(FlaskForm):
     position = StringField("Position", validators=[Optional(), Length(max=100)])
     bio = TextAreaField("Bio", validators=[Optional(), Length(max=1000)])
     location = StringField("Location", validators=[Optional(), Length(max=150)])
+    title = StringField("Title", validators=[Optional(), Length(max=150)])
+    department = StringField("Department", validators=[Optional(), Length(max=150)])
     
     # Social media links
     linkedin_url = URLField("LinkedIn URL", validators=[Optional()])

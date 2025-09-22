@@ -38,6 +38,7 @@ class Profile(db.Model):
     location = db.Column(db.String(150))
     research_interests = db.Column(db.Text)  # comma-separated research interests
     section_order = db.Column(db.Text, nullable=True) #JSON-encoded list of section keys
+    position = db.Column(db.String(150))
     
     user = db.relationship('User', backref=db.backref('profile', uselist=False))
 

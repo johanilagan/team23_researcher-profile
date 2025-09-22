@@ -71,7 +71,7 @@
 
         {% elif section == 'interests-section' %}
         <!-- Research Interests -->
-        <div class="interests-section">
+        <div class="interests-section" style="display:none;" id="interests-section">
             <div class="profile-section" data-section="interests-section">
                 <div class="section-header">
                     <h2>Research Interests</h2>
@@ -96,7 +96,7 @@
         {% elif section == 'papers-section' %}
 
         <!-- Recent Papers -->
-        <div class="papers-section">
+        <div class="papers-section" style="display:none;">
             <div class="profile-section" data-section="papers-section">
                 <div class="section-header">
                     <h2>Recent Papers</h2>
@@ -287,6 +287,23 @@
             </div>
         </div>
     </div>
+    <button onclick="addSection('interests-section')">add interests section</button>
+    <script>
+        function addSection(sect) {
+            // Grab the template section
+            const template = document.getElementById(sect);
+
+            // Clone it (true = deep clone with children)
+            const clone = template.cloneNode(true);
+
+            // Make sure it's visible and unique
+            clone.style.display = "block";
+            clone.id = ""; // clear id so duplicates are valid
+
+            // Append to the container
+            document.getElementById("profile-sections").appendChild(clone);
+        }
+  </script>
 
 {% endblock %}
 

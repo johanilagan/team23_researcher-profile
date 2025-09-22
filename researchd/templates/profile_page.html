@@ -173,6 +173,8 @@
         <div id="buttons_section">
             <button class="btn btn-primary" onclick="addSection('papers-section')">add papers section</button>
             <button class="btn btn-primary" onclick="addSection('interests-section')">add intrests section</button>
+            <button type="button" class="btn btn-primary" onclick="deleteSection('papers-section')">delete papers section</button>
+            <button type="button" class="btn btn-primary" onclick="deleteSection('interests-section')">delete intrests section</button>
         </div>
         {% endif %}
 
@@ -303,10 +305,16 @@
 
             // Make sure it's visible and unique
             clone.style.display = "block";
-            clone.id = ""; // clear id so duplicates are valid
+            clone.id = sect + "Clone"; // clear id so duplicates are valid
 
             // Append to the container
             document.getElementById("profile-sections").appendChild(clone);
+        }
+
+        function deleteSection(sect) {
+            let section_id = sect + "Clone";
+            const Section = document.getElementById(section_id);
+            Section.remove();
         }
   </script>
 

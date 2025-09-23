@@ -8,6 +8,7 @@
         <div class = "col-lg-10">
             <div class="card shadow-sm">
                 <div class="card-body">
+                
                     <!-- Title -->
                     <h2 class = "fw-bold mb-3">
                         <i class = "fas fa-file-alt me-2 text-primary"></i>
@@ -77,7 +78,7 @@
                         {% endif %}
                     </div>
                 </div>
-                
+
                 <!-- Footer -->
                 <div class="card-footer bg-light d-flex justify-content-between align-items-center">
                     <small class = "text-muted">
@@ -117,8 +118,8 @@
                     </div>
                 </div>
 
-                <!-- PDF Preview Section -->
-                <div id="pdf-viewer" class="p-3 text-center" style="background:#1e1e2f; color:white; border-radius:0 0 8px 8px;">
+                <!-- PDF.js Viewer -->
+                <div id="pdf-viewer" class="p-3 text-center" style="background:#1e1e2f; border-radius:0 0 8px 8px;">
                     <canvas id="pdf-canvas" class="shadow-sm rounded"></canvas>
                 </div>
             </div>
@@ -134,53 +135,53 @@
         pageNum = 1,
         pageRendering = false,
         pageNumPending = null,
-        scale = 1.2,
+        scale = 1,
         canvas = document.getElementById('pdf-canvas'),
         ctx = canvas.getContext('2d');
 
     function renderPage(num) {
         pageRendering = true;
-        pdfDoc.getPage(num).then(function(page) {
-            const container = document.getElementById("pdf-viewer");
+            pdfDoc.getPage(num).then(function(page) {
+                const container = document.getElementById("pdf-viewer");
 
-            // Get unscaled viewport (scale = 1)
-            const unscaledViewport = page.getViewport({ scale: 1 });
+                // Unscaled viewport
+                const unscaledViewport = page.getViewport({ scale: 1 });
 
-            // Compute scale so PDF width matches container width
-            const desiredWidth = container.clientWidth;
-            const scale = desiredWidth / unscaledViewport.width;
+                // Fit-to-width scale
+                const desiredWidth = container.clientWidth;
+                scale = desiredWidth / unscaledViewport.width;
 
-            // Apply devicePixelRatio for HD quality
-            const outputScale = window.devicePixelRatio || 1;
-            const viewport = page.getViewport({ scale: scale });
+                // Retina/HiDPI support
+                const outputScale = window.devicePixelRatio || 1;
+                const viewport = page.getViewport({ scale: scale });
 
-            canvas.width = Math.floor(viewport.width * outputScale);
-            canvas.height = Math.floor(viewport.height * outputScale);
-            canvas.style.width = Math.floor(viewport.width) + "px";
-            canvas.style.height = Math.floor(viewport.height) + "px";
+                canvas.width = Math.floor(viewport.width * outputScale);
+                canvas.height = Math.floor(viewport.height * outputScale);
+                canvas.style.width = "100%";
+                canvas.style.height = "auto";
 
-            const transform = outputScale !== 1
-            ? [outputScale, 0, 0, outputScale, 0, 0]
-            : null;
+                const transform = outputScale !== 1
+                    ? [outputScale, 0, 0, outputScale, 0, 0]
+                    : null;
 
-            const renderContext = {
-            canvasContext: ctx,
-            viewport: viewport,
-            transform: transform
-            };
+                const renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport,
+                    transform: transform
+                };
 
-            const renderTask = page.render(renderContext);
-            renderTask.promise.then(function() {
-            pageRendering = false;
-            if (pageNumPending !== null) {
-                renderPage(pageNumPending);
-                pageNumPending = null;
-            }
+                const renderTask = page.render(renderContext);
+                renderTask.promise.then(function() {
+                    pageRendering = false;
+                    if (pageNumPending !== null) {
+                        renderPage(pageNumPending);
+                        pageNumPending = null;
+                        }
+                });
             });
-        });
 
-        document.getElementById("page_num").textContent = num;
-        }
+        document.getElementById('page_num').textContent = num;
+    }
 
     function queueRenderPage(num) {
         if (pageRendering) {
@@ -209,8 +210,8 @@
 
     function zoomOut() {
         if (scale > 0.4) {
-        scale -= 0.2;
-        queueRenderPage(pageNum);
+            scale -= 0.2;
+            queueRenderPage(pageNum);
         }
     }
 
@@ -219,10 +220,16 @@
     document.getElementById('zoom_in').addEventListener('click', zoomIn);
     document.getElementById('zoom_out').addEventListener('click', zoomOut);
 
+    // Load the PDF
     pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
         pdfDoc = pdfDoc_;
         document.getElementById('page_count').textContent = pdfDoc.numPages;
         renderPage(pageNum);
+    });
+
+    // Re-render on window resize (keep fit-to-width)
+    window.addEventListener("resize", () => {
+        queueRenderPage(pageNum);
     });
 </script>
 {% endblock %}

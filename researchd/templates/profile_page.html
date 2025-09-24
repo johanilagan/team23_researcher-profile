@@ -204,7 +204,7 @@
                             </div>
                             {% if is_owner %}
                             <div>
-                                <button class="btn btn-sm btn-danger" onclick="deleteExternalRole({{ er.erid }})" title="Delete this role">
+                                <button class="btn btn-sm btn-danger" onclick="deleteExternalRole(Number(this.closest('[data-erid]').dataset.erid))" title="Delete this role">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -468,7 +468,7 @@
                     <div class="custom-modal-overlay" onclick="closeExternalRoleModal()"></div>
                     <div class="custom-modal-content">
                         <div class="custom-modal-header">
-                            <h5 class="custom-modal-title"><i class=\"fas fa-users me-2\"></i>Add External Role</h5>
+                            <h5 class="custom-modal-title"><i class="fas fa-users me-2"></i>Add External Role</h5>
                             <button type="button" class="custom-modal-close" onclick="closeExternalRoleModal()">&times;</button>
                         </div>
                         <div class="custom-modal-body">
@@ -589,7 +589,7 @@
                 <div>
                     <strong>${escapeHtml(er.role_title)}</strong> — ${escapeHtml(er.organization)}
                     ${yearRange}
-                    ${er.description ? `<p class=\"mb-0 text-muted\">${escapeHtml(er.description)}</p>` : ''}
+                    ${er.description ? `<p class="mb-0 text-muted">${escapeHtml(er.description)}</p>` : ''}
                 </div>
                 <div>
                     <button class="btn btn-sm btn-danger" onclick="deleteExternalRole(${er.erid})" title="Delete this role">
@@ -614,7 +614,7 @@
                 .then(r => r.json())
                 .then(data => {
                     if (data.success) {
-                        const el = document.querySelector(`[data-erid=\"${erid}\"]`);
+                        const el = document.querySelector(`[data-erid="${erid}"]`);
                         if (el) el.remove();
                         showNotification('External role deleted', 'success');
                     } else {

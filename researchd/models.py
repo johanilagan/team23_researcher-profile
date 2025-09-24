@@ -49,6 +49,7 @@ class Profile(db.Model):
     files = db.relationship("File", back_populates="profile", cascade="all, delete-orphan", passive_deletes=True)
     photos = db.relationship("Photo", back_populates="profile", cascade="all, delete-orphan", passive_deletes=True)
     socials = db.relationship("Social", back_populates="profile", cascade="all, delete-orphan", passive_deletes=True)
+    external_roles = db.relationship("ExternalRole", back_populates="profile", cascade="all, delete-orphan", passive_deletes=True, order_by="ExternalRole.sort_order")
 
 
 class Education(db.Model):
@@ -73,6 +74,22 @@ class Experience(db.Model):
     end_year = db.Column(db.Integer, nullable=True)
 
     profile = db.relationship("Profile", back_populates="experiences")
+
+
+class ExternalRole(db.Model):
+    __tablename__ = "external_roles"
+
+    erid = db.Column(db.Integer, primary_key=True)  # ExternalRoleID
+    pid = db.Column(db.Integer, db.ForeignKey("profiles.pid", ondelete="CASCADE"), nullable=False, index=True)
+
+    role_title = db.Column(db.String(150), nullable=False)
+    organization = db.Column(db.String(150), nullable=False)
+    start_year = db.Column(db.Integer, nullable=True)
+    end_year = db.Column(db.Integer, nullable=True)
+    description = db.Column(db.Text)
+    sort_order = db.Column(db.Integer, nullable=True, index=True)
+
+    profile = db.relationship("Profile", back_populates="external_roles")
 
 
 class File(db.Model):

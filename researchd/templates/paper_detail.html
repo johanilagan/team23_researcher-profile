@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}{{ paper.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class = "col-lg-10">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                
+                    <!-- Title -->
+                    <h2 class = "fw-bold mb-3">
+                        <i class = "fas fa-file-alt me-2 text-primary"></i>
+                        {{ paper.title }}
+                    </h2>
+
+                    <!-- Authors -->
+                    {% if paper.authors %}
+                    <p class = "mb-2">
+                        <strong>Authors:</strong> {{ paper.authors }}
+                    </p>
+                    {% endif %}
+
+                    <!-- Journal and Year -->
+                    <p class="mb-3 text-muted">
+                        {% if paper.journal %}
+                        <span class="badge bg-primary me-1">{{ paper.journal }}</span>
+                        {% endif %}
+                        {% if paper.year %}
+                        <span class="badge bg-secondary">{{ paper.year }}</span>
+                        {% endif %}
+                    </p>
+
+                    <!-- Publication Date -->
+                    {% if paper.publication_date %}
+                    <p class="text-muted">
+                        <i class="fas fa-calendar me-1"></i> Published on {{ paper.publication_date.strftime('%B %d, %Y') }}
+                    </p>
+                    {% endif %}
+
+                    <!-- Abstract -->
+                    {% if paper.abstract %}
+                    <div class="mt-4">
+                        <h5>Abstract</h5>
+                        <p>{{ paper.abstract }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Keywords -->
+                    {% if paper.keywords %}
+                    <div class="mt-4">
+                        <h5>Keywords</h5>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for keyword in paper.keywords.split(',') %}
+                            <span class="badge bg-light text-dark">{{ keyword.strip() }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Links -->
+                    <div class = "mt-4 d-flex flex-wrap gap-2">
+                        {% if paper.doi %}
+                        <a href = "https://doi.org/{{ paper.doi }}" target = "_blank" class = "btn btn-outline-secondary">
+                            <i class = "fas fa-link me-1"></i> DOI
+                        </a>
+                        {% endif %}
+                        {% if paper.file %}
+                        <a href = "{{ url_for('main.download_file', filename=paper.file.file_path) }}" target = "_blank" class = "btn btn-outline-primary">
+                            <i class = "fas fa-download me-1"></i> Download PDF
+                        </a>
+                        {% endif %}
+                        {% if paper.url %}
+                        <a href = "{{ paper.url }}" target = "_blank" class = "btn btn-outline-secondary">
+                            <i class = "fas fa-external-link-alt me-1"></i> View Link
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+                    <small class = "text-muted">
+                        Uploaded on {{ paper.created_at.strftime('%B %d, %Y') }}
+                    </small>
+                    <div class = "d-flex gap-2">
+                        <a href = "{{ url_for('main.edit_paper', paper_id=paper.pubid) }}" class = "btn btn-sm btn-outline-success">
+                            <i class = "fas fa-edit me-1"></i> Edit
+                        </a>
+                        <a href = "{{ url_for('main.my_papers') }}" class = "btn btn-sm btn-outline-secondary">
+                            <i class = "fas fa-arrow-left me-1"></i> Back to My Papers
+                        </a>
+                    </div>
+                </div>
+
+                
+                <!-- PDF Toolbar -->
+                <div class="bg-dark text-white p-2 d-flex justify-content-between align-items-center">
+                    <div>
+                        <button id="prev" class="btn btn-sm btn-outline-light me-2">
+                            <i class="fas fa-arrow-left"></i> Prev
+                        </button>
+                        <button id="next" class="btn btn-sm btn-outline-light">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div>
+                        Page <span id="page_num">1</span> / <span id="page_count">--</span>
+                    </div>
+                    <div>
+                        <button id="zoom_out" class="btn btn-sm btn-outline-light me-2">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <button id="zoom_in" class="btn btn-sm btn-outline-light">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PDF.js Viewer -->
+                <div id="pdf-viewer" class="p-3 text-center" style="background:#1e1e2f; border-radius:0 0 8px 8px;">
+                    <canvas id="pdf-canvas" class="shadow-sm rounded"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+    const url = "{{ url_for('main.download_file', filename=paper.file.file_path) }}";
+
+    let pdfDoc = null,
+        pageNum = 1,
+        pageRendering = false,
+        pageNumPending = null,
+        scale = 1,
+        canvas = document.getElementById('pdf-canvas'),
+        ctx = canvas.getContext('2d');
+
+    function renderPage(num) {
+        pageRendering = true;
+            pdfDoc.getPage(num).then(function(page) {
+                const container = document.getElementById("pdf-viewer");
+
+                // Unscaled viewport
+                const unscaledViewport = page.getViewport({ scale: 1 });
+
+                // Fit-to-width scale
+                const desiredWidth = container.clientWidth;
+                scale = desiredWidth / unscaledViewport.width;
+
+                // Retina/HiDPI support
+                const outputScale = window.devicePixelRatio || 1;
+                const viewport = page.getViewport({ scale: scale });
+
+                canvas.width = Math.floor(viewport.width * outputScale);
+                canvas.height = Math.floor(viewport.height * outputScale);
+                canvas.style.width = "100%";
+                canvas.style.height = "auto";
+
+                const transform = outputScale !== 1
+                    ? [outputScale, 0, 0, outputScale, 0, 0]
+                    : null;
+
+                const renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport,
+                    transform: transform
+                };
+
+                const renderTask = page.render(renderContext);
+                renderTask.promise.then(function() {
+                    pageRendering = false;
+                    if (pageNumPending !== null) {
+                        renderPage(pageNumPending);
+                        pageNumPending = null;
+                        }
+                });
+            });
+
+        document.getElementById('page_num').textContent = num;
+    }
+
+    function queueRenderPage(num) {
+        if (pageRendering) {
+            pageNumPending = num;
+        } else {
+            renderPage(num);
+        }
+    }
+
+    function onPrevPage() {
+        if (pageNum <= 1) return;
+        pageNum--;
+        queueRenderPage(pageNum);
+    }
+
+    function onNextPage() {
+        if (pageNum >= pdfDoc.numPages) return;
+        pageNum++;
+        queueRenderPage(pageNum);
+    }
+
+    function zoomIn() {
+        scale += 0.2;
+        queueRenderPage(pageNum);
+    }
+
+    function zoomOut() {
+        if (scale > 0.4) {
+            scale -= 0.2;
+            queueRenderPage(pageNum);
+        }
+    }
+
+    document.getElementById('prev').addEventListener('click', onPrevPage);
+    document.getElementById('next').addEventListener('click', onNextPage);
+    document.getElementById('zoom_in').addEventListener('click', zoomIn);
+    document.getElementById('zoom_out').addEventListener('click', zoomOut);
+
+    // Load the PDF
+    pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
+        pdfDoc = pdfDoc_;
+        document.getElementById('page_count').textContent = pdfDoc.numPages;
+        renderPage(pageNum);
+    });
+
+    // Re-render on window resize (keep fit-to-width)
+    window.addEventListener("resize", () => {
+        queueRenderPage(pageNum);
+    });
+</script>
+{% endblock %}

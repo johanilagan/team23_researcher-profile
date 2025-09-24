@@ -67,6 +67,10 @@
                                         Uploaded {{ paper.created_at.strftime('%B %d, %Y') }}
                                     </small>
                                     <div class="d-flex gap-1">
+                                        <a href="{{ url_for('main.paper_detail', paper_id=paper.pubid) }}" 
+                                           class="btn btn-sm btn-outline-info" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
                                         <a href="{{ url_for('main.edit_paper', paper_id=paper.pubid) }}" 
                                            class="btn btn-sm btn-outline-success" title="Edit Paper">
                                             <i class="fas fa-edit"></i>

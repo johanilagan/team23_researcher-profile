@@ -1,5 +1,5 @@
 import json
-from flask import Blueprint, render_template, redirect, url_for, request, jsonify, current_app
+from flask import Blueprint, render_template, redirect, url_for, request, jsonify, current_app, send_from_directory
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.utils import secure_filename
 from .forms import LoginForm, RegisterForm, EditProfileForm, UploadPaperForm, EditPaperForm
@@ -315,6 +315,11 @@ def my_papers():
     papers = Publication.query.filter_by(pid=profile.pid).order_by(Publication.created_at.desc()).all()
     return render_template("my_papers.html", papers=papers)
 
+@main.route("/paper/<int:paper_id>")
+def paper_detail(paper_id):
+    paper = Publication.query.get_or_404(paper_id)
+    return render_template("paper_detail.html", paper=paper)
+
 @main.route("/edit-paper/<int:paper_id>", methods=["GET", "POST"])
 @login_required
 def edit_paper(paper_id):
@@ -419,7 +424,7 @@ def edit_paper(paper_id):
 @main.route("/download/<filename>")
 @login_required
 def download_file(filename):
-    """Securely serve uploaded files"""
+    """Securely serve uploaded files with option to preview inline"""
     try:
         # Verify the file belongs to the current user
         profile = Profile.query.filter_by(user_id=current_user.id).first()
@@ -430,9 +435,10 @@ def download_file(filename):
         if not file_record:
             return redirect(url_for("main.my_profile"))
         
-        file_path = os.path.join(current_app.root_path, 'static', 'uploads', filename)
-        if os.path.exists(file_path):
-            return redirect(url_for('static', filename='uploads/' + filename))
+        file_path = os.path.join(current_app.root_path, 'static', 'uploads')
+        if os.path.exists(os.path.join(file_path, filename)):
+            # Use send_from_directory with as_attachment=False to preview inline
+            return send_from_directory(file_path, filename, as_attachment=False, mimetype='application/pdf')
         else:
             return redirect(url_for("main.my_profile"))
             

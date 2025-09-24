@@ -178,7 +178,30 @@
         </div>
         {% endif %}
 
-        
+        <!-- Achievements Section -->
+        {% if profile.achievements %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <h5 class="text-primary mb-3">
+                    <i class="fas fa-trophy me-2"></i>Achievements
+                </h5>
+                <ul class="list-group">
+                    {% for ach in profile.achievements %}
+                    <li class="list-group-item">
+                        <strong>{{ ach.title }}</strong>
+                        {% if ach.type %} <span class="badge bg-secondary">{{ ach.type }}</span>{% endif %}
+                        {% if ach.year %} <small class="text-muted">({{ ach.year }})</small>{% endif %}
+                        {% if ach.description %}
+                        <p class="mb-0">{{ ach.description }}</p>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
+
         <!-- Logout Section -->
         <div class="logout-section text-center py-4">
             <div class="container">

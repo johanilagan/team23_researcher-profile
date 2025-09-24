@@ -49,6 +49,7 @@ class Profile(db.Model):
     files = db.relationship("File", back_populates="profile", cascade="all, delete-orphan", passive_deletes=True)
     photos = db.relationship("Photo", back_populates="profile", cascade="all, delete-orphan", passive_deletes=True)
     socials = db.relationship("Social", back_populates="profile", cascade="all, delete-orphan", passive_deletes=True)
+    achievements = db.relationship("Achievement", back_populates="profile", cascade="all, delete-orphan", passive_deletes=True)
 
 
 class Education(db.Model):
@@ -74,6 +75,16 @@ class Experience(db.Model):
 
     profile = db.relationship("Profile", back_populates="experiences")
 
+class Achievement(db.Model):
+    aid = db.Column(db.Integer, primary_key=True) 
+    pid = db.Column(db.Integer, db.ForeignKey("profiles.pid", ondelete="CASCADE"), nullable=False, index=True)
+
+    title = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text)
+    year = db.Column(db.Integer)
+    type = db.Column(db.String(100))  # e.g., 'Award', 'Grant', or 'Funds'
+
+    profile = db.relationship("Profile", back_populates="achievements")
 
 class File(db.Model):
     __tablename__ = "files"

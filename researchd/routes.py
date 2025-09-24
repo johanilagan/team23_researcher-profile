@@ -3,7 +3,7 @@ from flask import Blueprint, render_template, redirect, url_for, request, jsonif
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.utils import secure_filename
 from .forms import LoginForm, RegisterForm, EditProfileForm, UploadPaperForm, EditPaperForm
-from .models import User, Profile, Social, Publication, File
+from .models import User, Profile, Social, Publication, File, Achievement
 from sqlalchemy.orm import joinedload
 from . import db
 import os
@@ -115,19 +115,19 @@ def privacy():
 def edit_profile():
     form = EditProfileForm()
     
+    profile = Profile.query.filter_by(user_id=current_user.id).first()
+    if not profile:
+        profile = Profile(user_id=current_user.id)
+        db.session.add(profile)
+        db.session.flush()  # Ensures profile.pid is available for achievements/socials
+
     if form.validate_on_submit():
         try:
-            # Update User table fields
+            # Update User fields
             current_user.first_name = form.first_name.data
             current_user.last_name = form.last_name.data
-            
-            # Get or create Profile record
-            profile = Profile.query.filter_by(user_id=current_user.id).first()
-            if not profile:
-                profile = Profile(user_id=current_user.id)
-                db.session.add(profile)
-            
-            # Update Profile table fields
+
+            # Update Profile fields
             profile.institution = form.institution.data
             profile.position = form.position.data
             profile.bio = form.bio.data
@@ -135,59 +135,77 @@ def edit_profile():
             profile.title = form.title.data
             profile.department = form.department.data
 
-            
-            # Update social media links
+            # Update social links
             social_platforms = {
                 'LinkedIn': form.linkedin_url.data,
                 'Twitter': form.twitter_url.data,
                 'Instagram': form.instagram_url.data,
                 'GitHub': form.github_url.data
             }
-            
+
             for platform, url in social_platforms.items():
-                if url:  # Only add if URL is provided
-                    social = Social.query.filter_by(pid=profile.pid, platform=platform).first()
+                social = Social.query.filter_by(pid=profile.pid, platform=platform).first()
+                if url:
                     if social:
                         social.url = url
                     else:
-                        social = Social(pid=profile.pid, platform=platform, url=url)
-                        db.session.add(social)
+                        db.session.add(Social(pid=profile.pid, platform=platform, url=url))
                 else:
-                    # Remove social link if URL is empty
-                    social = Social.query.filter_by(pid=profile.pid, platform=platform).first()
                     if social:
                         db.session.delete(social)
-            
+
+            # Update achievements
+            Achievement.query.filter_by(pid=profile.pid).delete()
+            db.session.flush()  # Ensure deletion happens before adding new
+
+            for a in form.achievements.data:
+                if a.get('title'):  # Only add non-empty achievements
+                    db.session.add(Achievement(
+                        pid=profile.pid,
+                        type=a.get('type'),
+                        title=a.get('title'),
+                        year=a.get('year'),
+                        description=a.get('description')
+                    ))
+
             db.session.commit()
             return redirect(url_for("main.my_profile"))
-            
-        except Exception as e:
+
+        except Exception:
             db.session.rollback()
-            pass
-    
-    # Pre-populate form with current data
-    if request.method == "GET":
+
+    elif request.method == "GET":
+        # Pre-populate User fields
         form.first_name.data = current_user.first_name
         form.last_name.data = current_user.last_name
-        
-        # Get profile data
-        profile = Profile.query.filter_by(user_id=current_user.id).first()
-        if profile:
-            form.bio.data = profile.bio
-            form.location.data = profile.location
-            form.title.data = profile.title
-            form.department.data = profile.department
-            form.institution.data = profile.institution
-            form.position.data = profile.position
-            
-            # Get social media links
-            socials = {s.platform: s.url for s in profile.socials}
-            form.linkedin_url.data = socials.get('LinkedIn', '')
-            form.twitter_url.data = socials.get('Twitter', '')
-            form.instagram_url.data = socials.get('Instagram', '')
-            form.github_url.data = socials.get('GitHub', '')
-    
+
+        # Pre-populate Profile fields
+        form.institution.data = profile.institution
+        form.position.data = profile.position
+        form.bio.data = profile.bio
+        form.location.data = profile.location
+        form.title.data = profile.title
+        form.department.data = profile.department
+
+        # Pre-populate social links
+        socials = {s.platform: s.url for s in profile.socials}
+        form.linkedin_url.data = socials.get('LinkedIn', '')
+        form.twitter_url.data = socials.get('Twitter', '')
+        form.instagram_url.data = socials.get('Instagram', '')
+        form.github_url.data = socials.get('GitHub', '')
+
+        # Pre-populate achievements
+        for ach in profile.achievements:
+            form.achievements.append_entry({
+                'title': ach.title,
+                'type': ach.type,
+                'year': ach.year,
+                'description': ach.description
+            })
+
     return render_template("edit_profile.html", form=form)
+
+
 
 @main.route("/update-interests", methods=["POST"])
 @login_required

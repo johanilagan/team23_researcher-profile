@@ -56,6 +56,11 @@
                 </ul>
                 
                 <div class="navbar-nav">
+                    <!-- Theme Toggle Button -->
+                    <button class="theme-toggle" id="theme-toggle" title="Toggle Dark Mode">
+                        <i class="fas fa-moon" id="theme-icon"></i>
+                    </button>
+                    
                     <!-- Authentication buttons - shown when not logged in -->
                     {% if current_user.is_authenticated %}
                         <a href="{{ url_for('auth.logout') }}" class="btn btn-danger btn-lg">
@@ -89,7 +94,7 @@
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="#"><i class="fas fa-cog"></i> Settings</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#" onclick="signOut()"><i class="fas fa-sign-out-alt"></i> Sign Out</a></li>
+                                <li><button class="dropdown-item" type="button" onclick="signOut()"><i class="fas fa-sign-out-alt"></i> Sign Out</button></li>
                             </ul>
                         </div>
                     </div>
@@ -143,6 +148,45 @@
     
     <!-- Custom JavaScript -->
     <script>
+        // Theme Management
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-icon');
+            
+            // Apply saved theme
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            
+            // Update icon based on current theme
+            if (savedTheme === 'dark') {
+                themeIcon.className = 'fas fa-sun';
+                themeToggle.title = 'Switch to Light Mode';
+            } else {
+                themeIcon.className = 'fas fa-moon';
+                themeToggle.title = 'Switch to Dark Mode';
+            }
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            const themeIcon = document.getElementById('theme-icon');
+            const themeToggle = document.getElementById('theme-toggle');
+            
+            // Apply new theme
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            // Update icon and tooltip
+            if (newTheme === 'dark') {
+                themeIcon.className = 'fas fa-sun';
+                themeToggle.title = 'Switch to Light Mode';
+            } else {
+                themeIcon.className = 'fas fa-moon';
+                themeToggle.title = 'Switch to Dark Mode';
+            }
+        }
+
         // Check authentication status
         function checkAuthStatus() {
             const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
@@ -181,7 +225,6 @@
             }
         }
 
-
         // Sign out function
         function signOut() {
             localStorage.removeItem('isLoggedIn');
@@ -193,6 +236,17 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOMContentLoaded event fired');
             console.log('Bootstrap version:', typeof bootstrap !== 'undefined' ? bootstrap.VERSION : 'Not loaded');
+            
+            // Initialize theme
+            initTheme();
+            
+            // Add event listener to theme toggle
+            const themeToggle = document.getElementById('theme-toggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', toggleTheme);
+            }
+            
+            // Check authentication status
             checkAuthStatus();
         });
     </script>

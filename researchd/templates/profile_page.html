@@ -4,10 +4,10 @@
 
 {% block content %}
     <div class="container mt-4" id="profile-sections">
-        {% for section in section_order %}
-        {% if section == 'profile-header' %}
+        {% for s in section_order %}
+        {% if s.section == 'profile-header' %}
         <!-- Profile Header -->
-        <div class="profile-header">
+        <div class="profile-header {% if not s.visible %}d-none{% endif %}">
             <div class="profile-section" data-section="profile-header">
                 <div class="row">
                     <div class="col-md-3 text-center">
@@ -69,9 +69,9 @@
         </div>
 
 
-        {% elif section == 'interests-section' %}
+        {% elif s.section == 'interests-section' %}
         <!-- Research Interests -->
-        <div class="interests-section" style="display:none;" id="interests-section">
+        <div class="interests-section {% if not s.visible %}d-none{% endif %}" id="interests-section">
             <div class="profile-section" data-section="interests-section">
                 <div class="section-header">
                     <h2>Research Interests</h2>
@@ -93,10 +93,10 @@
             </div>
         </div>
 
-        {% elif section == 'papers-section' %}
+        {% elif s.section == 'papers-section' %}
 
         <!-- Recent Papers -->
-        <div class="papers-section" id="papers-section" style="display:none;">
+        <div class="papers-section {% if not s.visible %}d-none{% endif %}" id="papers-section">
             <div class="profile-section" data-section="papers-section">
                 <div class="section-header">
                     <h2>Recent Papers</h2>
@@ -167,16 +167,92 @@
             <a href="{{ url_for('main.my_papers') }}" class="btn btn-info">
                 <i class="fas fa-file-alt"></i> View My Papers
             </a>
+            <button class="btn btn-outline-primary" onclick="toggleExternalRoles()" id="toggle-external-roles-btn">
+                <i class="fas fa-users me-1"></i> External Roles
+            </button>
             <button class="btn btn-primary" onclick="addSection('buttons_section')">Add Section</button>
 
         </div>
         <div id="buttons_section">
-            <button class="btn btn-primary" onclick="addSection('papers-section')">add papers section</button>
-            <button class="btn btn-primary" onclick="addSection('interests-section')">add intrests section</button>
-            <button type="button" class="btn btn-primary" onclick="deleteSection('papers-section')">delete papers section</button>
-            <button type="button" class="btn btn-primary" onclick="deleteSection('interests-section')">delete intrests section</button>
+            {% set section_map = section_order | map(attribute='section') | list %}
+            {% set visible_map = section_order | map(attribute='visible') | list %}
+            {% for s in section_order %}
+                {% if s.section == 'papers-section' %}
+                    {% if not s.visible %}
+                        <button class="btn btn-primary" onclick="addSection('papers-section')">Add Papers Section</button>
+                    {% else %}
+                        <button type="button" class="btn btn-primary" onclick="deleteSection('papers-section')">Delete Papers Section</button>
+                    {% endif %}
+                {% elif s.section == 'interests-section' %}
+                    {% if not s.visible %}
+                        <button class="btn btn-primary" onclick="addSection('interests-section')">Add Interests Section</button>
+                    {% else %}
+                        <button type="button" class="btn btn-primary" onclick="deleteSection('interests-section')">Delete Interests Section</button>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
+        
+        <!-- External Positions / Roles (placed under buttons section) -->
+        <div class="papers-section external-roles-section mt-4" id="external-roles-section" style="display: none;">
+            <div class="profile-section" data-section="external-roles-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-users me-2"></i>External Roles</h2>
+                    {% if is_owner %}
+                    <div>
+                        <button class="btn btn-outline-primary btn-sm me-2" onclick="addExternalRoleWithModal()">
+                            <i class="fas fa-plus me-1"></i>Add Role
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="toggleExternalRoles()">
+                            <i class="fas fa-eye-slash me-1"></i>Hide
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div id="external-roles-list" class="list-group">
+                    {% if external_roles %}
+                        {% for er in external_roles %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center" data-erid="{{ er.erid }}" style="cursor: move;">
+                            <div>
+                                <strong>{{ er.role_title }}</strong> — {{ er.organization }}
+                                {% if er.start_year %}
+                                    <small>({{ er.start_year }}{% if er.end_year %} – {{ er.end_year }}{% else %} – Present{% endif %})</small>
+                                {% endif %}
+                                {% if er.description %}
+                                    <p class="mb-0 text-muted">{{ er.description }}</p>
+                                {% endif %}
+                            </div>
+                            {% if is_owner %}
+                            <div>
+                                <button class="btn btn-sm btn-danger" onclick="deleteExternalRole(Number(this.closest('[data-erid]').dataset.erid))" title="Delete this role">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        {% if is_owner and external_roles|length > 1 %}
+                        <small class="text-muted mt-2 d-block drag-instructions-external">
+                            <i class="fas fa-grip-vertical me-1"></i>Drag and drop to reorder roles
+                        </small>
+                        {% endif %}
+                    {% else %}
+                        <div class="empty-state">
+                            <h5 class="text-muted">No external positions added yet</h5>
+                            {% if is_owner %}
+                            <p class="text-muted">Showcase roles like editorial boards, society offices, visiting appointments, etc.</p>
+                            <button class="btn btn-primary" onclick="addExternalRoleWithModal()">
+                                <i class="fas fa-plus me-2"></i>Add Your First Role
+                            </button>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
         {% endif %}
+    </div>
 
         <!-- Achievements Section -->
         {% if profile.achievements %}
@@ -202,6 +278,7 @@
         {% endif %}
 
 
+       {% if is_owner %} 
         <!-- Logout Section -->
         <div class="logout-section text-center py-4">
             <div class="container">
@@ -218,7 +295,8 @@
                 </div>
             </div>
         </div>
-    </div>
+        {% endif %}
+
 
     <!-- Modals -->
 
@@ -320,24 +398,61 @@
     </div>
     <script>
         function addSection(sect) {
-            // Grab the template section
-            const template = document.getElementById(sect);
-
-            // Clone it (true = deep clone with children)
-            const clone = template.cloneNode(true);
-
-            // Make sure it's visible and unique
-            clone.style.display = "block";
-            clone.id = sect + "Clone"; // clear id so duplicates are valid
-
-            // Append to the container
-            document.getElementById("profile-sections").appendChild(clone);
+            console.log("Button has")
+            const section = document.querySelector(`.profile-section[data-section="${sect}"]`);
+            if (section) {
+                section.parentElement.style.display = "";
+                toggleSectionButtons(sect, true);
+                saveSectionOrder();
+            }
         }
 
         function deleteSection(sect) {
-            let section_id = sect + "Clone";
-            const Section = document.getElementById(section_id);
-            Section.remove();
+            const section = document.querySelector(`.profile-section[data-section="${sect}"]`);
+            if (section) {
+                section.parentElement.style.display = "none";
+                toggleSectionButtons(sect, false);
+                saveSectionOrder();
+            }
+        }
+
+        function toggleSectionButtons(sect, isVisible) {
+            const addBtn = document.querySelector(`#buttons_section .btn[data-add-section="${sect}"]`);
+            const delBtn = document.querySelector(`#buttons_section .btn[data-del-section="${sect}"]`);
+            if (addBtn) addBtn.style.display = isVisible ? "none" : "";
+            if (delBtn) delBtn.style.display = isVisible ? "" : "none";
+        }
+
+        function saveSectionOrder() {
+            let order = [];
+            document.querySelectorAll('#profile-sections .profile-section').forEach(function(section) {
+                order.push({
+                    section: section.getAttribute('data-section'),
+                    visible: section.parentElement.style.display !== 'none'
+                });
+            });
+            fetch('/save-section-order', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({order: order})
+            });
+        }
+
+        function toggleExternalRoles() {
+            const externalSection = document.getElementById('external-roles-section');
+            const toggleBtn = document.getElementById('toggle-external-roles-btn');
+            
+            if (externalSection.style.display === 'none') {
+                externalSection.style.display = 'block';
+                toggleBtn.innerHTML = '<i class="fas fa-eye-slash me-1"></i> Hide External Roles';
+                toggleBtn.classList.remove('btn-outline-primary');
+                toggleBtn.classList.add('btn-outline-secondary');
+            } else {
+                externalSection.style.display = 'none';
+                toggleBtn.innerHTML = '<i class="fas fa-users me-1"></i> External Roles';
+                toggleBtn.classList.remove('btn-outline-secondary');
+                toggleBtn.classList.add('btn-outline-primary');
+            }
         }
   </script>
 
@@ -345,24 +460,41 @@
 
 {% block extra_js %}
     {% if is_owner%}
-    <script src="https:cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             new Sortable(document.getElementById('profile-sections'), {
                 animation: 150,
                 handle: '.profile-section',
                 onEnd: function (evt) {
-                    let order = [];
-                    document.querySelectorAll('#profile-sections .profile-section').forEach(function(section) {
-                        order.push(section.getAttribute('data-section'));
-                    });
-                    fetch('/save-section-order', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({order: order})
-                    });
+                    saveSectionOrder();
                 }
             });
+
+            // Initialize sortable for External Roles list if present
+            const extList = document.getElementById('external-roles-list');
+            if (extList) {
+                new Sortable(extList, {
+                    animation: 150,
+                    handle: '.list-group-item',
+                    onEnd: function () {
+                        const order = Array.from(extList.children)
+                            .filter(item => item.dataset.erid)
+                            .map(item => item.dataset.erid);
+                        fetch('/update_external_role_order', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({ order: order })
+                        }).then(r => r.json()).then(data => {
+                            if (data.success) {
+                                showNotification('External roles order updated!', 'success');
+                            } else {
+                                showNotification('Error updating roles order', 'error');
+                            }
+                        });
+                    }
+                });
+            }
         });
     </script>
     {% endif %}
@@ -402,6 +534,177 @@
             }
         }
 
+
+        // External Roles - Modal create
+        function addExternalRoleWithModal() {
+            const modalHTML = `
+                <div id="addExternalRoleModal" class="custom-modal" style="display: flex;">
+                    <div class="custom-modal-overlay" onclick="closeExternalRoleModal()"></div>
+                    <div class="custom-modal-content">
+                        <div class="custom-modal-header">
+                            <h5 class="custom-modal-title"><i class="fas fa-users me-2"></i>Add External Role</h5>
+                            <button type="button" class="custom-modal-close" onclick="closeExternalRoleModal()">&times;</button>
+                        </div>
+                        <div class="custom-modal-body">
+                            <form id="external-role-form">
+                                <div class="mb-3">
+                                    <label class="form-label">Role/Title *</label>
+                                    <input type="text" class="form-control" id="er-role-title" required placeholder="e.g., Editorial Board Member">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Organisation *</label>
+                                    <input type="text" class="form-control" id="er-organization" required placeholder="e.g., Journal of X, ACM SIGY">
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Start Year</label>
+                                            <input type="number" class="form-control" id="er-start-year" min="1900" max="2035">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">End Year</label>
+                                            <input type="number" class="form-control" id="er-end-year" min="1900" max="2035">
+                                            <small class="form-text text-muted">Leave empty if current</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Description</label>
+                                    <textarea class="form-control" id="er-description" rows="3" placeholder="Optional short description..."></textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="custom-modal-footer">
+                            <button type="button" class="btn btn-secondary" onclick="closeExternalRoleModal()">Cancel</button>
+                            <button type="button" class="btn btn-primary" onclick="submitExternalRole()">Add Role</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => {
+                const input = document.getElementById('er-role-title');
+                if (input) input.focus();
+            }, 100);
+        }
+
+        function closeExternalRoleModal() {
+            const modal = document.getElementById('addExternalRoleModal');
+            if (modal) modal.remove();
+            document.body.style.overflow = 'auto';
+        }
+
+        function submitExternalRole() {
+            const roleTitle = document.getElementById('er-role-title').value.trim();
+            const organization = document.getElementById('er-organization').value.trim();
+            const startYear = document.getElementById('er-start-year').value;
+            const endYear = document.getElementById('er-end-year').value;
+            const description = document.getElementById('er-description').value.trim();
+
+            if (!roleTitle || !organization) {
+                showNotification('Please fill in required fields (Role and Organization)', 'error');
+                return;
+            }
+
+            const submitBtn = document.querySelector('#addExternalRoleModal .btn-primary');
+            if (submitBtn) { submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Adding...'; submitBtn.disabled = true; }
+
+            fetch('/add_external_role', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    role_title: roleTitle,
+                    organization: organization,
+                    start_year: startYear ? parseInt(startYear) : null,
+                    end_year: endYear ? parseInt(endYear) : null,
+                    description: description
+                })
+            })
+            .then(r => r.json())
+            .then(result => {
+                if (result.success) {
+                    addExternalRoleToDOM(result);
+                    closeExternalRoleModal();
+                    showNotification('External role added!', 'success');
+                } else {
+                    showNotification('Error adding role: ' + (result.error || 'Unknown error'), 'error');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showNotification('Error adding role', 'error');
+            })
+            .finally(() => {
+                if (submitBtn) { submitBtn.innerHTML = 'Add Role'; submitBtn.disabled = false; }
+            });
+        }
+
+        function addExternalRoleToDOM(er) {
+            const list = document.getElementById('external-roles-list');
+            if (!list) return;
+
+            const emptyState = list.querySelector('.empty-state');
+            if (emptyState) emptyState.remove();
+
+            const div = document.createElement('div');
+            div.className = 'list-group-item d-flex justify-content-between align-items-center';
+            div.dataset.erid = er.erid;
+            div.style.cursor = 'move';
+
+            let yearRange = '';
+            if (er.start_year) {
+                yearRange = `<small>(${er.start_year}${er.end_year ? ' – ' + er.end_year : ' – Present'})</small>`;
+            }
+
+            div.innerHTML = `
+                <div>
+                    <strong>${escapeHtml(er.role_title)}</strong> — ${escapeHtml(er.organization)}
+                    ${yearRange}
+                    ${er.description ? `<p class="mb-0 text-muted">${escapeHtml(er.description)}</p>` : ''}
+                </div>
+                <div>
+                    <button class="btn btn-sm btn-danger" onclick="deleteExternalRole(${er.erid})" title="Delete this role">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+
+            list.appendChild(div);
+
+            const instructions = document.querySelector('.drag-instructions-external');
+            if (!instructions && list.children.length > 1) {
+                const small = document.createElement('small');
+                small.className = 'text-muted mt-2 d-block drag-instructions-external';
+                small.innerHTML = '<i class="fas fa-grip-vertical me-1"></i>Drag and drop to reorder roles';
+                list.parentNode.appendChild(small);
+            }
+        }
+
+        function deleteExternalRole(erid) {
+            fetch(`/delete_external_role/${erid}`, { method: 'DELETE' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        const el = document.querySelector(`[data-erid="${erid}"]`);
+                        if (el) el.remove();
+                        showNotification('External role deleted', 'success');
+                    } else {
+                        showNotification('Error deleting role', 'error');
+                    }
+                })
+                .catch(() => showNotification('Error deleting role', 'error'));
+        }
+
+        // Reuse escapeHtml from interests section if present; otherwise define it here
+        if (typeof escapeHtml !== 'function') {
+            function escapeHtml(text) {
+                const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+                return String(text).replace(/[&<>"']/g, m => map[m]);
+            }
+        }
 
         // Paper management functions now redirect to dedicated upload page
         function addNewPaper() {

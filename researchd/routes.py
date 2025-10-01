@@ -3,7 +3,7 @@ from flask import Blueprint, render_template, redirect, url_for, request, jsonif
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.utils import secure_filename
 from .forms import LoginForm, RegisterForm, EditProfileForm, UploadPaperForm, EditPaperForm
-from .models import User, Profile, Social, Publication, File, Achievement
+from .models import User, Profile, Social, Publication, File, Achievement, ExternalRole
 from sqlalchemy.orm import joinedload
 from . import db
 import os
@@ -32,7 +32,11 @@ def my_profile():
     print(f"Loading profile for user {user.id}, interests: {profile.research_interests}")
 
     # Sets default order for sections
-    default_sections = ['profile-header', 'interests-section', 'papers-section']
+    default_sections = [
+        {"section": 'profile-header', 'visible': True},
+        {'section': 'interests-section', 'visible': True},
+        {'section': 'papers-section', 'visible': True}
+    ]
     if profile.section_order:
         try:
             section_order = json.loads(profile.section_order)
@@ -45,8 +49,11 @@ def my_profile():
     
     # Get user's publications (papers)
     publications = Publication.query.filter_by(pid=profile.pid).order_by(Publication.created_at.desc()).limit(3).all()
-    
-    return render_template("profile_page.html", profile=profile, is_owner=True, publications=publications, section_order=section_order)
+
+    # Load external roles
+    external_roles = ExternalRole.query.filter_by(pid=profile.pid).order_by(ExternalRole.sort_order.nulls_last(), ExternalRole.start_year.desc().nulls_last()).all()
+
+    return render_template("profile_page.html", profile=profile, is_owner=True, publications=publications, section_order=section_order, external_roles=external_roles)
 
 @main.route("/profile/<int:researcher_id>")
 def researcher_profile(researcher_id):
@@ -65,7 +72,11 @@ def researcher_profile(researcher_id):
         db.session.commit()
 
     # Sets default order for sections
-    default_sections = ['profile-header', 'interests-section', 'papers-section']
+    default_sections = [
+        {"section": 'profile-header', 'visible': True},
+        {'section': 'interests-section', 'visible': True},
+        {'section': 'papers-section', 'visible': True}
+    ]
     if profile.section_order:
         try:
             section_order = json.loads(profile.section_order)
@@ -78,25 +89,80 @@ def researcher_profile(researcher_id):
     
     # Get researcher's publications (papers)
     publications = Publication.query.filter_by(pid=profile.pid).order_by(Publication.created_at.desc()).limit(3).all()
-    
-    return render_template("profile_page.html", profile=profile, is_owner=is_owner, publications=publications, section_order=section_order)
+
+    # Load external roles
+    external_roles = ExternalRole.query.filter_by(pid=profile.pid).order_by(ExternalRole.sort_order.nulls_last(), ExternalRole.start_year.desc().nulls_last()).all()
+
+    return render_template("profile_page.html", profile=profile, is_owner=is_owner, publications=publications, section_order=section_order, external_roles=external_roles)
 
 @main.route("/search")
 def search():
     q = request.args.get("q", "").strip()
+    institution_filter = request.args.get("institution", "").strip()
+    position_filter = request.args.get("position", "").strip()
+    interests_filter = request.args.get("interests", "").strip()
+    sort_by = request.args.get("sort", "name").strip()
     
-    # Basic query: adjust to your ORM/search logic
+    # Start with base query
+    query = User.query.join(Profile).options(joinedload(User.profile))
+    
+    # Apply search query
     if q:
-        results = User.query.join(Profile).options(joinedload(User.profile)).filter(
+        query = query.filter(
             (User.first_name.ilike(f"%{q}%")) |
             (User.last_name.ilike(f"%{q}%")) |
             (Profile.institution.ilike(f"%{q}%")) |
-            (Profile.position.ilike(f"%{q}%"))
-        ).all()
-    else:
-        results = User.query.all()  # show all users if no query
+            (Profile.position.ilike(f"%{q}%")) |
+            (Profile.research_interests.ilike(f"%{q}%"))
+        )
+    
+    # Apply filters
+    if institution_filter:
+        query = query.filter(Profile.institution == institution_filter)
+    
+    if position_filter:
+        query = query.filter(Profile.position == position_filter)
+    
+    if interests_filter:
+        query = query.filter(Profile.research_interests.ilike(f"%{interests_filter}%"))
+    
+    # Apply sorting
+    if sort_by == "institution":
+        query = query.order_by(Profile.institution.asc())
+    elif sort_by == "position":
+        query = query.order_by(Profile.position.asc())
+    else:  # default to name
+        query = query.order_by(User.first_name.asc(), User.last_name.asc())
+    
+    results = query.all()
+    
+    # Get unique values for filter dropdowns
+    institutions = db.session.query(Profile.institution).filter(Profile.institution.isnot(None), Profile.institution != "").distinct().all()
+    institutions = [inst[0] for inst in institutions if inst[0]]
+    
+    positions = db.session.query(Profile.position).filter(Profile.position.isnot(None), Profile.position != "").distinct().all()
+    positions = [pos[0] for pos in positions if pos[0]]
+    
+    # Get unique research interests (split by comma and get unique values)
+    interests_query = db.session.query(Profile.research_interests).filter(Profile.research_interests.isnot(None), Profile.research_interests != "").all()
+    interests = set()
+    for interest_row in interests_query:
+        if interest_row[0]:
+            # Split by comma and add each interest
+            for interest in interest_row[0].split(','):
+                interests.add(interest.strip())
+    interests = sorted(list(interests))
 
-    return render_template("search.html", results=results, q=q)
+    return render_template("search.html", 
+                         results=results, 
+                         q=q,
+                         institution_filter=institution_filter,
+                         position_filter=position_filter,
+                         interests_filter=interests_filter,
+                         sort_by=sort_by,
+                         institutions=institutions,
+                         positions=positions,
+                         interests=interests)
 
 @main.route("/help")
 def help():
@@ -516,11 +582,106 @@ def logout():
 def save_section_order():
     data = request.get_json()
     order = data.get("order")
-    if not order or not isinstance(order, list):
-        return jsonify({"success": False, "error": "Invalid order data"}), 400
+    if not isinstance(order, list):
+        return jsonify({'success': False, 'error': 'Invalid data'}), 400
     profile = Profile.query.filter_by(user_id=current_user.id).first()
     if not profile:
-        return jsonify({"success": False, "error": "Profile not found"}), 404
+        return jsonify({'success': False, 'error': 'Profile not found'}), 400
     profile.section_order = json.dumps(order)
     db.session.commit()
-    return jsonify({"success": True})
+    return jsonify({'success': True})
+
+
+@main.route("/add_external_role", methods=["POST"])
+@login_required
+def add_external_role():
+    try:
+        data = request.get_json()
+        role_title = data.get("role_title", "").strip()
+        organization = data.get("organization", "").strip()
+        start_year = data.get("start_year")
+        end_year = data.get("end_year")
+        description = data.get("description", "").strip()
+
+        if not role_title or not organization:
+            return jsonify({"success": False, "error": "role_title and organization are required"}), 400
+
+        profile = Profile.query.filter_by(user_id=current_user.id).first()
+        if not profile:
+            profile = Profile(user_id=current_user.id)
+            db.session.add(profile)
+            db.session.flush()
+
+        # Determine next sort order
+        max_sort = db.session.query(db.func.max(ExternalRole.sort_order)).filter_by(pid=profile.pid).scalar()
+        next_sort = (max_sort or 0) + 1
+
+        er = ExternalRole(
+            pid=profile.pid,
+            role_title=role_title,
+            organization=organization,
+            start_year=int(start_year) if start_year else None,
+            end_year=int(end_year) if end_year else None,
+            description=description,
+            sort_order=next_sort
+        )
+        db.session.add(er)
+        db.session.commit()
+
+        return jsonify({
+            "success": True,
+            "erid": er.erid,
+            "role_title": er.role_title,
+            "organization": er.organization,
+            "start_year": er.start_year,
+            "end_year": er.end_year,
+            "description": er.description
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@main.route("/delete_external_role/<int:erid>", methods=["DELETE"])
+@login_required
+def delete_external_role(erid):
+    try:
+        profile = Profile.query.filter_by(user_id=current_user.id).first()
+        if not profile:
+            return jsonify({"success": False, "error": "Profile not found"}), 404
+
+        er = ExternalRole.query.filter_by(erid=erid, pid=profile.pid).first()
+        if not er:
+            return jsonify({"success": False, "error": "External role not found"}), 404
+
+        db.session.delete(er)
+        db.session.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@main.route("/update_external_role_order", methods=["POST"])
+@login_required
+def update_external_role_order():
+    try:
+        data = request.get_json()
+        order = data.get("order", [])
+        if not isinstance(order, list):
+            return jsonify({"success": False, "error": "Invalid order"}), 400
+
+        profile = Profile.query.filter_by(user_id=current_user.id).first()
+        if not profile:
+            return jsonify({"success": False, "error": "Profile not found"}), 404
+
+        # Assign sort_order based on incoming order list of erids
+        for index, erid in enumerate(order, start=1):
+            er = ExternalRole.query.filter_by(erid=int(erid), pid=profile.pid).first()
+            if er:
+                er.sort_order = index
+        db.session.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": str(e)}), 500

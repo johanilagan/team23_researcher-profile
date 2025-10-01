@@ -497,10 +497,22 @@
         }
 
         function toggleAchievements() {
-            const section = document.getElementById('achievements-section');
-            section.classList.toggle('d-none');
-            section.classList.toggle('d-block');
+            const achievementSection = document.getElementById('achievements-section');
+            const toggleBtn = document.getElementById('toggle-achievements-btn');
+
+            achievementSection.classList.toggle('d-none');
+
+            if (achievementSection.classList.contains('d-none')) {
+                toggleBtn.innerHTML = '<i class="fas fa-trophy me-1"></i> Achievements';
+                toggleBtn.classList.remove('btn-outline-secondary');
+                toggleBtn.classList.add('btn-outline-primary');
+            } else {
+                toggleBtn.innerHTML = '<i class="fas fa-eye-slash me-1"></i> Hide Achievements';
+                toggleBtn.classList.remove('btn-outline-primary');
+                toggleBtn.classList.add('btn-outline-secondary');
+            }
         }
+
 
         function deleteAchievement(aid) {
             fetch(`/delete_achievement/${aid}`, { method: 'DELETE'})

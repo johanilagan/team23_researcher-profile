@@ -90,19 +90,71 @@ def researcher_profile(researcher_id):
 @main.route("/search")
 def search():
     q = request.args.get("q", "").strip()
+    institution_filter = request.args.get("institution", "").strip()
+    position_filter = request.args.get("position", "").strip()
+    interests_filter = request.args.get("interests", "").strip()
+    sort_by = request.args.get("sort", "name").strip()
     
-    # Basic query: adjust to your ORM/search logic
+    # Start with base query
+    query = User.query.join(Profile).options(joinedload(User.profile))
+    
+    # Apply search query
     if q:
-        results = User.query.join(Profile).options(joinedload(User.profile)).filter(
+        query = query.filter(
             (User.first_name.ilike(f"%{q}%")) |
             (User.last_name.ilike(f"%{q}%")) |
             (Profile.institution.ilike(f"%{q}%")) |
-            (Profile.position.ilike(f"%{q}%"))
-        ).all()
-    else:
-        results = User.query.all()  # show all users if no query
+            (Profile.position.ilike(f"%{q}%")) |
+            (Profile.research_interests.ilike(f"%{q}%"))
+        )
+    
+    # Apply filters
+    if institution_filter:
+        query = query.filter(Profile.institution == institution_filter)
+    
+    if position_filter:
+        query = query.filter(Profile.position == position_filter)
+    
+    if interests_filter:
+        query = query.filter(Profile.research_interests.ilike(f"%{interests_filter}%"))
+    
+    # Apply sorting
+    if sort_by == "institution":
+        query = query.order_by(Profile.institution.asc())
+    elif sort_by == "position":
+        query = query.order_by(Profile.position.asc())
+    else:  # default to name
+        query = query.order_by(User.first_name.asc(), User.last_name.asc())
+    
+    results = query.all()
+    
+    # Get unique values for filter dropdowns
+    institutions = db.session.query(Profile.institution).filter(Profile.institution.isnot(None), Profile.institution != "").distinct().all()
+    institutions = [inst[0] for inst in institutions if inst[0]]
+    
+    positions = db.session.query(Profile.position).filter(Profile.position.isnot(None), Profile.position != "").distinct().all()
+    positions = [pos[0] for pos in positions if pos[0]]
+    
+    # Get unique research interests (split by comma and get unique values)
+    interests_query = db.session.query(Profile.research_interests).filter(Profile.research_interests.isnot(None), Profile.research_interests != "").all()
+    interests = set()
+    for interest_row in interests_query:
+        if interest_row[0]:
+            # Split by comma and add each interest
+            for interest in interest_row[0].split(','):
+                interests.add(interest.strip())
+    interests = sorted(list(interests))
 
-    return render_template("search.html", results=results, q=q)
+    return render_template("search.html", 
+                         results=results, 
+                         q=q,
+                         institution_filter=institution_filter,
+                         position_filter=position_filter,
+                         interests_filter=interests_filter,
+                         sort_by=sort_by,
+                         institutions=institutions,
+                         positions=positions,
+                         interests=interests)
 
 @main.route("/help")
 def help():

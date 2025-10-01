@@ -6,17 +6,99 @@
         <!-- Search Header -->
         <div class="container mt-4">
             <div class="row justify-content-center">
-                <div class="col-lg-8">
+                <div class="col-lg-10">
                     <div class="text-center mb-4">
                         <h1 class="h2">Find Researchers</h1>
                         <p class="text-muted">Search by name, field, institution, or research interests</p>
                     </div>
-                    <form action="{{ url_for('main.search') }}" method="GET">
-                        <div class="input-group input-group-lg">
-                            <input type="text" placeholder="Search researchers, papers, or institutions..." class="form-control" name="q">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-search"></i> Search
-                            </button>
+                    
+                    <!-- Search Form -->
+                    <form action="{{ url_for('main.search') }}" method="GET" id="searchForm">
+                        <div class="row g-3">
+                            <!-- Main Search Bar -->
+                            <div class="col-md-8">
+                                <div class="input-group input-group-lg">
+                                    <input type="text" 
+                                           placeholder="Search researchers, papers, or institutions..." 
+                                           class="form-control" 
+                                           name="q" 
+                                           value="{{ q }}"
+                                           id="searchInput">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search"></i> Search
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Sort Dropdown -->
+                            <div class="col-md-4">
+                                <select class="form-select form-select-lg" name="sort" id="sortSelect">
+                                    <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Sort by Name</option>
+                                    <option value="institution" {% if sort_by == 'institution' %}selected{% endif %}>Sort by Institution</option>
+                                    <option value="position" {% if sort_by == 'position' %}selected{% endif %}>Sort by Position</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Filter Section -->
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">
+                                            <i class="fas fa-filter me-2"></i>Filters
+                                            <button type="button" class="btn btn-sm btn-outline-secondary float-end" onclick="clearFilters()">
+                                                <i class="fas fa-times"></i> Clear All
+                                            </button>
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-3">
+                                            <!-- Institution Filter -->
+                                            <div class="col-md-4">
+                                                <label for="institutionFilter" class="form-label">Institution</label>
+                                                <select class="form-select" name="institution" id="institutionFilter">
+                                                    <option value="">All Institutions</option>
+                                                    {% for institution in institutions %}
+                                                        <option value="{{ institution }}" 
+                                                                {% if institution_filter == institution %}selected{% endif %}>
+                                                            {{ institution }}
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            
+                                            <!-- Position Filter -->
+                                            <div class="col-md-4">
+                                                <label for="positionFilter" class="form-label">Position</label>
+                                                <select class="form-select" name="position" id="positionFilter">
+                                                    <option value="">All Positions</option>
+                                                    {% for position in positions %}
+                                                        <option value="{{ position }}" 
+                                                                {% if position_filter == position %}selected{% endif %}>
+                                                            {{ position }}
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            
+                                            <!-- Research Interests Filter -->
+                                            <div class="col-md-4">
+                                                <label for="interestsFilter" class="form-label">Research Interests</label>
+                                                <select class="form-select" name="interests" id="interestsFilter">
+                                                    <option value="">All Interests</option>
+                                                    {% for interest in interests %}
+                                                        <option value="{{ interest }}" 
+                                                                {% if interests_filter == interest %}selected{% endif %}>
+                                                            {{ interest }}
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -24,47 +106,85 @@
         </div>
 
         <!-- Search Results -->
-            <div class="container mt-4">
-                <div class="row g-3">
+        <div class="container mt-4">
+            <!-- Results Header -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <h5 class="mb-0">
+                        {% if results %}
+                            {{ results|length }} researcher{{ 's' if results|length != 1 else '' }} found
+                        {% else %}
+                            No researchers found
+                        {% endif %}
+                    </h5>
+                </div>
+                <div class="col-md-6 text-end">
                     {% if results %}
-                        {% for researcher in results %}
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="row g-0 align-items-center">
-                                        <div class="col-auto">
-                                            <img src="{{ researcher.profile_pic or url_for('static', filename='img/default-avatar.png') }}"
-                                                class="img-fluid rounded-circle"
-                                                alt="{{ researcher.first_name }} {{ researcher.last_name }}"
-                                                style="width: 80px; height: 80px; object-fit: cover;">
-                                        </div>
-                                        <div class="col">
-                                            <div class="card-body">
-                                                <h5 class="card-title">
-                                                    {{ researcher.first_name }} {{ researcher.last_name }}
-                                                </h5>
-                                                <p class="card-text">
-                                                    {{ researcher.position }} at {{ researcher.institution }}
-                                                </p>
-                                                <p class="card-text">
-                                                    <small class="text-muted">
-                                                        Research: {{ researcher.research_interests }}
-                                                    </small>
-                                                </p>
-                                                <a href="{{ url_for('main.researcher_profile', researcher_id=researcher.id) }}"
-                                                class="btn btn-outline-primary btn-sm">
-                                                    View Profile
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>  
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <p class="text-center text-muted">No researchers found.</p>
+                        <small class="text-muted">
+                            Showing results for 
+                            {% if q %}"{{ q }}"{% endif %}
+                            {% if institution_filter %}in {{ institution_filter }}{% endif %}
+                            {% if position_filter %}as {{ position_filter }}{% endif %}
+                            {% if interests_filter %}interested in {{ interests_filter }}{% endif %}
+                        </small>
                     {% endif %}
                 </div>
             </div>
+            
+            <!-- Results Grid -->
+            <div class="row g-3">
+                {% if results %}
+                    {% for researcher in results %}
+                        <div class="col-12">
+                            <div class="card h-100">
+                                <div class="row g-0 align-items-center">
+                                    <div class="col-auto">
+                                        <img src="{{ researcher.profile.profile_pic or url_for('static', filename='default_pfp.png') }}"
+                                            class="img-fluid rounded-circle"
+                                            alt="{{ researcher.first_name }} {{ researcher.last_name }}"
+                                            style="width: 80px; height: 80px; object-fit: cover;">
+                                    </div>
+                                    <div class="col">
+                                        <div class="card-body">
+                                            <h5 class="card-title">
+                                                {{ researcher.first_name }} {{ researcher.last_name }}
+                                            </h5>
+                                            <p class="card-text">
+                                                <i class="fas fa-briefcase me-1"></i>
+                                                {{ researcher.profile.position or 'Position not specified' }} 
+                                                {% if researcher.profile.institution %}
+                                                    at {{ researcher.profile.institution }}
+                                                {% endif %}
+                                            </p>
+                                            {% if researcher.profile.research_interests %}
+                                                <p class="card-text">
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-flask me-1"></i>
+                                                        Research: {{ researcher.profile.research_interests }}
+                                                    </small>
+                                                </p>
+                                            {% endif %}
+                                            <a href="{{ url_for('main.researcher_profile', researcher_id=researcher.id) }}"
+                                            class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-user me-1"></i>View Profile
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>  
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12">
+                        <div class="text-center py-5">
+                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No researchers found</h5>
+                            <p class="text-muted">Try adjusting your search criteria or filters</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
 
 
         <!-- Pagination -->
@@ -81,4 +201,54 @@
                 <li class="page-item"><a class="page-link" href="#"><span aria-hidden="true">&raquo;</span></a></li>
             </ul>
         </nav>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const institutionFilter = document.getElementById('institutionFilter');
+    const positionFilter = document.getElementById('positionFilter');
+    const interestsFilter = document.getElementById('interestsFilter');
+    const sortSelect = document.getElementById('sortSelect');
+    
+    // Clear all filters and submit form
+    function clearFilters() {
+        searchInput.value = '';
+        institutionFilter.value = '';
+        positionFilter.value = '';
+        interestsFilter.value = '';
+        sortSelect.value = 'name';
+        document.getElementById('searchForm').submit();
+    }
+    
+    // Auto-submit form when filters change
+    if (institutionFilter) {
+        institutionFilter.addEventListener('change', function() {
+            document.getElementById('searchForm').submit();
+        });
+    }
+    
+    if (positionFilter) {
+        positionFilter.addEventListener('change', function() {
+            document.getElementById('searchForm').submit();
+        });
+    }
+    
+    if (interestsFilter) {
+        interestsFilter.addEventListener('change', function() {
+            document.getElementById('searchForm').submit();
+        });
+    }
+    
+    if (sortSelect) {
+        sortSelect.addEventListener('change', function() {
+            document.getElementById('searchForm').submit();
+        });
+    }
+    
+    // Make clearFilters function global
+    window.clearFilters = clearFilters;
+});
+</script>
 {% endblock %}

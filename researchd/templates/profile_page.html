@@ -167,6 +167,9 @@
             <a href="{{ url_for('main.my_papers') }}" class="btn btn-info">
                 <i class="fas fa-file-alt"></i> View My Papers
             </a>
+            <button class="btn btn-outline-primary" onclick="toggleExternalRoles()" id="toggle-external-roles-btn">
+                <i class="fas fa-users me-1"></i> External Roles
+            </button>
             <button class="btn btn-primary" onclick="addSection('buttons_section')">Add Section</button>
 
         </div>
@@ -178,14 +181,19 @@
         </div>
         
         <!-- External Positions / Roles (placed under buttons section) -->
-        <div class="papers-section external-roles-section mt-4" id="external-roles-section">
+        <div class="papers-section external-roles-section mt-4" id="external-roles-section" style="display: none;">
             <div class="profile-section" data-section="external-roles-section">
                 <div class="section-header">
-                    <h2><i class="fas fa-users me-2"></i>External Positions</h2>
+                    <h2><i class="fas fa-users me-2"></i>External Roles</h2>
                     {% if is_owner %}
-                    <button class="btn btn-outline-primary btn-sm" onclick="addExternalRoleWithModal()">
-                        <i class="fas fa-plus me-1"></i>Add Role
-                    </button>
+                    <div>
+                        <button class="btn btn-outline-primary btn-sm me-2" onclick="addExternalRoleWithModal()">
+                            <i class="fas fa-plus me-1"></i>Add Role
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="toggleExternalRoles()">
+                            <i class="fas fa-eye-slash me-1"></i>Hide
+                        </button>
+                    </div>
                     {% endif %}
                 </div>
 
@@ -371,6 +379,23 @@
             let section_id = sect + "Clone";
             const Section = document.getElementById(section_id);
             Section.remove();
+        }
+
+        function toggleExternalRoles() {
+            const externalSection = document.getElementById('external-roles-section');
+            const toggleBtn = document.getElementById('toggle-external-roles-btn');
+            
+            if (externalSection.style.display === 'none') {
+                externalSection.style.display = 'block';
+                toggleBtn.innerHTML = '<i class="fas fa-eye-slash me-1"></i> Hide External Roles';
+                toggleBtn.classList.remove('btn-outline-primary');
+                toggleBtn.classList.add('btn-outline-secondary');
+            } else {
+                externalSection.style.display = 'none';
+                toggleBtn.innerHTML = '<i class="fas fa-users me-1"></i> External Roles';
+                toggleBtn.classList.remove('btn-outline-secondary');
+                toggleBtn.classList.add('btn-outline-primary');
+            }
         }
   </script>
 

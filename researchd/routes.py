@@ -154,9 +154,8 @@ def edit_profile():
                     if social:
                         db.session.delete(social)
 
-            # Update achievements
-            Achievement.query.filter_by(pid=profile.pid).delete()
-            db.session.flush()  # Ensure deletion happens before adding new
+            for ach in profile.achievements:
+                db.session.delete(ach)
 
             for a in form.achievements.data:
                 if a.get('title'):  # Only add non-empty achievements

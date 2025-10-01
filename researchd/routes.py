@@ -32,7 +32,11 @@ def my_profile():
     print(f"Loading profile for user {user.id}, interests: {profile.research_interests}")
 
     # Sets default order for sections
-    default_sections = ['profile-header', 'interests-section', 'papers-section']
+    default_sections = [
+        {"section": 'profile-header', 'visible': True},
+        {'section': 'interests-section', 'visible': True},
+        {'section': 'papers-section', 'visible': True}
+    ]
     if profile.section_order:
         try:
             section_order = json.loads(profile.section_order)
@@ -68,7 +72,11 @@ def researcher_profile(researcher_id):
         db.session.commit()
 
     # Sets default order for sections
-    default_sections = ['profile-header', 'interests-section', 'papers-section']
+    default_sections = [
+        {"section": 'profile-header', 'visible': True},
+        {'section': 'interests-section', 'visible': True},
+        {'section': 'papers-section', 'visible': True}
+    ]
     if profile.section_order:
         try:
             section_order = json.loads(profile.section_order)
@@ -557,14 +565,14 @@ def logout():
 def save_section_order():
     data = request.get_json()
     order = data.get("order")
-    if not order or not isinstance(order, list):
-        return jsonify({"success": False, "error": "Invalid order data"}), 400
+    if not isinstance(order, list):
+        return jsonify({'success': False, 'error': 'Invalid data'}), 400
     profile = Profile.query.filter_by(user_id=current_user.id).first()
     if not profile:
-        return jsonify({"success": False, "error": "Profile not found"}), 404
+        return jsonify({'success': False, 'error': 'Profile not found'}), 400
     profile.section_order = json.dumps(order)
     db.session.commit()
-    return jsonify({"success": True})
+    return jsonify({'success': True})
 
 
 @main.route("/add_external_role", methods=["POST"])

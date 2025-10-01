@@ -4,10 +4,10 @@
 
 {% block content %}
     <div class="container mt-4" id="profile-sections">
-        {% for section in section_order %}
-        {% if section == 'profile-header' %}
+        {% for s in section_order %}
+        {% if s.section == 'profile-header' %}
         <!-- Profile Header -->
-        <div class="profile-header">
+        <div class="profile-header {% if not s.visible %}d-none{% endif %}">
             <div class="profile-section" data-section="profile-header">
                 <div class="row">
                     <div class="col-md-3 text-center">
@@ -69,9 +69,9 @@
         </div>
 
 
-        {% elif section == 'interests-section' %}
+        {% elif s.section == 'interests-section' %}
         <!-- Research Interests -->
-        <div class="interests-section" style="display:none;" id="interests-section">
+        <div class="interests-section {% if not s.visible %}d-none{% endif %}" id="interests-section">
             <div class="profile-section" data-section="interests-section">
                 <div class="section-header">
                     <h2>Research Interests</h2>
@@ -93,10 +93,10 @@
             </div>
         </div>
 
-        {% elif section == 'papers-section' %}
+        {% elif s.section == 'papers-section' %}
 
         <!-- Recent Papers -->
-        <div class="papers-section" id="papers-section" style="display:none;">
+        <div class="papers-section {% if not s.visible %}d-none{% endif %}" id="papers-section">
             <div class="profile-section" data-section="papers-section">
                 <div class="section-header">
                     <h2>Recent Papers</h2>
@@ -174,10 +174,23 @@
 
         </div>
         <div id="buttons_section">
-            <button class="btn btn-primary" onclick="addSection('papers-section')">add papers section</button>
-            <button class="btn btn-primary" onclick="addSection('interests-section')">add intrests section</button>
-            <button type="button" class="btn btn-primary" onclick="deleteSection('papers-section')">delete papers section</button>
-            <button type="button" class="btn btn-primary" onclick="deleteSection('interests-section')">delete intrests section</button>
+            {% set section_map = section_order | map(attribute='section') | list %}
+            {% set visible_map = section_order | map(attribute='visible') | list %}
+            {% for s in section_order %}
+                {% if s.section == 'papers-section' %}
+                    {% if not s.visible %}
+                        <button class="btn btn-primary" onclick="addSection('papers-section')">Add Papers Section</button>
+                    {% else %}
+                        <button type="button" class="btn btn-primary" onclick="deleteSection('papers-section')">Delete Papers Section</button>
+                    {% endif %}
+                {% elif s.section == 'interests-section' %}
+                    {% if not s.visible %}
+                        <button class="btn btn-primary" onclick="addSection('interests-section')">Add Interests Section</button>
+                    {% else %}
+                        <button type="button" class="btn btn-primary" onclick="deleteSection('interests-section')">Delete Interests Section</button>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
         </div>
         
         <!-- External Positions / Roles (placed under buttons section) -->
@@ -361,24 +374,44 @@
     </div>
     <script>
         function addSection(sect) {
-            // Grab the template section
-            const template = document.getElementById(sect);
-
-            // Clone it (true = deep clone with children)
-            const clone = template.cloneNode(true);
-
-            // Make sure it's visible and unique
-            clone.style.display = "block";
-            clone.id = sect + "Clone"; // clear id so duplicates are valid
-
-            // Append to the container
-            document.getElementById("profile-sections").appendChild(clone);
+            console.log("Button has")
+            const section = document.querySelector(`.profile-section[data-section="${sect}"]`);
+            if (section) {
+                section.parentElement.style.display = "";
+                toggleSectionButtons(sect, true);
+                saveSectionOrder();
+            }
         }
 
         function deleteSection(sect) {
-            let section_id = sect + "Clone";
-            const Section = document.getElementById(section_id);
-            Section.remove();
+            const section = document.querySelector(`.profile-section[data-section="${sect}"]`);
+            if (section) {
+                section.parentElement.style.display = "none";
+                toggleSectionButtons(sect, false);
+                saveSectionOrder();
+            }
+        }
+
+        function toggleSectionButtons(sect, isVisible) {
+            const addBtn = document.querySelector(`#buttons_section .btn[data-add-section="${sect}"]`);
+            const delBtn = document.querySelector(`#buttons_section .btn[data-del-section="${sect}"]`);
+            if (addBtn) addBtn.style.display = isVisible ? "none" : "";
+            if (delBtn) delBtn.style.display = isVisible ? "" : "none";
+        }
+
+        function saveSectionOrder() {
+            let order = [];
+            document.querySelectorAll('#profile-sections .profile-section').forEach(function(section) {
+                order.push({
+                    section: section.getAttribute('data-section'),
+                    visible: section.parentElement.style.display !== 'none'
+                });
+            });
+            fetch('/save-section-order', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({order: order})
+            });
         }
 
         function toggleExternalRoles() {
@@ -410,15 +443,7 @@
                 animation: 150,
                 handle: '.profile-section',
                 onEnd: function (evt) {
-                    let order = [];
-                    document.querySelectorAll('#profile-sections .profile-section').forEach(function(section) {
-                        order.push(section.getAttribute('data-section'));
-                    });
-                    fetch('/save-section-order', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({order: order})
-                    });
+                    saveSectionOrder();
                 }
             });
 

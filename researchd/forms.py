@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField, URLField, DateField, IntegerField
-from wtforms.validators import InputRequired, Length, Email, EqualTo, Optional, NumberRange
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, URLField, DateField, IntegerField, SelectField
+from wtforms.validators import InputRequired, Length, Email, EqualTo, Optional, NumberRange, DataRequired
 
 class LoginForm(FlaskForm):
     email = StringField("Email", validators=[InputRequired(), Email(), Length(max=150)])
@@ -38,6 +38,14 @@ class EditProfileForm(FlaskForm):
     github_url = URLField("GitHub URL", validators=[Optional()])
     
     submit = SubmitField("Save Changes")
+
+ACHIEVEMENT_TYPES = ['Award', 'Grant', 'Funds', 'Other']
+
+class AchievementForm(FlaskForm):
+    title = StringField("Title", validators=[DataRequired()])
+    type = SelectField("Type", choices=[(t, t) for t in ACHIEVEMENT_TYPES], validators=[DataRequired()])
+    year = IntegerField("Year")
+    description = TextAreaField("Description")
 
 class UploadPaperForm(FlaskForm):
     title = StringField("Paper Title", validators=[InputRequired(), Length(min=1, max=300)])

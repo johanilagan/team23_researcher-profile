@@ -16,7 +16,7 @@ class RegisterForm(FlaskForm):
     password = PasswordField("Password", validators=[InputRequired(), Length(min=4, message="Password must be at least 4 characters long")])
     confirm_password = PasswordField("Confirm Password", validators=[InputRequired(), EqualTo("password", message="Passwords must match")])
 
-    institution = StringField("Institution", validators=[Length(max=150)])
+    institution = SelectField("Institution", choices=[], validators=[InputRequired(message="Please select an institution")])
     position = StringField("Position", validators=[Length(max=100)])
 
     submit = SubmitField("Register")

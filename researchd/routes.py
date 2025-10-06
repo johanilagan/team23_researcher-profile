@@ -8,6 +8,7 @@ from sqlalchemy.orm import joinedload
 from . import db
 import os
 from datetime import datetime
+import pandas as pd
 
 auth = Blueprint("auth", __name__)
 main = Blueprint("main", __name__)
@@ -542,6 +543,18 @@ def login():
 @auth.route("/register", methods=["GET", "POST"])
 def register():
     form = RegisterForm()
+
+    # Load institutions from external file
+    try:
+        df = pd.read_csv("researchd/institutions.csv")
+        institutions = df["Institution"].dropna().tolist()
+    except Exception as e:
+        print(f"Error loading institutions: {e}")
+        institutions = []
+
+    # Populate dropdown choices dynamically
+    form.institution.choices = [("", "Select an institution")] + [(i, i) for i in institutions]
+
     if form.validate_on_submit():
         # check if email already exists
         existing_user = User.query.filter_by(email=form.email.data).first()
@@ -559,6 +572,7 @@ def register():
         db.session.add(user)
         db.session.commit()
 
+        # Save selected institution and position
         profile = Profile(
             user_id=user.id,
             institution=form.institution.data,

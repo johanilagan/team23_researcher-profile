@@ -3,7 +3,7 @@ from flask import Blueprint, render_template, redirect, url_for, request, jsonif
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.utils import secure_filename
 from .forms import LoginForm, RegisterForm, EditProfileForm, UploadPaperForm, EditPaperForm
-from .models import User, Profile, Social, Publication, File, ExternalRole
+from .models import User, Profile, Social, Publication, File, Achievement, ExternalRole
 from sqlalchemy.orm import joinedload
 from . import db
 import os
@@ -32,7 +32,11 @@ def my_profile():
     print(f"Loading profile for user {user.id}, interests: {profile.research_interests}")
 
     # Sets default order for sections
-    default_sections = ['profile-header', 'interests-section', 'papers-section']
+    default_sections = [
+        {"section": 'profile-header', 'visible': True},
+        {'section': 'interests-section', 'visible': True},
+        {'section': 'papers-section', 'visible': True}
+    ]
     if profile.section_order:
         try:
             section_order = json.loads(profile.section_order)
@@ -68,7 +72,11 @@ def researcher_profile(researcher_id):
         db.session.commit()
 
     # Sets default order for sections
-    default_sections = ['profile-header', 'interests-section', 'papers-section']
+    default_sections = [
+        {"section": 'profile-header', 'visible': True},
+        {'section': 'interests-section', 'visible': True},
+        {'section': 'papers-section', 'visible': True}
+    ]
     if profile.section_order:
         try:
             section_order = json.loads(profile.section_order)
@@ -90,19 +98,71 @@ def researcher_profile(researcher_id):
 @main.route("/search")
 def search():
     q = request.args.get("q", "").strip()
+    institution_filter = request.args.get("institution", "").strip()
+    position_filter = request.args.get("position", "").strip()
+    interests_filter = request.args.get("interests", "").strip()
+    sort_by = request.args.get("sort", "name").strip()
     
-    # Basic query: adjust to your ORM/search logic
+    # Start with base query
+    query = User.query.join(Profile).options(joinedload(User.profile))
+    
+    # Apply search query
     if q:
-        results = User.query.join(Profile).options(joinedload(User.profile)).filter(
+        query = query.filter(
             (User.first_name.ilike(f"%{q}%")) |
             (User.last_name.ilike(f"%{q}%")) |
             (Profile.institution.ilike(f"%{q}%")) |
-            (Profile.position.ilike(f"%{q}%"))
-        ).all()
-    else:
-        results = User.query.all()  # show all users if no query
+            (Profile.position.ilike(f"%{q}%")) |
+            (Profile.research_interests.ilike(f"%{q}%"))
+        )
+    
+    # Apply filters
+    if institution_filter:
+        query = query.filter(Profile.institution == institution_filter)
+    
+    if position_filter:
+        query = query.filter(Profile.position == position_filter)
+    
+    if interests_filter:
+        query = query.filter(Profile.research_interests.ilike(f"%{interests_filter}%"))
+    
+    # Apply sorting
+    if sort_by == "institution":
+        query = query.order_by(Profile.institution.asc())
+    elif sort_by == "position":
+        query = query.order_by(Profile.position.asc())
+    else:  # default to name
+        query = query.order_by(User.first_name.asc(), User.last_name.asc())
+    
+    results = query.all()
+    
+    # Get unique values for filter dropdowns
+    institutions = db.session.query(Profile.institution).filter(Profile.institution.isnot(None), Profile.institution != "").distinct().all()
+    institutions = [inst[0] for inst in institutions if inst[0]]
+    
+    positions = db.session.query(Profile.position).filter(Profile.position.isnot(None), Profile.position != "").distinct().all()
+    positions = [pos[0] for pos in positions if pos[0]]
+    
+    # Get unique research interests (split by comma and get unique values)
+    interests_query = db.session.query(Profile.research_interests).filter(Profile.research_interests.isnot(None), Profile.research_interests != "").all()
+    interests = set()
+    for interest_row in interests_query:
+        if interest_row[0]:
+            # Split by comma and add each interest
+            for interest in interest_row[0].split(','):
+                interests.add(interest.strip())
+    interests = sorted(list(interests))
 
-    return render_template("search.html", results=results, q=q)
+    return render_template("search.html", 
+                         results=results, 
+                         q=q,
+                         institution_filter=institution_filter,
+                         position_filter=position_filter,
+                         interests_filter=interests_filter,
+                         sort_by=sort_by,
+                         institutions=institutions,
+                         positions=positions,
+                         interests=interests)
 
 @main.route("/help")
 def help():
@@ -121,19 +181,19 @@ def privacy():
 def edit_profile():
     form = EditProfileForm()
     
+    profile = Profile.query.filter_by(user_id=current_user.id).first()
+    if not profile:
+        profile = Profile(user_id=current_user.id)
+        db.session.add(profile)
+        db.session.flush()  # Ensures profile.pid is available for achievements/socials
+
     if form.validate_on_submit():
         try:
-            # Update User table fields
+            # Update User fields
             current_user.first_name = form.first_name.data
             current_user.last_name = form.last_name.data
-            
-            # Get or create Profile record
-            profile = Profile.query.filter_by(user_id=current_user.id).first()
-            if not profile:
-                profile = Profile(user_id=current_user.id)
-                db.session.add(profile)
-            
-            # Update Profile table fields
+
+            # Update Profile fields
             profile.institution = form.institution.data
             profile.position = form.position.data
             profile.bio = form.bio.data
@@ -141,59 +201,76 @@ def edit_profile():
             profile.title = form.title.data
             profile.department = form.department.data
 
-            
-            # Update social media links
+            # Update social links
             social_platforms = {
                 'LinkedIn': form.linkedin_url.data,
                 'Twitter': form.twitter_url.data,
                 'Instagram': form.instagram_url.data,
                 'GitHub': form.github_url.data
             }
-            
+
             for platform, url in social_platforms.items():
-                if url:  # Only add if URL is provided
-                    social = Social.query.filter_by(pid=profile.pid, platform=platform).first()
+                social = Social.query.filter_by(pid=profile.pid, platform=platform).first()
+                if url:
                     if social:
                         social.url = url
                     else:
-                        social = Social(pid=profile.pid, platform=platform, url=url)
-                        db.session.add(social)
+                        db.session.add(Social(pid=profile.pid, platform=platform, url=url))
                 else:
-                    # Remove social link if URL is empty
-                    social = Social.query.filter_by(pid=profile.pid, platform=platform).first()
                     if social:
                         db.session.delete(social)
-            
+
+            for ach in profile.achievements:
+                db.session.delete(ach)
+
+            for a in form.achievements.data:
+                if a.get('title'):  # Only add non-empty achievements
+                    db.session.add(Achievement(
+                        pid=profile.pid,
+                        type=a.get('type'),
+                        title=a.get('title'),
+                        year=a.get('year'),
+                        description=a.get('description')
+                    ))
+
             db.session.commit()
             return redirect(url_for("main.my_profile"))
-            
-        except Exception as e:
+
+        except Exception:
             db.session.rollback()
-            pass
-    
-    # Pre-populate form with current data
-    if request.method == "GET":
+
+    elif request.method == "GET":
+        # Pre-populate User fields
         form.first_name.data = current_user.first_name
         form.last_name.data = current_user.last_name
-        
-        # Get profile data
-        profile = Profile.query.filter_by(user_id=current_user.id).first()
-        if profile:
-            form.bio.data = profile.bio
-            form.location.data = profile.location
-            form.title.data = profile.title
-            form.department.data = profile.department
-            form.institution.data = profile.institution
-            form.position.data = profile.position
-            
-            # Get social media links
-            socials = {s.platform: s.url for s in profile.socials}
-            form.linkedin_url.data = socials.get('LinkedIn', '')
-            form.twitter_url.data = socials.get('Twitter', '')
-            form.instagram_url.data = socials.get('Instagram', '')
-            form.github_url.data = socials.get('GitHub', '')
-    
+
+        # Pre-populate Profile fields
+        form.institution.data = profile.institution
+        form.position.data = profile.position
+        form.bio.data = profile.bio
+        form.location.data = profile.location
+        form.title.data = profile.title
+        form.department.data = profile.department
+
+        # Pre-populate social links
+        socials = {s.platform: s.url for s in profile.socials}
+        form.linkedin_url.data = socials.get('LinkedIn', '')
+        form.twitter_url.data = socials.get('Twitter', '')
+        form.instagram_url.data = socials.get('Instagram', '')
+        form.github_url.data = socials.get('GitHub', '')
+
+        # Pre-populate achievements
+        for ach in profile.achievements:
+            form.achievements.append_entry({
+                'title': ach.title,
+                'type': ach.type,
+                'year': ach.year,
+                'description': ach.description
+            })
+
     return render_template("edit_profile.html", form=form)
+
+
 
 @main.route("/update-interests", methods=["POST"])
 @login_required
@@ -505,14 +582,14 @@ def logout():
 def save_section_order():
     data = request.get_json()
     order = data.get("order")
-    if not order or not isinstance(order, list):
-        return jsonify({"success": False, "error": "Invalid order data"}), 400
+    if not isinstance(order, list):
+        return jsonify({'success': False, 'error': 'Invalid data'}), 400
     profile = Profile.query.filter_by(user_id=current_user.id).first()
     if not profile:
-        return jsonify({"success": False, "error": "Profile not found"}), 404
+        return jsonify({'success': False, 'error': 'Profile not found'}), 400
     profile.section_order = json.dumps(order)
     db.session.commit()
-    return jsonify({"success": True})
+    return jsonify({'success': True})
 
 
 @main.route("/add_external_role", methods=["POST"])
@@ -603,6 +680,94 @@ def update_external_role_order():
             er = ExternalRole.query.filter_by(erid=int(erid), pid=profile.pid).first()
             if er:
                 er.sort_order = index
+        db.session.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": str(e)}), 500
+    
+@main.route("/add_achievement", methods=["POST"])
+@login_required
+def add_achievement():
+    try:
+        data = request.get_json()
+        title = data.get("title", "").strip()
+        type = data.get("type", "").strip()
+        year = data.get("year")
+        description = data.get("description", "").strip()
+
+        if not title or not type:
+            return jsonify({"success": False, "error": "title and type are required"}), 400
+
+        profile = Profile.query.filter_by(user_id=current_user.id).first()
+        if not profile:
+            profile = Profile(user_id=current_user.id)
+            db.session.add(profile)
+            db.session.flush()
+
+        # Determine next sort order
+        max_sort = db.session.query(db.func.max(Achievement.aid)).filter_by(pid=profile.pid).scalar()
+        next_sort = (max_sort or 0) + 1
+
+        ach = Achievement(
+            pid=profile.pid,
+            title=title,
+            type=type,
+            year=int(year) if year else None,
+            description=description
+        )
+        db.session.add(ach)
+        db.session.commit()
+
+        return jsonify({
+            "success": True,
+            "aid": ach.aid,
+            "title": ach.title,
+            "type": ach.type,
+            "year": ach.year,
+            "description": ach.description
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@main.route("/delete_achievement/<int:aid>", methods=["DELETE"])
+@login_required
+def delete_achievement(aid):
+    try:
+        profile = Profile.query.filter_by(user_id=current_user.id).first()
+        if not profile:
+            return jsonify({"success": False, "error": "Profile not found"}), 404
+
+        ach = Achievement.query.filter_by(aid=aid, pid=profile.pid).first()
+        if not ach:
+            return jsonify({"success": False, "error": "Achievement not found"}), 404
+
+        db.session.delete(ach)
+        db.session.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": str(e)}), 500
+    
+@main.route("/update_achievement_order", methods=["POST"])
+@login_required
+def update_achievement_order():
+    try:
+        data = request.get_json()
+        order = data.get("order", [])
+        if not isinstance(order, list):
+            return jsonify({"success": False, "error": "Invalid order"}), 400
+
+        profile = Profile.query.filter_by(user_id=current_user.id).first()
+        if not profile:
+            return jsonify({"success": False, "error": "Profile not found"}), 404
+
+        # Assign sort_order based on incoming order list of aids
+        for index, aid in enumerate(order, start=1):
+            ach = Achievement.query.filter_by(aid=int(aid), pid=profile.pid).first()
+            if ach:
+                ach.sort_order = index
         db.session.commit()
         return jsonify({"success": True})
     except Exception as e:

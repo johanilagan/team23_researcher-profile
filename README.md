@@ -36,4 +36,44 @@ in your terminal
 2. Run the programe by running 
 `python app.py`
 in your terminal.
-()
+=======
+
+## Group Members
+
+| Name        | Student Number              |
+|-------------|------------------------------------|
+| Elijah Thomson | |
+| Austin Ngo     | |
+| Sepehr Amid  | |
+| Johan Illagan  | |
+| Rohma Rehman   | |
+| Annabelle Tiew     | |
+
+
+---
+
+##  Credits & Tools Used
+
+### Languages & Frameworks
+- Python (Flask) – Backend development  
+- HTML, CSS, JavaScript – Frontend interface  
+- Bootstrap 5 – Styling and responsive design  
+- Jinja2 – Template engine  
+
+### Libraries & Packages
+- Flask-Login – Authentication  
+- SQLAlchemy – ORM  
+- WTForms – Form handling  
+- SortableJS – Drag-and-drop functionality  
+
+### Development & Collaboration Tools
+- GitHub – Version control & collaboration  
+- Git – Branching & pull requests  
+- Visual Studio Code / PyCharm – IDEs  
+- Figma – UI prototyping  
+
+### Credits
+- Bootstrap Icons & Font Awesome for icons  
+- Placeholder images from [via.placeholder.com](https://via.placeholder.com)  
+- Open-source libraries listed above  
+>>>>>>> fecb0e293c58378ecec66684c7f3c5d6ec7c5c6e

@@ -195,6 +195,104 @@
                                 </div>
                             </div>
                         </div>
+
+                       <!-- Achievements Section -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-trophy me-2"></i>Achievements
+                                </h5>
+                                <p class="text-muted">Add your grants, funds, or awards. Select the type, provide a title, year, and optional description.</p>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div id="achievements-container">
+                                    {% for achievement in form.achievements %}
+                                    <div class="mb-3 achievement-item">
+                                        <div class="row g-2 align-items-end">
+                                            <div class="col-md-3">
+                                                {{ achievement.type.label(class="form-label") }}
+                                                {{ achievement.type(class="form-select") }}
+                                            </div>
+                                            <div class="col-md-4">
+                                                {{ achievement.title.label(class="form-label") }}
+                                                {{ achievement.title(class="form-control") }}
+                                            </div>
+                                            <div class="col-md-2">
+                                                {{ achievement.year.label(class="form-label") }}
+                                                {{ achievement.year(class="form-control", placeholder="YYYY") }}
+                                            </div>
+                                            <div class="col-md-3">
+                                                {{ achievement.description.label(class="form-label") }}
+                                                {{ achievement.description(class="form-control", placeholder="Optional description") }}
+                                            </div>
+                                            <div class="col-12 text-end mt-2">
+                                                <button type="button" class="btn btn-outline-danger btn-sm remove-achievement">
+                                                    <i class="fas fa-trash-alt"></i> Remove
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="add-achievement">
+                                    <i class="fas fa-plus me-1"></i>Add Achievement
+                                </button>
+                            </div>
+                        </div>
+
+                        <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const container = document.getElementById('achievements-container');
+                            const addButton = document.getElementById('add-achievement');
+
+                            addButton.addEventListener('click', function() {
+                                const index = container.children.length;
+                                const newItem = document.createElement('div');
+                                newItem.className = 'mb-3 achievement-item';
+                                newItem.innerHTML = `
+                                    <div class="row g-2 align-items-end">
+                                        <div class="col-md-3">
+                                            <label class="form-label" for="achievements-${index}-type">Type</label>
+                                            <select class="form-select" name="achievements-${index}-type" id="achievements-${index}-type">
+                                                <option value="grant">Grant</option>
+                                                <option value="fund">Fund</option>
+                                                <option value="award">Award</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label" for="achievements-${index}-title">Title</label>
+                                            <input type="text" class="form-control" name="achievements-${index}-title" id="achievements-${index}-title" placeholder="Enter title">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label" for="achievements-${index}-year">Year</label>
+                                            <input type="text" class="form-control" name="achievements-${index}-year" id="achievements-${index}-year" placeholder="YYYY">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label" for="achievements-${index}-description">Description</label>
+                                            <input type="text" class="form-control" name="achievements-${index}-description" id="achievements-${index}-description" placeholder="Optional description">
+                                        </div>
+                                        <div class="col-12 text-end mt-2">
+                                            <button type="button" class="btn btn-outline-danger btn-sm remove-achievement">
+                                                <i class="fas fa-trash-alt"></i> Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+                                container.appendChild(newItem);
+                            });
+
+                            container.addEventListener('click', function(e) {
+                                if (e.target.closest('.remove-achievement')) {
+                                    e.target.closest('.achievement-item').remove();
+                                }
+                            });
+                        });
+                        </script>
+
+
                         
                         <!-- Form Actions -->
                         <div class="d-flex justify-content-between mt-4">

@@ -541,6 +541,11 @@ body {
     color: #ffd700;
 }
 
+.navbar-nav {
+    display: flex;
+    align-items: center;
+}
+
 .nav-link {
     color: rgba(255,255,255,0.9) !important;
     font-weight: 500;
@@ -1484,6 +1489,7 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     margin-left: 0.5rem;
+    margin-right: 1rem;
     font-size: 1.1rem;
 }
 

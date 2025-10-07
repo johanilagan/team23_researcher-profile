@@ -957,50 +957,60 @@
             }
         }
 
-        function submitAchievement() {
-            const form = document.getElementById('addAchievementForm');
-            const formData = {
-                title: document.getElementById('achievementTitle').value,
-                type: document.getElementById('achievementType').value,
-                year: document.getElementById('achievementYear').value,
-                description: document.getElementById('achievementDescription').value
-            };
+        async function submitAchievement() {
+            const title = document.getElementById("achievementTitle").value.trim();
+            const type = document.getElementById("achievementType").value.trim();
+            const year = document.getElementById("achievementYear").value.trim();
+            const description = document.getElementById("achievementDescription").value.trim();
 
-            fetch('/add_achievement', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(formData)
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    const list = document.getElementById('achievements-list');
-                    const newItem = document.createElement('div');
-                    newItem.className = 'list-group-item d-flex justify-content-between align-items-center';
-                    newItem.dataset.achid = data.achievement.id;
-                    newItem.style.cursor = 'move';
-                    newItem.innerHTML = `
-                        <div>
-                            <strong>${data.achievement.title}</strong>
-                            ${data.achievement.type ? `<span class="badge bg-secondary">${data.achievement.type}</span>` : ''}
-                            ${data.achievement.year ? `<small class="text-muted">(${data.achievement.year})</small>` : ''}
-                            ${data.achievement.description ? `<p class="mb-0 text-muted">${data.achievement.description}</p>` : ''}
-                        </div>
-                        <div>
-                            <button class="btn btn-sm btn-danger" onclick="deleteAchievement('${data.achievement.id}')">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    `;
-                    list.prepend(newItem);
+            if (!title || !type) {
+                showNotification("Title and Type are required.", "error");
+                return;
+            }
+
+            const payload = { title, type, year, description };
+
+            try {
+                const response = await fetch("/add_achievement", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showNotification("Achievement added successfully!", "success");
+
+                    // Clear form fields
+                    document.getElementById("achievementTitle").value = "";
+                    document.getElementById("achievementType").value = "";
+                    document.getElementById("achievementYear").value = "";
+                    document.getElementById("achievementDescription").value = "";
+
+                    // Append to list
+                    const list = document.getElementById("achievements-list");
+                    if (list) {
+                        const item = document.createElement("li");
+                        item.className = "list-group-item";
+                        item.innerHTML = `
+                            <strong>${result.title}</strong> (${result.year || "N/A"}) - ${result.type}
+                            <p class="text-muted mb-0">${result.description || ""}</p>
+                        `;
+                        list.appendChild(item);
+                    }
+
+                    // Close modal
                     closeAchievementModal();
-                    showNotification('Achievement added successfully!', 'success');
                 } else {
-                    showNotification('Error adding achievement', 'error');
+                    showNotification(result.error || "Failed to add achievement.", "error");
                 }
-            })
-            .catch(() => showNotification('Error adding achievement', 'error'));
+            } catch (err) {
+                console.error("Error:", err);
+                showNotification("An unexpected error occurred.", "error");
+            }
         }
+
 
 
 

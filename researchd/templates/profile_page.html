@@ -71,8 +71,8 @@
 
         {% elif s.section == 'interests-section' %}
         <!-- Research Interests -->
-        <div class="interests-section {% if not s.visible %}d-none{% endif %}" id="interests-section">
-            <div class="profile-section" data-section="interests-section">
+        <div class="interests-section {% if not s.visible %}d-none{% endif %}" id="interests-section" data-section="interests-section">
+            <div class="profile-section">
                 <div class="section-header">
                     <h2>Research Interests</h2>
                     {% if is_owner %}
@@ -96,8 +96,8 @@
         {% elif s.section == 'papers-section' %}
 
         <!-- Recent Papers -->
-        <div class="papers-section {% if not s.visible %}d-none{% endif %}" id="papers-section">
-            <div class="profile-section" data-section="papers-section">
+        <div class="papers-section {% if not s.visible %}d-none{% endif %}" id="papers-section" data-section="papers-section">
+            <div class="profile-section">
                 <div class="section-header">
                     <h2>Recent Papers</h2>
                     {% if publications %}
@@ -179,18 +179,19 @@
         <div id="buttons_section">
             {% set section_map = section_order | map(attribute='section') | list %}
             {% set visible_map = section_order | map(attribute='visible') | list %}
+            
             {% for s in section_order %}
                 {% if s.section == 'papers-section' %}
                     {% if not s.visible %}
-                        <button class="btn btn-primary" onclick="addSection('papers-section')">Add Papers Section</button>
+                        <button class="btn btn-primary" data-section-btn="papers-section" onclick="addSection('papers-section')">Add Papers Section</button>
                     {% else %}
-                        <button type="button" class="btn btn-primary" onclick="deleteSection('papers-section')">Delete Papers Section</button>
+                        <button type="button" class="btn btn-primary" data-section-btn="papers-section" onclick="deleteSection('papers-section')">Delete Papers Section</button>
                     {% endif %}
                 {% elif s.section == 'interests-section' %}
                     {% if not s.visible %}
-                        <button class="btn btn-primary" onclick="addSection('interests-section')">Add Interests Section</button>
+                        <button class="btn btn-primary" data-section-btn="interests-section" onclick="addSection('interests-section')">Add Interests Section</button>
                     {% else %}
-                        <button type="button" class="btn btn-primary" onclick="deleteSection('interests-section')">Delete Interests Section</button>
+                        <button type="button" class="btn btn-primary" data-section-btn="interests-section" onclick="deleteSection('interests-section')">Delete Interests Section</button>
                     {% endif %}
                 {% endif %}
             {% endfor %}
@@ -439,45 +440,69 @@
     <!-- End of Modals -->
     <script>
         function addSection(sect) {
-            console.log("Button has")
-            const section = document.querySelector(`.profile-section[data-section="${sect}"]`);
+            console.log("Button clicked for:", sect);
+            const section = document.querySelector(`[data-section="${sect}"]`);
+            console.log("Section found?", section);
             if (section) {
-                section.parentElement.style.display = "";
+                section.classList.remove('d-none');
                 toggleSectionButtons(sect, true);
                 saveSectionOrder();
+            } else {
+                console.error("Section not found:", sect);
             }
         }
 
+
         function deleteSection(sect) {
-            const section = document.querySelector(`.profile-section[data-section="${sect}"]`);
+            const section = document.querySelector(`[data-section="${sect}"]`);
             if (section) {
-                section.parentElement.style.display = "none";
+                section.classList.add('d-none');
                 toggleSectionButtons(sect, false);
                 saveSectionOrder();
             }
         }
 
-        function toggleSectionButtons(sect, isVisible) {
-            const addBtn = document.querySelector(`#buttons_section .btn[data-add-section="${sect}"]`);
-            const delBtn = document.querySelector(`#buttons_section .btn[data-del-section="${sect}"]`);
-            if (addBtn) addBtn.style.display = isVisible ? "none" : "";
-            if (delBtn) delBtn.style.display = isVisible ? "" : "none";
+        function toggleSectionButtons(sectionName, isVisible) {
+            const btn = document.querySelector(`[data-section-btn="${sectionName}"]`);
+            if (!btn) return;
+
+            if (isVisible) {
+                btn.innerHTML = `<i class="fas fa-trash me-1"></i>Delete ${formatSectionName(sectionName)}`;
+                btn.setAttribute("onclick", `deleteSection('${sectionName}')`);
+            } else {
+                btn.innerHTML = `<i class="fas fa-plus me-1"></i>Add ${formatSectionName(sectionName)}`;
+                btn.setAttribute("onclick", `addSection('${sectionName}')`);
+            }
+        }
+
+        function formatSectionName(section) {
+            switch (section) {
+                case 'papers-section': return 'Papers Section';
+                case 'interests-section': return 'Interests Section';
+                default: return 'Section';
+            }
         }
 
         function saveSectionOrder() {
             let order = [];
-            document.querySelectorAll('#profile-sections .profile-section').forEach(function(section) {
+            document.querySelectorAll('#profile-sections [data-section]').forEach(function(section) {
                 order.push({
                     section: section.getAttribute('data-section'),
-                    visible: section.parentElement.style.display !== 'none'
+                    visible: !section.classList.contains('d-none')
                 });
             });
+            console.log('Saving section order:', order);
             fetch('/save-section-order', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({order: order})
-            });
-        }
+            })
+            .then(response => response.json())
+            .then(data => console.log("Saved section order:", data))
+            .catch(err => console.error("Error saving section order:", err));
+        };
+
+
 
         function toggleExternalRoles() {
             const externalSection = document.getElementById('external-roles-section');
@@ -957,50 +982,60 @@
             }
         }
 
-        function submitAchievement() {
-            const form = document.getElementById('addAchievementForm');
-            const formData = {
-                title: document.getElementById('achievementTitle').value,
-                type: document.getElementById('achievementType').value,
-                year: document.getElementById('achievementYear').value,
-                description: document.getElementById('achievementDescription').value
-            };
+        async function submitAchievement() {
+            const title = document.getElementById("achievementTitle").value.trim();
+            const type = document.getElementById("achievementType").value.trim();
+            const year = document.getElementById("achievementYear").value.trim();
+            const description = document.getElementById("achievementDescription").value.trim();
 
-            fetch('/add_achievement', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(formData)
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    const list = document.getElementById('achievements-list');
-                    const newItem = document.createElement('div');
-                    newItem.className = 'list-group-item d-flex justify-content-between align-items-center';
-                    newItem.dataset.achid = data.achievement.id;
-                    newItem.style.cursor = 'move';
-                    newItem.innerHTML = `
-                        <div>
-                            <strong>${data.achievement.title}</strong>
-                            ${data.achievement.type ? `<span class="badge bg-secondary">${data.achievement.type}</span>` : ''}
-                            ${data.achievement.year ? `<small class="text-muted">(${data.achievement.year})</small>` : ''}
-                            ${data.achievement.description ? `<p class="mb-0 text-muted">${data.achievement.description}</p>` : ''}
-                        </div>
-                        <div>
-                            <button class="btn btn-sm btn-danger" onclick="deleteAchievement('${data.achievement.id}')">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    `;
-                    list.prepend(newItem);
+            if (!title || !type) {
+                showNotification("Title and Type are required.", "error");
+                return;
+            }
+
+            const payload = { title, type, year, description };
+
+            try {
+                const response = await fetch("/add_achievement", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showNotification("Achievement added successfully!", "success");
+
+                    // Clear form fields
+                    document.getElementById("achievementTitle").value = "";
+                    document.getElementById("achievementType").value = "";
+                    document.getElementById("achievementYear").value = "";
+                    document.getElementById("achievementDescription").value = "";
+
+                    // Append to list
+                    const list = document.getElementById("achievements-list");
+                    if (list) {
+                        const item = document.createElement("li");
+                        item.className = "list-group-item";
+                        item.innerHTML = `
+                            <strong>${result.title}</strong> (${result.year || "N/A"}) - ${result.type}
+                            <p class="text-muted mb-0">${result.description || ""}</p>
+                        `;
+                        list.appendChild(item);
+                    }
+
+                    // Close modal
                     closeAchievementModal();
-                    showNotification('Achievement added successfully!', 'success');
                 } else {
-                    showNotification('Error adding achievement', 'error');
+                    showNotification(result.error || "Failed to add achievement.", "error");
                 }
-            })
-            .catch(() => showNotification('Error adding achievement', 'error'));
+            } catch (err) {
+                console.error("Error:", err);
+                showNotification("An unexpected error occurred.", "error");
+            }
         }
+
 
 
 

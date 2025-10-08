@@ -93,11 +93,13 @@
             </div>
         </div>
 
+        <p>DEBUG: {{ s.section }} → visible={{ s.visible }} (type: {{ s.visible.__class__.__name__ }})</p>
+
         {% elif s.section == 'papers-section' %}
 
         <!-- Recent Papers -->
-        <div class="papers-section {% if not s.visible %}d-none{% endif %}" id="papers-section">
-            <div class="profile-section" data-section="papers-section">
+        <div class="papers-section" id="papers-section">
+            <div class="profile-section {% if not s.visible %}d-none{% endif %}" data-section="papers-section">
                 <div class="section-header">
                     <h2>Recent Papers</h2>
                     {% if publications %}
@@ -179,18 +181,19 @@
         <div id="buttons_section">
             {% set section_map = section_order | map(attribute='section') | list %}
             {% set visible_map = section_order | map(attribute='visible') | list %}
+            
             {% for s in section_order %}
                 {% if s.section == 'papers-section' %}
                     {% if not s.visible %}
-                        <button class="btn btn-primary" onclick="addSection('papers-section')">Add Papers Section</button>
+                        <button class="btn btn-primary" data-section-btn="papers-section" onclick="addSection('papers-section')">Add Papers Section</button>
                     {% else %}
-                        <button type="button" class="btn btn-primary" onclick="deleteSection('papers-section')">Delete Papers Section</button>
+                        <button type="button" class="btn btn-primary" data-section-btn="papers-section" onclick="deleteSection('papers-section')">Delete Papers Section</button>
                     {% endif %}
                 {% elif s.section == 'interests-section' %}
                     {% if not s.visible %}
-                        <button class="btn btn-primary" onclick="addSection('interests-section')">Add Interests Section</button>
+                        <button class="btn btn-primary" data-section-btn="interests-section" onclick="addSection('interests-section')">Add Interests Section</button>
                     {% else %}
-                        <button type="button" class="btn btn-primary" onclick="deleteSection('interests-section')">Delete Interests Section</button>
+                        <button type="button" class="btn btn-primary" data-section-btn="interests-section" onclick="deleteSection('interests-section')">Delete Interests Section</button>
                     {% endif %}
                 {% endif %}
             {% endfor %}
@@ -439,45 +442,50 @@
     <!-- End of Modals -->
     <script>
         function addSection(sect) {
-            console.log("Button has")
+            console.log("Button clicked for:", sect);
             const section = document.querySelector(`.profile-section[data-section="${sect}"]`);
+            console.log("Section found?", section);
             if (section) {
-                section.parentElement.style.display = "";
+                section.classList.remove('d-none');
                 toggleSectionButtons(sect, true);
                 saveSectionOrder();
+            } else {
+                console.error("Section not found:", sect);
             }
         }
+
 
         function deleteSection(sect) {
             const section = document.querySelector(`.profile-section[data-section="${sect}"]`);
             if (section) {
-                section.parentElement.style.display = "none";
+                section.classList.add('d-none');
                 toggleSectionButtons(sect, false);
                 saveSectionOrder();
             }
         }
 
-        function toggleSectionButtons(sect, isVisible) {
-            const addBtn = document.querySelector(`#buttons_section .btn[data-add-section="${sect}"]`);
-            const delBtn = document.querySelector(`#buttons_section .btn[data-del-section="${sect}"]`);
-            if (addBtn) addBtn.style.display = isVisible ? "none" : "";
-            if (delBtn) delBtn.style.display = isVisible ? "" : "none";
+        function toggleSectionButtons(sectionName, isVisible) {
+            const btn = document.querySelector(`[data-section-btn="${sectionName}"]`);
+            if (!btn) return;
+
+            if (isVisible) {
+                btn.innerHTML = `<i class="fas fa-trash me-1"></i>Delete ${formatSectionName(sectionName)}`;
+                btn.setAttribute("onclick", `deleteSection('${sectionName}')`);
+            } else {
+                btn.innerHTML = `<i class="fas fa-plus me-1"></i>Add ${formatSectionName(sectionName)}`;
+                btn.setAttribute("onclick", `addSection('${sectionName}')`);
+            }
         }
 
-        function saveSectionOrder() {
-            let order = [];
-            document.querySelectorAll('#profile-sections .profile-section').forEach(function(section) {
-                order.push({
-                    section: section.getAttribute('data-section'),
-                    visible: section.parentElement.style.display !== 'none'
-                });
-            });
-            fetch('/save-section-order', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({order: order})
-            });
+        function formatSectionName(section) {
+            switch (section) {
+                case 'papers-section': return 'Papers Section';
+                case 'interests-section': return 'Interests Section';
+                default: return 'Section';
+            }
         }
+
+
 
         function toggleExternalRoles() {
             const externalSection = document.getElementById('external-roles-section');

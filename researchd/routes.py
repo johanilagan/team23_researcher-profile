@@ -19,6 +19,7 @@ def home():
 @main.route("/profile")
 @login_required
 def my_profile():
+    print(">>> Running MY_PROFILE route <<<")
     # Get fresh user data with profile
     user = User.query.get(current_user.id)
     
@@ -35,7 +36,9 @@ def my_profile():
     default_sections = [
         {"section": 'profile-header', 'visible': True},
         {'section': 'interests-section', 'visible': True},
-        {'section': 'papers-section', 'visible': True}
+        {'section': 'papers-section', 'visible': True},
+        {'section': 'achievements-section', 'visible': False},
+        {'section': 'external-roles-section', 'visible': False}
     ]
     if profile.section_order:
         try:
@@ -53,10 +56,15 @@ def my_profile():
     # Load external roles
     external_roles = ExternalRole.query.filter_by(pid=profile.pid).order_by(ExternalRole.sort_order.nulls_last(), ExternalRole.start_year.desc().nulls_last()).all()
 
+    print("Loaded section_order:", section_order)
+    for s in section_order:
+        print(s['section'], s['visible'], type(s['visible']))
+    
     return render_template("profile_page.html", profile=profile, is_owner=True, publications=publications, section_order=section_order, external_roles=external_roles)
 
 @main.route("/profile/<int:researcher_id>")
 def researcher_profile(researcher_id):
+    print(f">>> Running RESEARCHER_PROFILE route for {researcher_id} <<<")
     researcher = User.query.get(researcher_id)
     if not researcher:
         from flask import abort
@@ -75,7 +83,9 @@ def researcher_profile(researcher_id):
     default_sections = [
         {"section": 'profile-header', 'visible': True},
         {'section': 'interests-section', 'visible': True},
-        {'section': 'papers-section', 'visible': True}
+        {'section': 'papers-section', 'visible': True},
+        {'section': 'achievements-section', 'visible': False},
+        {'section': 'external-roles-section', 'visible': False}
     ]
     if profile.section_order:
         try:
@@ -92,7 +102,7 @@ def researcher_profile(researcher_id):
 
     # Load external roles
     external_roles = ExternalRole.query.filter_by(pid=profile.pid).order_by(ExternalRole.sort_order.nulls_last(), ExternalRole.start_year.desc().nulls_last()).all()
-
+    
     return render_template("profile_page.html", profile=profile, is_owner=is_owner, publications=publications, section_order=section_order, external_roles=external_roles)
 
 @main.route("/search")
@@ -216,22 +226,8 @@ def edit_profile():
                         social.url = url
                     else:
                         db.session.add(Social(pid=profile.pid, platform=platform, url=url))
-                else:
-                    if social:
-                        db.session.delete(social)
-
-            for ach in profile.achievements:
-                db.session.delete(ach)
-
-            for a in form.achievements.data:
-                if a.get('title'):  # Only add non-empty achievements
-                    db.session.add(Achievement(
-                        pid=profile.pid,
-                        type=a.get('type'),
-                        title=a.get('title'),
-                        year=a.get('year'),
-                        description=a.get('description')
-                    ))
+                elif social:
+                    db.session.delete(social)
 
             db.session.commit()
             return redirect(url_for("main.my_profile"))
@@ -258,15 +254,6 @@ def edit_profile():
         form.twitter_url.data = socials.get('Twitter', '')
         form.instagram_url.data = socials.get('Instagram', '')
         form.github_url.data = socials.get('GitHub', '')
-
-        # Pre-populate achievements
-        for ach in profile.achievements:
-            form.achievements.append_entry({
-                'title': ach.title,
-                'type': ach.type,
-                'year': ach.year,
-                'description': ach.description
-            })
 
     return render_template("edit_profile.html", form=form)
 

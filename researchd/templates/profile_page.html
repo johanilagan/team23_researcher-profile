@@ -3,35 +3,37 @@
 {% block title %}Researcher Profile - Academic Network{% endblock %}
 
 {% block content %}
-    <div class="container mt-4" id="profile-sections">
+    <div class="container-fluid px-2 px-md-4 mt-2 mt-md-4" id="profile-sections">
         {% for s in section_order %}
         {% if s.section == 'profile-header' %}
         <!-- Profile Header -->
         <div class="profile-header {% if not s.visible %}d-none{% endif %}">
             <div class="profile-section" data-section="profile-header">
-                <div class="row">
-                    <div class="col-md-3 text-center">
+                <div class="row g-3">
+                    <div class="col-12 col-sm-6 col-md-3 text-center text-sm-start">
                         <div class="profile-pic-container">
                             <img id="profile-pic" src="{{ url_for('static', filename='placeholder.png') }}" 
                                 alt="Profile Picture" class="profile-pic">
+                            {% if is_owner %}
                             <button class="change-pic-btn" onclick="document.getElementById('profile-pic-input').click()">
                                 <i class="fas fa-camera"></i>
                             </button>
                             <input type="file" id="profile-pic-input" accept="image/*" style="display: none;" 
                                 onchange="changeProfilePic(this)">
+                            {% endif %}
                         </div>
                     </div>
-                    <div class="col-md-9">
+                    <div class="col-12 col-sm-6 col-md-9">
                         <div class="profile-info">
-                            <h1 id="researcher-name">{{ profile.user.first_name }} {{ profile.user.last_name }}</h1>
-                            <p class="title" id="researcher-title">{{ profile.position or 'Position not specified' }}</p>
-                            <p class="institution" id="researcher-institution">{{ profile.institution or 'Institution not specified' }}</p>
+                            <h1 id="researcher-name" class="h2 h3-md">{{ profile.user.first_name }} {{ profile.user.last_name }}</h1>
+                            <p class="title h5 h6-md" id="researcher-title">{{ profile.position or 'Position not specified' }}</p>
+                            <p class="institution h6" id="researcher-institution">{{ profile.institution or 'Institution not specified' }}</p>
                             {% if profile.location %}
-                            <p class="location" id="researcher-location">
+                            <p class="location small" id="researcher-location">
                                 <i class="fas fa-map-marker-alt me-1"></i>{{ profile.location }}
                             </p>
                             {% endif %}
-                            <p class="bio" id="researcher-bio">
+                            <p class="bio small" id="researcher-bio">
                                 {% if profile.bio %}
                                     {{ profile.bio }}
                                 {% else %}
@@ -40,23 +42,23 @@
                             </p>
                             
                             <!-- Social Media Links -->
-                            <div class="social-links">
+                            <div class="social-links d-flex flex-wrap gap-2">
                                 {% for social in profile.socials %}
                                         {% if social.platform == 'LinkedIn' %}
-                                            <a href="{{ social.url }}" class="social-link linkedin" target="_blank">
-                                                <i class="fab fa-linkedin"></i> LinkedIn
+                                            <a href="{{ social.url }}" class="social-link linkedin btn btn-outline-primary btn-sm" target="_blank">
+                                                <i class="fab fa-linkedin me-1"></i>LinkedIn
                                             </a>
                                         {% elif social.platform == 'Twitter' %}
-                                            <a href="{{ social.url }}" class="social-link twitter" target="_blank">
-                                                <i class="fab fa-twitter"></i> Twitter
+                                            <a href="{{ social.url }}" class="social-link twitter btn btn-outline-info btn-sm" target="_blank">
+                                                <i class="fab fa-twitter me-1"></i>Twitter
                                             </a>
                                         {% elif social.platform == 'Instagram' %}
-                                            <a href="{{ social.url }}" class="social-link instagram" target="_blank">
-                                                <i class="fab fa-instagram"></i> Instagram
+                                            <a href="{{ social.url }}" class="social-link instagram btn btn-outline-danger btn-sm" target="_blank">
+                                                <i class="fab fa-instagram me-1"></i>Instagram
                                             </a>
                                         {% elif social.platform == 'GitHub' %}
-                                            <a href="{{ social.url }}" class="social-link github" target="_blank">
-                                                <i class="fab fa-github"></i> GitHub
+                                            <a href="{{ social.url }}" class="social-link github btn btn-outline-dark btn-sm" target="_blank">
+                                                <i class="fab fa-github me-1"></i>GitHub
                                             </a>
                                         {% endif %}
                                     {% endfor %}
@@ -73,10 +75,12 @@
         <!-- Research Interests -->
         <div class="interests-section {% if not s.visible %}d-none{% endif %}" id="interests-section" data-section="interests-section">
             <div class="profile-section">
-                <div class="section-header">
-                    <h2>Research Interests</h2>
+                <div class="section-header d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-3">
+                    <h2 class="h4 mb-2 mb-sm-0">Research Interests</h2>
                     {% if is_owner %}
-                    <button class="btn btn-outline-primary btn-sm" onclick="editInterests()" id="edit-interests-btn">Edit</button>
+                    <button class="btn btn-outline-primary btn-sm" onclick="editInterests()" id="edit-interests-btn">
+                        <i class="fas fa-edit me-1"></i>Edit
+                    </button>
                     {% endif %}
                 </div>
                 <div class="interests-tags" id="research-interests">
@@ -98,55 +102,61 @@
         <!-- Recent Papers -->
         <div class="papers-section {% if not s.visible %}d-none{% endif %}" id="papers-section" data-section="papers-section">
             <div class="profile-section">
-                <div class="section-header">
-                    <h2>Recent Papers</h2>
+                <div class="section-header d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-3">
+                    <h2 class="h4 mb-2 mb-sm-0">Recent Papers</h2>
                     {% if publications %}
-                    <a href="{{ url_for('main.my_papers') }}" class="btn btn-outline-primary btn-sm">View All</a>
+                    <a href="{{ url_for('main.my_papers') }}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-list me-1"></i>View All
+                    </a>
                     {% endif %}
                 </div>
-                <div class="papers-grid" id="recent-papers">
+                <div class="row g-3" id="recent-papers">
                     {% if publications %}
                         {% for publication in publications %}
-                        <div class="paper-card">
-                            <h3>{{ publication.title[:60] }}{% if publication.title|length > 60 %}...{% endif %}</h3>
-                            {% if publication.authors %}
-                            <p class="authors">{{ publication.authors[:80] }}{% if publication.authors|length > 80 %}...{% endif %}</p>
-                            {% endif %}
-                            {% if publication.journal and publication.year %}
-                            <p class="venue">{{ publication.journal }} ({{ publication.year }})</p>
-                            {% elif publication.year %}
-                            <p class="venue">{{ publication.year }}</p>
-                            {% endif %}
-                            {% if publication.abstract %}
-                            <p class="abstract">{{ publication.abstract[:150] }}{% if publication.abstract|length > 150 %}...{% endif %}</p>
-                            {% endif %}
-                            <div class="paper-actions">
-                                {% if publication.file %}
-                                <a href="{{ url_for('main.download_file', filename=publication.file.file_path) }}" 
-                                class="btn btn-sm btn-outline-primary" target="_blank">
-                                    <i class="fas fa-download me-1"></i>Download PDF
-                                </a>
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <div class="paper-card h-100">
+                                <h3 class="h6">{{ publication.title[:50] }}{% if publication.title|length > 50 %}...{% endif %}</h3>
+                                {% if publication.authors %}
+                                <p class="authors small text-muted">{{ publication.authors[:60] }}{% if publication.authors|length > 60 %}...{% endif %}</p>
                                 {% endif %}
-                                {% if publication.url %}
-                                <a href="{{ publication.url }}" class="btn btn-sm btn-outline-secondary" target="_blank">
-                                    <i class="fas fa-external-link-alt me-1"></i>View Online
-                                </a>
+                                {% if publication.journal and publication.year %}
+                                <p class="venue small fw-bold">{{ publication.journal }} ({{ publication.year }})</p>
+                                {% elif publication.year %}
+                                <p class="venue small fw-bold">{{ publication.year }}</p>
                                 {% endif %}
+                                {% if publication.abstract %}
+                                <p class="abstract small">{{ publication.abstract[:100] }}{% if publication.abstract|length > 100 %}...{% endif %}</p>
+                                {% endif %}
+                                <div class="paper-actions d-flex flex-wrap gap-1 mt-auto">
+                                    {% if publication.file %}
+                                    <a href="{{ url_for('main.download_file', filename=publication.file.file_path) }}" 
+                                    class="btn btn-sm btn-outline-primary" target="_blank">
+                                        <i class="fas fa-download me-1"></i>PDF
+                                    </a>
+                                    {% endif %}
+                                    {% if publication.url %}
+                                    <a href="{{ publication.url }}" class="btn btn-sm btn-outline-secondary" target="_blank">
+                                        <i class="fas fa-external-link-alt me-1"></i>View
+                                    </a>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                         {% endfor %}
                     {% else %}
-                        <div class="no-papers">
-                            <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">No papers uploaded yet</h5>
-                            {% if is_owner %}
-                            <p class="text-muted">Start sharing your research by uploading your first paper!</p>
-                            <a href="{{ url_for('main.upload_paper') }}" class="btn btn-primary">
-                                <i class="fas fa-plus me-2"></i>Upload Your First Paper
-                            </a>
-                            {% else %}
-                            <p class="text-muted">This researcher hasn't uploaded any papers yet.</p>
-                            {% endif %}
+                        <div class="col-12">
+                            <div class="no-papers text-center py-5">
+                                <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No papers uploaded yet</h5>
+                                {% if is_owner %}
+                                <p class="text-muted">Start sharing your research by uploading your first paper!</p>
+                                <a href="{{ url_for('main.upload_paper') }}" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>Upload Your First Paper
+                                </a>
+                                {% else %}
+                                <p class="text-muted">This researcher hasn't uploaded any papers yet.</p>
+                                {% endif %}
+                            </div>
                         </div>
                     {% endif %}
                 </div>
@@ -157,24 +167,39 @@
 
         <!-- Profile Actions -->
         {% if is_owner %}
-        <div class="profile-actions">
-            <a href="{{ url_for('main.edit_profile') }}" class="btn btn-primary">
-                <i class="fas fa-edit"></i> Edit Profile
-            </a>
-            <a href="{{ url_for('main.upload_paper') }}" class="btn btn-success">
-                <i class="fas fa-plus"></i> Upload New Paper
-            </a>
-            <a href="{{ url_for('main.my_papers') }}" class="btn btn-info">
-                <i class="fas fa-file-alt"></i> View My Papers
-            </a>
-            <button class="btn btn-outline-primary" onclick="toggleExternalRoles()" id="toggle-external-roles-btn">
-                <i class="fas fa-users me-1"></i> External Roles
-            </button>
-            <button class="btn btn-outline-primary" onclick="toggleAchievements()" id="toggle-achievements-btn">
-                <i class="fas fa-trophy me-1"></i> Achievements
-            </button>
-            <button class="btn btn-primary" onclick="addSection('buttons_section')">Add Section</button>
-
+        <div class="profile-actions mt-4">
+            <div class="row g-2">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                    <a href="{{ url_for('main.edit_profile') }}" class="btn btn-primary w-100">
+                        <i class="fas fa-edit me-1"></i><span class="d-none d-sm-inline">Edit Profile</span><span class="d-sm-none">Edit</span>
+                    </a>
+                </div>
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                    <a href="{{ url_for('main.upload_paper') }}" class="btn btn-success w-100">
+                        <i class="fas fa-plus me-1"></i><span class="d-none d-sm-inline">Upload Paper</span><span class="d-sm-none">Upload</span>
+                    </a>
+                </div>
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                    <a href="{{ url_for('main.my_papers') }}" class="btn btn-info w-100">
+                        <i class="fas fa-file-alt me-1"></i><span class="d-none d-sm-inline">My Papers</span><span class="d-sm-none">Papers</span>
+                    </a>
+                </div>
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                    <button class="btn btn-outline-primary w-100" onclick="toggleExternalRoles()" id="toggle-external-roles-btn">
+                        <i class="fas fa-users me-1"></i><span class="d-none d-sm-inline">External Roles</span><span class="d-sm-none">Roles</span>
+                    </button>
+                </div>
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                    <button class="btn btn-outline-primary w-100" onclick="toggleAchievements()" id="toggle-achievements-btn">
+                        <i class="fas fa-trophy me-1"></i><span class="d-none d-sm-inline">Achievements</span><span class="d-sm-none">Awards</span>
+                    </button>
+                </div>
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                    <button class="btn btn-outline-secondary w-100" onclick="addSection('buttons_section')">
+                        <i class="fas fa-plus me-1"></i><span class="d-none d-sm-inline">Add Section</span><span class="d-sm-none">Add</span>
+                    </button>
+                </div>
+            </div>
         </div>
         <div id="buttons_section">
             {% set section_map = section_order | map(attribute='section') | list %}
@@ -350,14 +375,14 @@
                 <button type="button" class="custom-modal-close" onclick="closeModal()">&times;</button>
             </div>
             <div class="custom-modal-body">
-                <div class="mb-4">
+                <div class="mb-3">
                     <label class="form-label">Search and add research interests:</label>
-                    <input type="text" class="form-control" id="interest-search" placeholder="Type to search through 500+ research interests across all academic disciplines...">
-                    <small class="form-text text-muted">Type to search for interests, then click to add them. Click on selected interests below to remove them.</small>
+                    <input type="text" class="form-control" id="interest-search" placeholder="Type to search through 500+ research interests...">
+                    <small class="form-text text-muted">Type to search for interests, then click to add them.</small>
                 </div>
                 
                 <!-- Search Results -->
-                <div class="search-results mb-4" id="search-results" style="display: none;">
+                <div class="search-results mb-3" id="search-results" style="display: none;">
                     <h6>Search Results:</h6>
                     <div id="search-results-list" class="search-results-container">
                         <!-- Search results will appear here -->
@@ -373,16 +398,16 @@
                     <small class="form-text text-muted mt-2">Click on any interest below to remove it from your profile.</small>
                 </div>
             </div>
-            <div class="custom-modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="saveInterests()">Save Interests</button>
+            <div class="custom-modal-footer d-flex flex-column flex-sm-row gap-2">
+                <button type="button" class="btn btn-secondary flex-fill" onclick="closeModal()">Cancel</button>
+                <button type="button" class="btn btn-primary flex-fill" onclick="saveInterests()">Save Interests</button>
             </div>
         </div>
     </div>
 
     <!-- Add Paper Modal -->
     <div class="modal fade" id="addPaperModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Add New Paper</h5>
@@ -395,21 +420,27 @@
                             <input type="text" class="form-control" id="paper-title" required>
                         </div>
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-12 col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">Authors *</label>
                                     <input type="text" class="form-control" id="paper-authors" required>
                                 </div>
+                            </div>
+                            <div class="col-12 col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">Publication Year *</label>
                                     <input type="number" class="form-control" id="paper-year" min="1900" max="2030" required>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                        </div>
+                        <div class="row">
+                            <div class="col-12 col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">Journal/Conference</label>
                                     <input type="text" class="form-control" id="paper-venue">
                                 </div>
+                            </div>
+                            <div class="col-12 col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">DOI</label>
                                     <input type="text" class="form-control" id="paper-doi" placeholder="10.1000/...">
@@ -418,7 +449,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Abstract</label>
-                            <textarea class="form-control" id="paper-abstract" rows="4"></textarea>
+                            <textarea class="form-control" id="paper-abstract" rows="3"></textarea>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Keywords</label>
@@ -430,9 +461,9 @@
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="submitPaper()">Add Paper</button>
+                <div class="modal-footer d-flex flex-column flex-sm-row gap-2">
+                    <button type="button" class="btn btn-secondary flex-fill" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary flex-fill" onclick="submitPaper()">Add Paper</button>
                 </div>
             </div>
         </div>

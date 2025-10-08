@@ -1,6 +1,7 @@
 import json
 from flask import Blueprint, render_template, redirect, url_for, request, jsonify, current_app, send_from_directory
 from flask_login import login_user, login_required, logout_user, current_user
+from flask_wtf.csrf import validate_csrf
 from werkzeug.utils import secure_filename
 from .forms import LoginForm, RegisterForm, EditProfileForm, UploadPaperForm, EditPaperForm
 from .models import User, Profile, Social, Publication, File, Achievement, ExternalRole
@@ -11,6 +12,14 @@ from datetime import datetime
 
 auth = Blueprint("auth", __name__)
 main = Blueprint("main", __name__)
+
+def validate_csrf_token():
+    """Validate CSRF token for AJAX requests"""
+    try:
+        validate_csrf(request.headers.get('X-CSRFToken'))
+        return True
+    except Exception:
+        return False
 
 @main.route("/")
 def home():
@@ -262,6 +271,9 @@ def edit_profile():
 @main.route("/update-interests", methods=["POST"])
 @login_required
 def update_interests():
+    if not validate_csrf_token():
+        return jsonify({'success': False, 'error': 'Invalid CSRF token'}), 400
+    
     try:
         data = request.get_json()
         interests = data.get('interests', '')
@@ -567,6 +579,9 @@ def logout():
 @main.route("/save-section-order", methods=["POST"])
 @login_required
 def save_section_order():
+    if not validate_csrf_token():
+        return jsonify({'success': False, 'error': 'Invalid CSRF token'}), 400
+    
     data = request.get_json()
     order = data.get("order")
     if not isinstance(order, list):
@@ -582,6 +597,9 @@ def save_section_order():
 @main.route("/add_external_role", methods=["POST"])
 @login_required
 def add_external_role():
+    if not validate_csrf_token():
+        return jsonify({'success': False, 'error': 'Invalid CSRF token'}), 400
+    
     try:
         data = request.get_json()
         role_title = data.get("role_title", "").strip()
@@ -632,6 +650,9 @@ def add_external_role():
 @main.route("/delete_external_role/<int:erid>", methods=["DELETE"])
 @login_required
 def delete_external_role(erid):
+    if not validate_csrf_token():
+        return jsonify({'success': False, 'error': 'Invalid CSRF token'}), 400
+    
     try:
         profile = Profile.query.filter_by(user_id=current_user.id).first()
         if not profile:
@@ -652,6 +673,9 @@ def delete_external_role(erid):
 @main.route("/update_external_role_order", methods=["POST"])
 @login_required
 def update_external_role_order():
+    if not validate_csrf_token():
+        return jsonify({'success': False, 'error': 'Invalid CSRF token'}), 400
+    
     try:
         data = request.get_json()
         order = data.get("order", [])
@@ -676,14 +700,17 @@ def update_external_role_order():
 @main.route("/add_achievement", methods=["POST"])
 @login_required
 def add_achievement():
+    if not validate_csrf_token():
+        return jsonify({'success': False, 'error': 'Invalid CSRF token'}), 400
+    
     try:
         data = request.get_json()
         title = data.get("title", "").strip()
-        type = data.get("type", "").strip()
+        achievement_type = data.get("type", "").strip()
         year = data.get("year")
         description = data.get("description", "").strip()
 
-        if not title or not type:
+        if not title or not achievement_type:
             return jsonify({"success": False, "error": "title and type are required"}), 400
 
         profile = Profile.query.filter_by(user_id=current_user.id).first()
@@ -694,12 +721,11 @@ def add_achievement():
 
         # Determine next sort order
         max_sort = db.session.query(db.func.max(Achievement.aid)).filter_by(pid=profile.pid).scalar()
-        next_sort = (max_sort or 0) + 1
 
         ach = Achievement(
             pid=profile.pid,
             title=title,
-            type=type,
+            type=achievement_type,
             year=int(year) if year else None,
             description=description
         )
@@ -721,6 +747,9 @@ def add_achievement():
 @main.route("/delete_achievement/<int:aid>", methods=["DELETE"])
 @login_required
 def delete_achievement(aid):
+    if not validate_csrf_token():
+        return jsonify({'success': False, 'error': 'Invalid CSRF token'}), 400
+    
     try:
         profile = Profile.query.filter_by(user_id=current_user.id).first()
         if not profile:
@@ -740,6 +769,9 @@ def delete_achievement(aid):
 @main.route("/update_achievement_order", methods=["POST"])
 @login_required
 def update_achievement_order():
+    if not validate_csrf_token():
+        return jsonify({'success': False, 'error': 'Invalid CSRF token'}), 400
+    
     try:
         data = request.get_json()
         order = data.get("order", [])

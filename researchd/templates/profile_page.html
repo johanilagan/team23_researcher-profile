@@ -71,8 +71,8 @@
 
         {% elif s.section == 'interests-section' %}
         <!-- Research Interests -->
-        <div class="interests-section {% if not s.visible %}d-none{% endif %}" id="interests-section">
-            <div class="profile-section" data-section="interests-section">
+        <div class="interests-section {% if not s.visible %}d-none{% endif %}" id="interests-section" data-section="interests-section">
+            <div class="profile-section">
                 <div class="section-header">
                     <h2>Research Interests</h2>
                     {% if is_owner %}
@@ -93,13 +93,11 @@
             </div>
         </div>
 
-        <p>DEBUG: {{ s.section }} → visible={{ s.visible }} (type: {{ s.visible.__class__.__name__ }})</p>
-
         {% elif s.section == 'papers-section' %}
 
         <!-- Recent Papers -->
-        <div class="papers-section" id="papers-section">
-            <div class="profile-section {% if not s.visible %}d-none{% endif %}" data-section="papers-section">
+        <div class="papers-section {% if not s.visible %}d-none{% endif %}" id="papers-section" data-section="papers-section">
+            <div class="profile-section">
                 <div class="section-header">
                     <h2>Recent Papers</h2>
                     {% if publications %}
@@ -375,7 +373,7 @@
                     <small class="form-text text-muted mt-2">Click on any interest below to remove it from your profile.</small>
                 </div>
             </div>
-            <div class="custom-modal-footer" style="display:none;">
+            <div class="custom-modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
                 <button type="button" class="btn btn-primary" onclick="saveInterests()">Save Interests</button>
             </div>
@@ -443,7 +441,7 @@
     <script>
         function addSection(sect) {
             console.log("Button clicked for:", sect);
-            const section = document.querySelector(`.profile-section[data-section="${sect}"]`);
+            const section = document.querySelector(`[data-section="${sect}"]`);
             console.log("Section found?", section);
             if (section) {
                 section.classList.remove('d-none');
@@ -456,7 +454,7 @@
 
 
         function deleteSection(sect) {
-            const section = document.querySelector(`.profile-section[data-section="${sect}"]`);
+            const section = document.querySelector(`[data-section="${sect}"]`);
             if (section) {
                 section.classList.add('d-none');
                 toggleSectionButtons(sect, false);
@@ -484,6 +482,25 @@
                 default: return 'Section';
             }
         }
+
+        function saveSectionOrder() {
+            let order = [];
+            document.querySelectorAll('#profile-sections [data-section]').forEach(function(section) {
+                order.push({
+                    section: section.getAttribute('data-section'),
+                    visible: !section.classList.contains('d-none')
+                });
+            });
+            console.log('Saving section order:', order);
+            fetch('/save-section-order', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({order: order})
+            })
+            .then(response => response.json())
+            .then(data => console.log("Saved section order:", data))
+            .catch(err => console.error("Error saving section order:", err));
+        };
 
 
 

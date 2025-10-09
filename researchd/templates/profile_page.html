@@ -54,6 +54,7 @@
                 {% endif %}
             {% endfor %}
         </div>
+        {% endif %}
 
     <div class="container-fluid px-2 px-md-4 mt-2 mt-md-4" id="profile-sections">
         {% for s in section_order %}
@@ -276,7 +277,6 @@
                 </div>
             </div>
         </div>
-        {% endif %}
 
         <!-- Achievements Section -->
         <div class="papers-section achievements-section mt-4 {% if profile.achievements %}d-block{% else %}d-none{% endif %}" id="achievements-section">

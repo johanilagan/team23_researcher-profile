@@ -121,6 +121,8 @@ def search():
     position_filter = request.args.get("position", "").strip()
     interests_filter = request.args.get("interests", "").strip()
     sort_by = request.args.get("sort", "name").strip()
+    page = request.args.get("page", 1, type=int)
+    per_page = 10  # 10 researchers per page
     
     # Start with base query
     query = User.query.join(Profile).options(joinedload(User.profile))
@@ -153,7 +155,13 @@ def search():
     else:  # default to name
         query = query.order_by(User.first_name.asc(), User.last_name.asc())
     
-    results = query.all()
+    # Apply pagination
+    pagination = query.paginate(
+        page=page, 
+        per_page=per_page, 
+        error_out=False
+    )
+    results = pagination.items
     
     # Get unique values for filter dropdowns
     institutions = db.session.query(Profile.institution).filter(Profile.institution.isnot(None), Profile.institution != "").distinct().all()
@@ -174,6 +182,7 @@ def search():
 
     return render_template("search.html", 
                          results=results, 
+                         pagination=pagination,
                          q=q,
                          institution_filter=institution_filter,
                          position_filter=position_filter,

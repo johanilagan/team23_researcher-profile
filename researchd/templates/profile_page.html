@@ -3,6 +3,58 @@
 {% block title %}Researcher Profile - Academic Network{% endblock %}
 
 {% block content %}
+    <!-- Profile Actions -->
+        {% if is_owner %}
+        <div class="profile-actions mt-4">
+            <div class="row g-2">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                    <a href="{{ url_for('main.edit_profile') }}" class="btn btn-primary w-100">
+                        <i class="fas fa-edit me-1"></i><span class="d-none d-sm-inline">Edit Profile</span><span class="d-sm-none">Edit</span>
+                    </a>
+                </div>
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                    <a href="{{ url_for('main.upload_paper') }}" class="btn btn-success w-100">
+                        <i class="fas fa-plus me-1"></i><span class="d-none d-sm-inline">Upload Paper</span><span class="d-sm-none">Upload</span>
+                    </a>
+                </div>
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                    <a href="{{ url_for('main.my_papers') }}" class="btn btn-info w-100">
+                        <i class="fas fa-file-alt me-1"></i><span class="d-none d-sm-inline">My Papers</span><span class="d-sm-none">Papers</span>
+                    </a>
+                </div>
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                    <button class="btn btn-outline-primary w-100" onclick="toggleExternalRoles()" id="toggle-external-roles-btn">
+                        <i class="fas fa-users me-1"></i><span class="d-none d-sm-inline">External Roles</span><span class="d-sm-none">Roles</span>
+                    </button>
+                </div>
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                    <button class="btn btn-outline-primary w-100" onclick="toggleAchievements()" id="toggle-achievements-btn">
+                        <i class="fas fa-trophy me-1"></i><span class="d-none d-sm-inline">Achievements</span><span class="d-sm-none">Awards</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="buttons_section">
+            {% set section_map = section_order | map(attribute='section') | list %}
+            {% set visible_map = section_order | map(attribute='visible') | list %}
+            
+            {% for s in section_order %}
+                {% if s.section == 'papers-section' %}
+                    {% if not s.visible %}
+                        <button class="btn btn-primary" data-section-btn="papers-section" onclick="addSection('papers-section')">Add Papers Section</button>
+                    {% else %}
+                        <button type="button" class="btn btn-primary" data-section-btn="papers-section" onclick="deleteSection('papers-section')">Delete Papers Section</button>
+                    {% endif %}
+                {% elif s.section == 'interests-section' %}
+                    {% if not s.visible %}
+                        <button class="btn btn-primary" data-section-btn="interests-section" onclick="addSection('interests-section')">Add Interests Section</button>
+                    {% else %}
+                        <button type="button" class="btn btn-primary" data-section-btn="interests-section" onclick="deleteSection('interests-section')">Delete Interests Section</button>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
+
     <div class="container-fluid px-2 px-md-4 mt-2 mt-md-4" id="profile-sections">
         {% for s in section_order %}
         {% if s.section == 'profile-header' %}
@@ -165,62 +217,6 @@
         {% endif %}
         {% endfor %}
 
-        <!-- Profile Actions -->
-        {% if is_owner %}
-        <div class="profile-actions mt-4">
-            <div class="row g-2">
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-                    <a href="{{ url_for('main.edit_profile') }}" class="btn btn-primary w-100">
-                        <i class="fas fa-edit me-1"></i><span class="d-none d-sm-inline">Edit Profile</span><span class="d-sm-none">Edit</span>
-                    </a>
-                </div>
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-                    <a href="{{ url_for('main.upload_paper') }}" class="btn btn-success w-100">
-                        <i class="fas fa-plus me-1"></i><span class="d-none d-sm-inline">Upload Paper</span><span class="d-sm-none">Upload</span>
-                    </a>
-                </div>
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-                    <a href="{{ url_for('main.my_papers') }}" class="btn btn-info w-100">
-                        <i class="fas fa-file-alt me-1"></i><span class="d-none d-sm-inline">My Papers</span><span class="d-sm-none">Papers</span>
-                    </a>
-                </div>
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-                    <button class="btn btn-outline-primary w-100" onclick="toggleExternalRoles()" id="toggle-external-roles-btn">
-                        <i class="fas fa-users me-1"></i><span class="d-none d-sm-inline">External Roles</span><span class="d-sm-none">Roles</span>
-                    </button>
-                </div>
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-                    <button class="btn btn-outline-primary w-100" onclick="toggleAchievements()" id="toggle-achievements-btn">
-                        <i class="fas fa-trophy me-1"></i><span class="d-none d-sm-inline">Achievements</span><span class="d-sm-none">Awards</span>
-                    </button>
-                </div>
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-                    <button class="btn btn-outline-secondary w-100" onclick="addSection('buttons_section')">
-                        <i class="fas fa-plus me-1"></i><span class="d-none d-sm-inline">Add Section</span><span class="d-sm-none">Add</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div id="buttons_section">
-            {% set section_map = section_order | map(attribute='section') | list %}
-            {% set visible_map = section_order | map(attribute='visible') | list %}
-            
-            {% for s in section_order %}
-                {% if s.section == 'papers-section' %}
-                    {% if not s.visible %}
-                        <button class="btn btn-primary" data-section-btn="papers-section" onclick="addSection('papers-section')">Add Papers Section</button>
-                    {% else %}
-                        <button type="button" class="btn btn-primary" data-section-btn="papers-section" onclick="deleteSection('papers-section')">Delete Papers Section</button>
-                    {% endif %}
-                {% elif s.section == 'interests-section' %}
-                    {% if not s.visible %}
-                        <button class="btn btn-primary" data-section-btn="interests-section" onclick="addSection('interests-section')">Add Interests Section</button>
-                    {% else %}
-                        <button type="button" class="btn btn-primary" data-section-btn="interests-section" onclick="deleteSection('interests-section')">Delete Interests Section</button>
-                    {% endif %}
-                {% endif %}
-            {% endfor %}
-        </div>
         
         <!-- External Positions / Roles (placed under buttons section) -->
         <div class="papers-section external-roles-section mt-4" id="external-roles-section" style="display: none;">

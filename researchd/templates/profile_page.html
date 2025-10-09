@@ -65,8 +65,13 @@
                 <div class="row g-3">
                     <div class="col-12 col-sm-6 col-md-3 text-center text-sm-start">
                         <div class="profile-pic-container">
-                            <img id="profile-pic" src="{{ url_for('static', filename='placeholder.png') }}" 
-                                alt="Profile Picture" class="profile-pic">
+                            {% if profile.pfp %}
+                                <img id="profile-pic" src="{{ url_for('static', filename=profile.pfp) }}" 
+                                    alt="Profile Picture" class="profile-pic">
+                            {% else %}
+                                <img id="profile-pic" src="{{ url_for('static', filename='placeholder.png') }}" 
+                                    alt="Profile Picture" class="profile-pic">
+                            {% endif %}
                             {% if is_owner %}
                             <button class="change-pic-btn" onclick="document.getElementById('profile-pic-input').click()">
                                 <i class="fas fa-camera"></i>
@@ -338,27 +343,6 @@
             </div>
         </div>
     </div>
-
-
-       {% if is_owner %} 
-        <!-- Logout Section -->
-        <div class="logout-section text-center py-4">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-md-6">
-                        <div class="logout-card">
-                            <h4 class="mb-3">Account Management</h4>
-                            <p class="text-muted mb-4">Manage your account settings and logout when you're done.</p>
-                            <a href="{{ url_for('auth.logout') }}" class="btn btn-danger btn-lg">
-                                <i class="fas fa-sign-out-alt me-2"></i>Sign Out
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-
 
     <!-- Modals -->
 

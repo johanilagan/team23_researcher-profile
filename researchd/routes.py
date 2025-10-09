@@ -225,6 +225,36 @@ def edit_profile():
             profile.title = form.title.data
             profile.department = form.department.data
 
+            # Handle profile picture upload
+            if form.profile_picture.data:
+                file = form.profile_picture.data
+                if file and file.filename:
+                    # Create profile_pics directory if it doesn't exist
+                    upload_dir = os.path.join(current_app.root_path, 'static', 'profile_pics')
+                    os.makedirs(upload_dir, exist_ok=True)
+                    
+                    # Generate secure filename
+                    filename = secure_filename(file.filename)
+                    # Add user ID and timestamp to avoid conflicts
+                    file_ext = os.path.splitext(filename)[1]
+                    filename = f"user_{current_user.id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}{file_ext}"
+                    filepath = os.path.join(upload_dir, filename)
+                    
+                    # Delete old profile picture if it exists
+                    if profile.pfp:
+                        old_pic_path = os.path.join(current_app.root_path, 'static', profile.pfp)
+                        if os.path.exists(old_pic_path):
+                            try:
+                                os.remove(old_pic_path)
+                            except Exception as e:
+                                print(f"Error removing old profile picture: {e}")
+                    
+                    # Save new file
+                    file.save(filepath)
+                    
+                    # Store relative path in database
+                    profile.pfp = f"profile_pics/{filename}"
+
             # Update social links
             social_platforms = {
                 'LinkedIn': form.linkedin_url.data,
@@ -246,8 +276,9 @@ def edit_profile():
             db.session.commit()
             return redirect(url_for("main.my_profile"))
 
-        except Exception:
+        except Exception as e:
             db.session.rollback()
+            print(f"Error updating profile: {e}")
 
     elif request.method == "GET":
         # Pre-populate User fields
@@ -269,7 +300,7 @@ def edit_profile():
         form.instagram_url.data = socials.get('Instagram', '')
         form.github_url.data = socials.get('GitHub', '')
 
-    return render_template("edit_profile.html", form=form)
+    return render_template("edit_profile.html", form=form, profile=profile)
 
 
 
@@ -302,6 +333,72 @@ def update_interests():
         db.session.rollback()
         print(f"Error updating interests: {str(e)}")
         return jsonify({'success': False, 'error': str(e)})
+
+@main.route("/upload-profile-picture", methods=["POST"])
+@login_required
+def upload_profile_picture():
+    if not validate_csrf_token():
+        return jsonify({'success': False, 'error': 'Invalid CSRF token'}), 400
+    
+    try:
+        # Check if file was uploaded
+        if 'profile_picture' not in request.files:
+            return jsonify({'success': False, 'error': 'No file uploaded'}), 400
+        
+        file = request.files['profile_picture']
+        
+        if file.filename == '':
+            return jsonify({'success': False, 'error': 'No file selected'}), 400
+        
+        # Validate file extension
+        allowed_extensions = {'png', 'jpg', 'jpeg', 'gif'}
+        if '.' not in file.filename:
+            return jsonify({'success': False, 'error': 'Invalid file type'}), 400
+        
+        file_ext = file.filename.rsplit('.', 1)[1].lower()
+        if file_ext not in allowed_extensions:
+            return jsonify({'success': False, 'error': 'Only image files (JPG, PNG, GIF) are allowed'}), 400
+        
+        # Get or create profile
+        profile = Profile.query.filter_by(user_id=current_user.id).first()
+        if not profile:
+            profile = Profile(user_id=current_user.id)
+            db.session.add(profile)
+            db.session.flush()
+        
+        # Create profile_pics directory if it doesn't exist
+        upload_dir = os.path.join(current_app.root_path, 'static', 'profile_pics')
+        os.makedirs(upload_dir, exist_ok=True)
+        
+        # Generate secure filename
+        filename = f"user_{current_user.id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{file_ext}"
+        filepath = os.path.join(upload_dir, filename)
+        
+        # Delete old profile picture if it exists
+        if profile.pfp:
+            old_pic_path = os.path.join(current_app.root_path, 'static', profile.pfp)
+            if os.path.exists(old_pic_path):
+                try:
+                    os.remove(old_pic_path)
+                except Exception as e:
+                    print(f"Error removing old profile picture: {e}")
+        
+        # Save new file
+        file.save(filepath)
+        
+        # Store relative path in database
+        profile.pfp = f"profile_pics/{filename}"
+        db.session.commit()
+        
+        return jsonify({
+            'success': True, 
+            'image_url': url_for('static', filename=profile.pfp)
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error uploading profile picture: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @main.route("/upload-paper", methods=["GET", "POST"])
 @login_required

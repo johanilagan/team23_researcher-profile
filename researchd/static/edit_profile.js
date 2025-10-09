@@ -1,6 +1,30 @@
 function resetForm() {
     if (confirm('Are you sure you want to reset all changes? This will restore the original values.')) {
         document.querySelector('form').reset();
+        // Reset profile picture preview
+        const preview = document.getElementById('profile-pic-preview');
+        if (preview && preview.dataset.originalSrc) {
+            preview.src = preview.dataset.originalSrc;
+        }
+    }
+}
+
+// Profile picture preview
+function previewProfilePicture(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        const preview = document.getElementById('profile-pic-preview');
+        
+        // Store original src for reset
+        if (!preview.dataset.originalSrc) {
+            preview.dataset.originalSrc = preview.src;
+        }
+        
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+        };
+        
+        reader.readAsDataURL(input.files[0]);
     }
 }
 

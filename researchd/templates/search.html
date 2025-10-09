@@ -145,10 +145,17 @@
                             <div class="card h-100">
                                 <div class="row g-0 align-items-center">
                                     <div class="col-auto">
-                                        <img src="{{ researcher.profile.profile_pic or url_for('static', filename='default_pfp.png') }}"
-                                            class="img-fluid rounded-circle"
-                                            alt="{{ researcher.first_name }} {{ researcher.last_name }}"
-                                            style="width: 80px; height: 80px; object-fit: cover;">
+                                        {% if researcher.profile.pfp %}
+                                            <img src="{{ url_for('static', filename=researcher.profile.pfp) }}"
+                                                class="img-fluid rounded-circle"
+                                                alt="{{ researcher.first_name }} {{ researcher.last_name }}"
+                                                style="width: 80px; height: 80px; object-fit: cover;">
+                                        {% else %}
+                                            <img src="{{ url_for('static', filename='placeholder.png') }}"
+                                                class="img-fluid rounded-circle"
+                                                alt="{{ researcher.first_name }} {{ researcher.last_name }}"
+                                                style="width: 80px; height: 80px; object-fit: cover;">
+                                        {% endif %}
                                     </div>
                                     <div class="col">
                                         <div class="card-body">

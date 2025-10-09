@@ -134,11 +134,60 @@ function deleteAchievement(aid) {
 // Profile Picture Management
 function changeProfilePic(input) {
     if (input.files && input.files[0]) {
+        const file = input.files[0];
+        
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+        if (!allowedTypes.includes(file.type)) {
+            showNotification('Please select a valid image file (JPG, PNG, or GIF)', 'error');
+            return;
+        }
+        
+        // Validate file size (max 5MB)
+        const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+        if (file.size > maxSize) {
+            showNotification('Image size must be less than 5MB', 'error');
+            return;
+        }
+        
+        // Preview the image immediately
         const reader = new FileReader();
         reader.onload = function(e) {
             document.getElementById('profile-pic').src = e.target.result;
         };
-        reader.readAsDataURL(input.files[0]);
+        reader.readAsDataURL(file);
+        
+        // Upload to server
+        const formData = new FormData();
+        formData.append('profile_picture', file);
+        
+        showNotification('Uploading profile picture...', 'info');
+        
+        fetch('/upload-profile-picture', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCSRFToken()
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Profile picture updated successfully!', 'success');
+                // Update image with server URL to ensure it persists
+                document.getElementById('profile-pic').src = data.image_url;
+            } else {
+                showNotification('Error uploading profile picture: ' + (data.error || 'Unknown error'), 'error');
+                // Revert to placeholder if upload fails
+                document.getElementById('profile-pic').src = '/static/placeholder.png';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Error uploading profile picture', 'error');
+            // Revert to placeholder if upload fails
+            document.getElementById('profile-pic').src = '/static/placeholder.png';
+        });
     }
 }
 

@@ -196,10 +196,6 @@ def search():
 def help():
     return render_template("help_centre.html")
 
-@main.route("/contact")
-def contact():
-    return render_template("contact.html")
-
 @main.route("/privacy")
 def privacy():
     return render_template("privacy.html")

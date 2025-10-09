@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_wtf.csrf import CSRFProtect
 import os
 from sqlalchemy import inspect
 from flask_login import current_user
@@ -18,6 +19,10 @@ def create_app():
     app.config["DEBUG"] = True
 
     db.init_app(app)
+
+    # CSRF Protection setup
+    csrf = CSRFProtect()
+    csrf.init_app(app)
 
     # Flask-Login setup
     login_manager = LoginManager()

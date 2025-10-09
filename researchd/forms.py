@@ -31,6 +31,11 @@ class EditProfileForm(FlaskForm):
     title = StringField("Title", validators=[Optional(), Length(max=150)])
     department = StringField("Department", validators=[Optional(), Length(max=150)])
     
+    # Profile picture
+    profile_picture = FileField("Profile Picture", validators=[
+        Optional(), FileAllowed(['jpg', 'jpeg', 'png', 'gif'], 'Only image files (JPG, PNG, GIF) are allowed!')
+    ])
+    
     # Social media links
     linkedin_url = URLField("LinkedIn URL", validators=[Optional()])
     twitter_url = URLField("Twitter URL", validators=[Optional()])

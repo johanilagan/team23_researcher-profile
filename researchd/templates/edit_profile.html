@@ -13,8 +13,45 @@
                     </h3>
                 </div>
                 <div class="card-body">
-                    <form method="POST" action="{{ url_for('main.edit_profile') }}">
+                    <form method="POST" action="{{ url_for('main.edit_profile') }}" enctype="multipart/form-data">
                         {{ form.hidden_tag() }}
+                        
+                        <!-- Profile Picture -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-image me-2"></i>Profile Picture
+                                </h5>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-12 col-md-4 text-center mb-3 mb-md-0">
+                                <div class="profile-pic-preview-container">
+                                    {% if profile and profile.pfp %}
+                                        <img id="profile-pic-preview" src="{{ url_for('static', filename=profile.pfp) }}" alt="Profile Picture" class="img-fluid rounded-circle" style="width: 150px; height: 150px; object-fit: cover; border: 3px solid #dee2e6;">
+                                    {% else %}
+                                        <img id="profile-pic-preview" src="{{ url_for('static', filename='placeholder.png') }}" alt="Profile Picture" class="img-fluid rounded-circle" style="width: 150px; height: 150px; object-fit: cover; border: 3px solid #dee2e6;">
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-8">
+                                <div class="mb-3">
+                                    {{ form.profile_picture.label(class="form-label") }}
+                                    {{ form.profile_picture(class="form-control", onchange="previewProfilePicture(this)") }}
+                                    {% if form.profile_picture.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.profile_picture.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Upload a profile picture (JPG, PNG, or GIF). Recommended size: 300x300px or larger.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         
                         <!-- Basic Information -->
                         <div class="row mb-4">
@@ -217,32 +254,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-    function resetForm() {
-        if (confirm('Are you sure you want to reset all changes? This will restore the original values.')) {
-            document.querySelector('form').reset();
-        }
-    }
-    
-    // Character counter for bio
-    document.addEventListener('DOMContentLoaded', function() {
-        const bioTextarea = document.querySelector('textarea[name="bio"]');
-        if (bioTextarea) {
-            const maxLength = 1000;
-            const counter = document.createElement('div');
-            counter.className = 'form-text text-end';
-            counter.textContent = `${bioTextarea.value.length}/${maxLength}`;
-            bioTextarea.parentNode.appendChild(counter);
-            
-            bioTextarea.addEventListener('input', function() {
-                counter.textContent = `${this.value.length}/${maxLength}`;
-                if (this.value.length > maxLength) {
-                    counter.classList.add('text-danger');
-                } else {
-                    counter.classList.remove('text-danger');
-                }
-            });
-        }
-    });
-</script>
+<script src="{{ url_for('static', filename='edit_profile.js') }}"></script>
 {% endblock %}

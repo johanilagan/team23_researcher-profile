@@ -112,7 +112,10 @@
                 <div class="col-md-6">
                     <h5 class="mb-0">
                         {% if results %}
-                            {{ results|length }} researcher{{ 's' if results|length != 1 else '' }} found
+                            {{ pagination.total }} researcher{{ 's' if pagination.total != 1 else '' }} found
+                            {% if pagination.pages > 1 %}
+                                (Page {{ pagination.page }} of {{ pagination.pages }})
+                            {% endif %}
                         {% else %}
                             No researchers found
                         {% endif %}
@@ -121,11 +124,14 @@
                 <div class="col-md-6 text-end">
                     {% if results %}
                         <small class="text-muted">
-                            Showing results for 
-                            {% if q %}"{{ q }}"{% endif %}
-                            {% if institution_filter %}in {{ institution_filter }}{% endif %}
-                            {% if position_filter %}as {{ position_filter }}{% endif %}
-                            {% if interests_filter %}interested in {{ interests_filter }}{% endif %}
+                            Showing {{ ((pagination.page - 1) * pagination.per_page) + 1 }} to {{ pagination.page * pagination.per_page if pagination.page * pagination.per_page < pagination.total else pagination.total }} of {{ pagination.total }} results
+                            {% if q or institution_filter or position_filter or interests_filter %}
+                                for 
+                                {% if q %}"{{ q }}"{% endif %}
+                                {% if institution_filter %}in {{ institution_filter }}{% endif %}
+                                {% if position_filter %}as {{ position_filter }}{% endif %}
+                                {% if interests_filter %}interested in {{ interests_filter }}{% endif %}
+                            {% endif %}
                         </small>
                     {% endif %}
                 </div>
@@ -139,10 +145,17 @@
                             <div class="card h-100">
                                 <div class="row g-0 align-items-center">
                                     <div class="col-auto">
-                                        <img src="{{ researcher.profile.profile_pic or url_for('static', filename='default_pfp.png') }}"
-                                            class="img-fluid rounded-circle"
-                                            alt="{{ researcher.first_name }} {{ researcher.last_name }}"
-                                            style="width: 80px; height: 80px; object-fit: cover;">
+                                        {% if researcher.profile.pfp %}
+                                            <img src="{{ url_for('static', filename=researcher.profile.pfp) }}"
+                                                class="img-fluid rounded-circle"
+                                                alt="{{ researcher.first_name }} {{ researcher.last_name }}"
+                                                style="width: 80px; height: 80px; object-fit: cover;">
+                                        {% else %}
+                                            <img src="{{ url_for('static', filename='placeholder.png') }}"
+                                                class="img-fluid rounded-circle"
+                                                alt="{{ researcher.first_name }} {{ researcher.last_name }}"
+                                                style="width: 80px; height: 80px; object-fit: cover;">
+                                        {% endif %}
                                     </div>
                                     <div class="col">
                                         <div class="card-body">
@@ -188,67 +201,62 @@
 
 
         <!-- Pagination -->
+        {% if pagination.pages > 1 %}
         <nav aria-label="Search results pages" class="mt-4">
             <ul class="pagination justify-content-center">
-                <li class="page-item disabled">
-                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item"><a class="page-link" href="#"><span aria-hidden="true">&raquo;</span></a></li>
+                <!-- Previous Page -->
+                {% if pagination.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('main.search', page=pagination.prev_num, q=q, institution=institution_filter, position=position_filter, interests=interests_filter, sort=sort_by) }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+
+                <!-- Page Numbers -->
+                {% for page_num in pagination.iter_pages() %}
+                    {% if page_num %}
+                        {% if page_num != pagination.page %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('main.search', page=page_num, q=q, institution=institution_filter, position=position_filter, interests=interests_filter, sort=sort_by) }}">{{ page_num }}</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item active">
+                                <a class="page-link" href="#">{{ page_num }}</a>
+                            </li>
+                        {% endif %}
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#">...</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- Next Page -->
+                {% if pagination.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('main.search', page=pagination.next_num, q=q, institution=institution_filter, position=position_filter, interests=interests_filter, sort=sort_by) }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
             </ul>
         </nav>
+        {% endif %}
 {% endblock %}
 
 {% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
-    const institutionFilter = document.getElementById('institutionFilter');
-    const positionFilter = document.getElementById('positionFilter');
-    const interestsFilter = document.getElementById('interestsFilter');
-    const sortSelect = document.getElementById('sortSelect');
-    
-    // Clear all filters and submit form
-    function clearFilters() {
-        searchInput.value = '';
-        institutionFilter.value = '';
-        positionFilter.value = '';
-        interestsFilter.value = '';
-        sortSelect.value = 'name';
-        document.getElementById('searchForm').submit();
-    }
-    
-    // Auto-submit form when filters change
-    if (institutionFilter) {
-        institutionFilter.addEventListener('change', function() {
-            document.getElementById('searchForm').submit();
-        });
-    }
-    
-    if (positionFilter) {
-        positionFilter.addEventListener('change', function() {
-            document.getElementById('searchForm').submit();
-        });
-    }
-    
-    if (interestsFilter) {
-        interestsFilter.addEventListener('change', function() {
-            document.getElementById('searchForm').submit();
-        });
-    }
-    
-    if (sortSelect) {
-        sortSelect.addEventListener('change', function() {
-            document.getElementById('searchForm').submit();
-        });
-    }
-    
-    // Make clearFilters function global
-    window.clearFilters = clearFilters;
-});
-</script>
+<script src="{{ url_for('static', filename='search.js') }}"></script>
 {% endblock %}

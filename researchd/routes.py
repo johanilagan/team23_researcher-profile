@@ -1,6 +1,7 @@
 import json
 from flask import Blueprint, render_template, redirect, url_for, request, jsonify, current_app, send_from_directory
 from flask_login import login_user, login_required, logout_user, current_user
+from flask_wtf.csrf import validate_csrf
 from werkzeug.utils import secure_filename
 from .forms import LoginForm, RegisterForm, EditProfileForm, UploadPaperForm, EditPaperForm
 from .models import User, Profile, Social, Publication, File, Achievement, ExternalRole
@@ -13,6 +14,14 @@ import fitz
 
 auth = Blueprint("auth", __name__)
 main = Blueprint("main", __name__)
+
+def validate_csrf_token():
+    """Validate CSRF token for AJAX requests"""
+    try:
+        validate_csrf(request.headers.get('X-CSRFToken'))
+        return True
+    except Exception:
+        return False
 
 @main.route("/")
 def home():
@@ -114,6 +123,8 @@ def search():
     position_filter = request.args.get("position", "").strip()
     interests_filter = request.args.get("interests", "").strip()
     sort_by = request.args.get("sort", "name").strip()
+    page = request.args.get("page", 1, type=int)
+    per_page = 10  # 10 researchers per page
     
     # Start with base query
     query = User.query.join(Profile).options(joinedload(User.profile))
@@ -146,7 +157,13 @@ def search():
     else:  # default to name
         query = query.order_by(User.first_name.asc(), User.last_name.asc())
     
-    results = query.all()
+    # Apply pagination
+    pagination = query.paginate(
+        page=page, 
+        per_page=per_page, 
+        error_out=False
+    )
+    results = pagination.items
     
     # Get unique values for filter dropdowns
     institutions = db.session.query(Profile.institution).filter(Profile.institution.isnot(None), Profile.institution != "").distinct().all()
@@ -167,6 +184,7 @@ def search():
 
     return render_template("search.html", 
                          results=results, 
+                         pagination=pagination,
                          q=q,
                          institution_filter=institution_filter,
                          position_filter=position_filter,
@@ -177,12 +195,8 @@ def search():
                          interests=interests)
 
 @main.route("/help")
-def help():
+def help_centre():
     return render_template("help_centre.html")
-
-@main.route("/contact")
-def contact():
-    return render_template("contact.html")
 
 @main.route("/privacy")
 def privacy():
@@ -213,6 +227,36 @@ def edit_profile():
             profile.title = form.title.data
             profile.department = form.department.data
 
+            # Handle profile picture upload
+            if form.profile_picture.data:
+                file = form.profile_picture.data
+                if file and file.filename:
+                    # Create profile_pics directory if it doesn't exist
+                    upload_dir = os.path.join(current_app.root_path, 'static', 'profile_pics')
+                    os.makedirs(upload_dir, exist_ok=True)
+                    
+                    # Generate secure filename
+                    filename = secure_filename(file.filename)
+                    # Add user ID and timestamp to avoid conflicts
+                    file_ext = os.path.splitext(filename)[1]
+                    filename = f"user_{current_user.id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}{file_ext}"
+                    filepath = os.path.join(upload_dir, filename)
+                    
+                    # Delete old profile picture if it exists
+                    if profile.pfp:
+                        old_pic_path = os.path.join(current_app.root_path, 'static', profile.pfp)
+                        if os.path.exists(old_pic_path):
+                            try:
+                                os.remove(old_pic_path)
+                            except Exception as e:
+                                print(f"Error removing old profile picture: {e}")
+                    
+                    # Save new file
+                    file.save(filepath)
+                    
+                    # Store relative path in database
+                    profile.pfp = f"profile_pics/{filename}"
+
             # Update social links
             social_platforms = {
                 'LinkedIn': form.linkedin_url.data,
@@ -234,8 +278,9 @@ def edit_profile():
             db.session.commit()
             return redirect(url_for("main.my_profile"))
 
-        except Exception:
+        except Exception as e:
             db.session.rollback()
+            print(f"Error updating profile: {e}")
 
     elif request.method == "GET":
         # Pre-populate User fields
@@ -257,13 +302,16 @@ def edit_profile():
         form.instagram_url.data = socials.get('Instagram', '')
         form.github_url.data = socials.get('GitHub', '')
 
-    return render_template("edit_profile.html", form=form)
+    return render_template("edit_profile.html", form=form, profile=profile)
 
 
 
 @main.route("/update-interests", methods=["POST"])
 @login_required
 def update_interests():
+    if not validate_csrf_token():
+        return jsonify({'success': False, 'error': 'Invalid CSRF token'}), 400
+    
     try:
         data = request.get_json()
         interests = data.get('interests', '')
@@ -287,6 +335,72 @@ def update_interests():
         db.session.rollback()
         print(f"Error updating interests: {str(e)}")
         return jsonify({'success': False, 'error': str(e)})
+
+@main.route("/upload-profile-picture", methods=["POST"])
+@login_required
+def upload_profile_picture():
+    if not validate_csrf_token():
+        return jsonify({'success': False, 'error': 'Invalid CSRF token'}), 400
+    
+    try:
+        # Check if file was uploaded
+        if 'profile_picture' not in request.files:
+            return jsonify({'success': False, 'error': 'No file uploaded'}), 400
+        
+        file = request.files['profile_picture']
+        
+        if file.filename == '':
+            return jsonify({'success': False, 'error': 'No file selected'}), 400
+        
+        # Validate file extension
+        allowed_extensions = {'png', 'jpg', 'jpeg', 'gif'}
+        if '.' not in file.filename:
+            return jsonify({'success': False, 'error': 'Invalid file type'}), 400
+        
+        file_ext = file.filename.rsplit('.', 1)[1].lower()
+        if file_ext not in allowed_extensions:
+            return jsonify({'success': False, 'error': 'Only image files (JPG, PNG, GIF) are allowed'}), 400
+        
+        # Get or create profile
+        profile = Profile.query.filter_by(user_id=current_user.id).first()
+        if not profile:
+            profile = Profile(user_id=current_user.id)
+            db.session.add(profile)
+            db.session.flush()
+        
+        # Create profile_pics directory if it doesn't exist
+        upload_dir = os.path.join(current_app.root_path, 'static', 'profile_pics')
+        os.makedirs(upload_dir, exist_ok=True)
+        
+        # Generate secure filename
+        filename = f"user_{current_user.id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{file_ext}"
+        filepath = os.path.join(upload_dir, filename)
+        
+        # Delete old profile picture if it exists
+        if profile.pfp:
+            old_pic_path = os.path.join(current_app.root_path, 'static', profile.pfp)
+            if os.path.exists(old_pic_path):
+                try:
+                    os.remove(old_pic_path)
+                except Exception as e:
+                    print(f"Error removing old profile picture: {e}")
+        
+        # Save new file
+        file.save(filepath)
+        
+        # Store relative path in database
+        profile.pfp = f"profile_pics/{filename}"
+        db.session.commit()
+        
+        return jsonify({
+            'success': True, 
+            'image_url': url_for('static', filename=profile.pfp)
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error uploading profile picture: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @main.route("/upload-paper", methods=["GET", "POST"])
 @login_required
@@ -569,6 +683,9 @@ def logout():
 @main.route("/save-section-order", methods=["POST"])
 @login_required
 def save_section_order():
+    if not validate_csrf_token():
+        return jsonify({'success': False, 'error': 'Invalid CSRF token'}), 400
+    
     data = request.get_json()
     order = data.get("order")
     if not isinstance(order, list):
@@ -584,6 +701,9 @@ def save_section_order():
 @main.route("/add_external_role", methods=["POST"])
 @login_required
 def add_external_role():
+    if not validate_csrf_token():
+        return jsonify({'success': False, 'error': 'Invalid CSRF token'}), 400
+    
     try:
         data = request.get_json()
         role_title = data.get("role_title", "").strip()
@@ -634,6 +754,9 @@ def add_external_role():
 @main.route("/delete_external_role/<int:erid>", methods=["DELETE"])
 @login_required
 def delete_external_role(erid):
+    if not validate_csrf_token():
+        return jsonify({'success': False, 'error': 'Invalid CSRF token'}), 400
+    
     try:
         profile = Profile.query.filter_by(user_id=current_user.id).first()
         if not profile:
@@ -654,6 +777,9 @@ def delete_external_role(erid):
 @main.route("/update_external_role_order", methods=["POST"])
 @login_required
 def update_external_role_order():
+    if not validate_csrf_token():
+        return jsonify({'success': False, 'error': 'Invalid CSRF token'}), 400
+    
     try:
         data = request.get_json()
         order = data.get("order", [])
@@ -678,14 +804,17 @@ def update_external_role_order():
 @main.route("/add_achievement", methods=["POST"])
 @login_required
 def add_achievement():
+    if not validate_csrf_token():
+        return jsonify({'success': False, 'error': 'Invalid CSRF token'}), 400
+    
     try:
         data = request.get_json()
         title = data.get("title", "").strip()
-        type = data.get("type", "").strip()
+        achievement_type = data.get("type", "").strip()
         year = data.get("year")
         description = data.get("description", "").strip()
 
-        if not title or not type:
+        if not title or not achievement_type:
             return jsonify({"success": False, "error": "title and type are required"}), 400
 
         profile = Profile.query.filter_by(user_id=current_user.id).first()
@@ -696,12 +825,11 @@ def add_achievement():
 
         # Determine next sort order
         max_sort = db.session.query(db.func.max(Achievement.aid)).filter_by(pid=profile.pid).scalar()
-        next_sort = (max_sort or 0) + 1
 
         ach = Achievement(
             pid=profile.pid,
             title=title,
-            type=type,
+            type=achievement_type,
             year=int(year) if year else None,
             description=description
         )
@@ -723,6 +851,9 @@ def add_achievement():
 @main.route("/delete_achievement/<int:aid>", methods=["DELETE"])
 @login_required
 def delete_achievement(aid):
+    if not validate_csrf_token():
+        return jsonify({'success': False, 'error': 'Invalid CSRF token'}), 400
+    
     try:
         profile = Profile.query.filter_by(user_id=current_user.id).first()
         if not profile:
@@ -742,6 +873,9 @@ def delete_achievement(aid):
 @main.route("/update_achievement_order", methods=["POST"])
 @login_required
 def update_achievement_order():
+    if not validate_csrf_token():
+        return jsonify({'success': False, 'error': 'Invalid CSRF token'}), 400
+    
     try:
         data = request.get_json()
         order = data.get("order", [])

@@ -193,7 +193,7 @@ def search():
                          interests=interests)
 
 @main.route("/help")
-def help():
+def help_centre():
     return render_template("help_centre.html")
 
 @main.route("/privacy")

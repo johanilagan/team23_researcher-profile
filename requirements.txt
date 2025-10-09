@@ -5,3 +5,5 @@ WTForms
 email-validator
 Werkzeug
 flask_login
+keybert
+PyMuPDF

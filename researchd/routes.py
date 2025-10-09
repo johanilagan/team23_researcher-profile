@@ -8,6 +8,8 @@ from sqlalchemy.orm import joinedload
 from . import db
 import os
 from datetime import datetime
+from keybert import KeyBERT
+import fitz
 
 auth = Blueprint("auth", __name__)
 main = Blueprint("main", __name__)
@@ -760,3 +762,23 @@ def update_achievement_order():
     except Exception as e:
         db.session.rollback()
         return jsonify({"success": False, "error": str(e)}), 500
+    
+@main.route('/extract_keywords', methods=['POST'])
+@login_required
+def extract_keywords():
+    kw_model = KeyBERT('all-MiniLM-L6-v2')
+
+    file = request.files.get('pdf')
+    if not file or not file.filename.endswith('.pdf'):
+        return jsonify({'success': False, 'error': 'Invalid or missing PDF'}), 400
+
+    text = ""
+    with fitz.open(stream=file.read(), filetype="pdf") as doc:
+        for page in doc:
+            text += page.get_text("text")
+
+    if not text.strip():
+        return jsonify({'success': False, 'error': 'No readable text found in PDF'}), 400
+
+    keywords = [kw for kw, _ in kw_model.extract_keywords(text, keyphrase_ngram_range=(1, 2), stop_words='english', top_n=8)]
+    return jsonify({'success': True, 'keywords': keywords})

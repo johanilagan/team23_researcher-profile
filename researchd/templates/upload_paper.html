@@ -111,16 +111,15 @@
                             <div class="form-text">Maximum 2000 characters</div>
                         </div>
                         
-                        <div class="mb-3">
+                        <div class="mb-3 position-relative">
                             {{ form.keywords.label(class="form-label") }}
-                            {{ form.keywords(class="form-control") }}
-                            {% if form.keywords.errors %}
-                                <div class="text-danger">
-                                    {% for error in form.keywords.errors %}
-                                        <small>{{ error }}</small>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
+                            <div class="d-flex align-items-center gap-2">
+                                {{ form.keywords(class="form-control", id="keywords-input") }}
+                                <button type="button" id="extract-keywords-btn" class="btn btn-outline-primary" disabled>
+                                    <i class="fas fa-magic me-1"></i> Extract Keywords
+                                </button>
+                            </div>
+                            <div id="keyword-status" class="form-text text-muted mt-1"></div>
                         </div>
                         
                         <div class="row">
@@ -210,9 +209,8 @@
         }
     }
     
-    // Character counters and file preview
     document.addEventListener('DOMContentLoaded', function() {
-        // Abstract character counter
+        // --- Abstract character counter ---
         const abstractTextarea = document.querySelector('textarea[name="abstract"]');
         if (abstractTextarea) {
             const maxLength = 2000;
@@ -223,35 +221,66 @@
             
             abstractTextarea.addEventListener('input', function() {
                 counter.textContent = `${this.value.length}/${maxLength}`;
-                if (this.value.length > maxLength) {
-                    counter.classList.add('text-danger');
-                } else {
-                    counter.classList.remove('text-danger');
-                }
+                counter.classList.toggle('text-danger', this.value.length > maxLength);
             });
         }
-        
-        // File preview
+
+        // --- File preview ---
         const fileInput = document.querySelector('input[type="file"]');
         const filePreview = document.getElementById('file-preview');
         const fileName = document.getElementById('file-name');
-        
+        const extractBtn = document.getElementById('extract-keywords-btn');
+        const keywordsInput = document.getElementById('keywords-input');
+        const status = document.getElementById('keyword-status');
+
         if (fileInput) {
             fileInput.addEventListener('change', function() {
                 if (this.files && this.files[0]) {
                     fileName.textContent = this.files[0].name;
                     filePreview.style.display = 'block';
+                    if (extractBtn) extractBtn.disabled = false;
                 } else {
                     filePreview.style.display = 'none';
+                    if (extractBtn) extractBtn.disabled = true;
                 }
             });
         }
-        
-        // Set current year as default for year field
+
+        // --- Extract Keywords ---
+        if (extractBtn) {
+            extractBtn.addEventListener('click', async function() {
+                if (!fileInput.files.length) {
+                    alert("Please upload a PDF first.");
+                    return;
+                }
+
+                status.textContent = "Extracting keywords... please wait ⏳";
+                const formData = new FormData();
+                formData.append('pdf', fileInput.files[0]);
+
+                try {
+                    const response = await fetch('/extract_keywords', { method: 'POST', body: formData });
+                    const data = await response.json();
+
+                    if (data.success) {
+                        keywordsInput.value = data.keywords.join(', ');
+                        status.textContent = "✅ Keywords extracted successfully.";
+                    } else {
+                        status.textContent = "⚠️ Could not extract keywords.";
+                    }
+                } catch (err) {
+                    console.error(err);
+                    status.textContent = "❌ Error extracting keywords.";
+                }
+            });
+        }
+
+        // --- Set default year ---
         const yearInput = document.querySelector('input[name="year"]');
         if (yearInput && !yearInput.value) {
             yearInput.value = new Date().getFullYear();
         }
     });
+
 </script>
 {% endblock %}

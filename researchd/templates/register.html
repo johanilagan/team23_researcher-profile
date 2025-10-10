@@ -90,12 +90,11 @@
                             </div>
                             
                             <script>
-                                $(document).ready(function() {
-                                    $('#institution').select2({
+                                $('#institution').select2({
+                                    theme: 'bootstrap-5',          //  integrate with Bootstrap 5
                                     placeholder: "Search institutions...",
                                     allowClear: true,
-                                    width: '100%' // makes sure it fits Bootstrap style
-                                    });
+                                    width: '100%'                  //  makes sure it fits nicely in form
                                 });
                             </script>
 

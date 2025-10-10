@@ -554,6 +554,7 @@ def register():
 
     # Populate dropdown choices dynamically
     form.institution.choices = [("", "Select an institution")] + [(i, i) for i in institutions]
+    form.position.choices = ["Select a role", "Student", "Educator", "Academic"]
 
     if form.validate_on_submit():
         # check if email already exists

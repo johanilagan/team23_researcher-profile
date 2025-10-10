@@ -15,10 +15,9 @@ It supports:
 - **Authentication**: User registration, login, and logout
 - **Profile Management**: Edit profile info
 - **Research Interests**: Add/remove interests with a searchable modal
-- **Publications**: Upload PDFs, add metadata (authors, year, journal, etc.)
+- **Publications**: Upload PDFs, add metadata (authors, year, journal, etc.), keyword extract from paper
 - **Dynamic Layout**: Drag-and-drop profile sections 
 - **Access Control**: Edit/Logout buttons only visible to profile owners
-
 
 ## Tech
 
@@ -28,6 +27,13 @@ It supports:
 - **Authentication**: Flask-Login
 - **File Storage**: 
 
+## Prerequisites
+
+- Python 3.7 or higher
+- pip (Python package manager)
+- Git (for cloning repository)
+- [Optional] Virtual environment tool (venv or virtualenv)
+
 ## Setup
 
 1. First install the requirements by running
@@ -36,18 +42,18 @@ in your terminal
 2. Run the programe by running 
 `python app.py`
 in your terminal.
-=======
+The application will start on http://localhost:5000 by default. 
 
 ## Group Members
 
 | Name        | Student Number              |
 |-------------|------------------------------------|
-| Elijah Thomson | |
-| Austin Ngo     | |
-| Sepehr Amid  | |
-| Johan Illagan  | |
-| Rohma Rehman   | |
-| Annabelle Tiew     | |
+| Elijah Thomson |23772983| 
+| Austin Ngo     |23801606 |
+| Sepehr Amid  |23342221|
+| Johan Illagan  |23832843|
+| Rohma Rehman   |23845362|
+| Annabelle Tiew     |24028292|
 
 
 ---
@@ -76,4 +82,4 @@ in your terminal.
 - Bootstrap Icons & Font Awesome for icons  
 - Placeholder images from [via.placeholder.com](https://via.placeholder.com)  
 - Open-source libraries listed above  
->>>>>>> fecb0e293c58378ecec66684c7f3c5d6ec7c5c6e
+

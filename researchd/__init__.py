@@ -7,6 +7,7 @@ from sqlalchemy import inspect
 from flask_login import current_user
 
 db = SQLAlchemy()
+csrf = CSRFProtect()
 
 def create_app():
     app = Flask(__name__)
@@ -21,7 +22,6 @@ def create_app():
     db.init_app(app)
 
     # CSRF Protection setup
-    csrf = CSRFProtect()
     csrf.init_app(app)
 
     # Flask-Login setup

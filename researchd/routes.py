@@ -2,6 +2,7 @@ import json
 from flask import Blueprint, render_template, redirect, url_for, request, jsonify, current_app, send_from_directory
 from flask_login import login_user, login_required, logout_user, current_user
 from flask_wtf.csrf import validate_csrf
+from researchd import csrf
 from werkzeug.utils import secure_filename
 from .forms import LoginForm, RegisterForm, EditProfileForm, UploadPaperForm, EditPaperForm
 from .models import User, Profile, Social, Publication, File, Achievement, ExternalRole
@@ -898,6 +899,7 @@ def update_achievement_order():
         return jsonify({"success": False, "error": str(e)}), 500
     
 @main.route('/extract_keywords', methods=['POST'])
+@csrf.exempt
 @login_required
 def extract_keywords():
     kw_model = KeyBERT('all-MiniLM-L6-v2')

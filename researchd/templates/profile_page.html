@@ -6,35 +6,35 @@
     <!-- Profile Actions -->
         {% if is_owner %}
         <div class="profile-actions mt-4">
-            <div class="row g-2">
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+            <div class="row g-2 justify-content-center">
+                <div class="col-auto">
                     <a href="{{ url_for('main.edit_profile') }}" class="btn btn-primary w-100">
                         <i class="fas fa-edit me-1"></i><span class="d-none d-sm-inline">Edit Profile</span><span class="d-sm-none">Edit</span>
                     </a>
                 </div>
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="col-auto">
                     <a href="{{ url_for('main.upload_paper') }}" class="btn btn-success w-100">
                         <i class="fas fa-plus me-1"></i><span class="d-none d-sm-inline">Upload Paper</span><span class="d-sm-none">Upload</span>
                     </a>
                 </div>
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="col-auto">
                     <a href="{{ url_for('main.my_papers') }}" class="btn btn-info w-100">
                         <i class="fas fa-file-alt me-1"></i><span class="d-none d-sm-inline">My Papers</span><span class="d-sm-none">Papers</span>
                     </a>
                 </div>
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="col-auto">
                     <button class="btn btn-outline-primary w-100" onclick="toggleExternalRoles()" id="toggle-external-roles-btn">
                         <i class="fas fa-users me-1"></i><span class="d-none d-sm-inline">External Roles</span><span class="d-sm-none">Roles</span>
                     </button>
                 </div>
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="col-auto">
                     <button class="btn btn-outline-primary w-100" onclick="toggleAchievements()" id="toggle-achievements-btn">
                         <i class="fas fa-trophy me-1"></i><span class="d-none d-sm-inline">Achievements</span><span class="d-sm-none">Awards</span>
                     </button>
                 </div>
             </div>
         </div>
-        <div id="buttons_section">
+        <div id="buttons_section" style="margin-left: 2rem;">
             {% set section_map = section_order | map(attribute='section') | list %}
             {% set visible_map = section_order | map(attribute='visible') | list %}
             
@@ -103,7 +103,7 @@
                             <div class="social-links d-flex flex-wrap gap-2">
                                 {% for social in profile.socials %}
                                         {% if social.platform == 'LinkedIn' %}
-                                            <a href="{{ social.url }}" class="social-link linkedin btn btn-outline-primary btn-sm" target="_blank">
+                                            <a href="{{ social.url }}" class="social-link linkedin btn btn-outline-info btn-sm" target="_blank">
                                                 <i class="fab fa-linkedin me-1"></i>LinkedIn
                                             </a>
                                         {% elif social.platform == 'Twitter' %}
@@ -171,11 +171,11 @@
                 <div class="row g-3" id="recent-papers">
                     {% if publications %}
                         {% for publication in publications %}
-                        <div class="col-12 col-md-6 col-lg-4">
+                        <div class="col-12">
                             <div class="paper-card h-100">
-                                <h3 class="h6">{{ publication.title[:50] }}{% if publication.title|length > 50 %}...{% endif %}</h3>
+                                <h3 class="h6">{{ publication.title }}</h3>
                                 {% if publication.authors %}
-                                <p class="authors small text-muted">{{ publication.authors[:60] }}{% if publication.authors|length > 60 %}...{% endif %}</p>
+                                <p class="authors small text-muted">{{ publication.authors }}</p>
                                 {% endif %}
                                 {% if publication.journal and publication.year %}
                                 <p class="venue small fw-bold">{{ publication.journal }} ({{ publication.year }})</p>
@@ -183,7 +183,7 @@
                                 <p class="venue small fw-bold">{{ publication.year }}</p>
                                 {% endif %}
                                 {% if publication.abstract %}
-                                <p class="abstract small">{{ publication.abstract[:100] }}{% if publication.abstract|length > 100 %}...{% endif %}</p>
+                                <p class="abstract small">{{ publication.abstract }}</p>
                                 {% endif %}
                                 <div class="paper-actions d-flex flex-wrap gap-1 mt-auto">
                                     {% if publication.file %}

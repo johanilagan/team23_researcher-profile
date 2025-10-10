@@ -26,26 +26,60 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // File preview
-    const fileInput = document.querySelector('input[type="file"]');
-    const filePreview = document.getElementById('file-preview');
-    const fileName = document.getElementById('file-name');
-    
-    if (fileInput) {
-        fileInput.addEventListener('change', function() {
-            if (this.files && this.files[0]) {
-                fileName.textContent = this.files[0].name;
-                filePreview.style.display = 'block';
-            } else {
-                filePreview.style.display = 'none';
-            }
-        });
-    }
-    
-    // Set current year as default for year field
-    const yearInput = document.querySelector('input[name="year"]');
-    if (yearInput && !yearInput.value) {
-        yearInput.value = new Date().getFullYear();
-    }
-});
+   // --- File preview ---
+        const fileInput = document.querySelector('input[type="file"]');
+        const filePreview = document.getElementById('file-preview');
+        const fileName = document.getElementById('file-name');
+        const extractBtn = document.getElementById('extract-keywords-btn');
+        const keywordsInput = document.getElementById('keywords-input');
+        const status = document.getElementById('keyword-status');
+
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    fileName.textContent = this.files[0].name;
+                    filePreview.style.display = 'block';
+                    if (extractBtn) extractBtn.disabled = false;
+                } else {
+                    filePreview.style.display = 'none';
+                    if (extractBtn) extractBtn.disabled = true;
+                }
+            });
+        }
+
+        // --- Extract Keywords ---
+        if (extractBtn) {
+            extractBtn.addEventListener('click', async function() {
+                if (!fileInput.files.length) {
+                    alert("Please upload a PDF first.");
+                    return;
+                }
+
+                status.textContent = "Extracting keywords... please wait ⏳";
+                const formData = new FormData();
+                formData.append('pdf', fileInput.files[0]);
+
+                try {
+                    const response = await fetch('/extract_keywords', { method: 'POST', body: formData });
+                    const data = await response.json();
+
+                    if (data.success) {
+                        keywordsInput.value = data.keywords.join(', ');
+                        status.textContent = "✅ Keywords extracted successfully.";
+                    } else {
+                        status.textContent = "⚠️ Could not extract keywords.";
+                    }
+                } catch (err) {
+                    console.error(err);
+                    status.textContent = "❌ Error extracting keywords.";
+                }
+            });
+        }
+
+        // --- Set default year ---
+        const yearInput = document.querySelector('input[name="year"]');
+        if (yearInput && !yearInput.value) {
+            yearInput.value = new Date().getFullYear();
+        }
+    });
 

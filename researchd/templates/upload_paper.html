@@ -111,18 +111,6 @@
                             <div class="form-text">Maximum 2000 characters</div>
                         </div>
                         
-                        <div class="mb-3">
-                            {{ form.keywords.label(class="form-label") }}
-                            {{ form.keywords(class="form-control") }}
-                            {% if form.keywords.errors %}
-                                <div class="text-danger">
-                                    {% for error in form.keywords.errors %}
-                                        <small>{{ error }}</small>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                        
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
@@ -179,6 +167,17 @@
                                 <span id="file-name"></span>
                                 <small class="text-muted d-block mt-1">File selected for upload</small>
                             </div>
+                        </div>
+
+                        <div class="mb-3 position-relative">
+                            {{ form.keywords.label(class="form-label") }}
+                            <div class="d-flex align-items-center gap-2">
+                                {{ form.keywords(class="form-control", id="keywords-input") }}
+                                <button type="button" id="extract-keywords-btn" class="btn btn-outline-primary" disabled>
+                                    <i class="fas fa-magic me-1"></i> Extract Keywords
+                                </button>
+                            </div>
+                            <div id="keyword-status" class="form-text text-muted mt-1"></div>
                         </div>
                         
                         <!-- Form Actions -->

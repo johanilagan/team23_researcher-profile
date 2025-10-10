@@ -38,12 +38,13 @@
                 <div class="row justify-content-center">
                     <div class="col-lg-8">
                         <div class="text-center mb-4">
-                            <h2 class="h3">Find Researchers</h2>
-                            <p class="text-muted">Search by name, field, institution, or research interests</p>
+                            <h2 class="h3">Find Researchers & Papers</h2>
+                            <p class="text-muted">Search by researchers, papers, keywords, institutions, or research interests</p>
                         </div>
                         <form action="{{ url_for('main.search') }}" method="GET">
                             <div class="input-group input-group-lg">
-                                <input type="text" class="form-control" placeholder="Search researchers, papers, or institutions..." name="q">
+                                <input type="text" class="form-control" placeholder="Search researchers, papers, keywords..." name="q">
+                                <input type="hidden" name="type" value="all">
                                 <button class="btn btn-primary" type="submit">
                                     <i class="fas fa-search"></i> Search
                                 </button>

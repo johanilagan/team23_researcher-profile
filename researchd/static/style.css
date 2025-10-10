@@ -711,12 +711,12 @@ body {
 }
 
 .profile-pic {
-    width: 350px;
-    height: 350px;
+    width: 200px;
+    height: 200px;
     border-radius: 50%;
     object-fit: cover;
-    border: 5px solid #fff;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    border: 3px solid #fff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     transition: transform 0.3s ease;
 }
 
@@ -1774,8 +1774,8 @@ body {
     }
     
     .profile-pic {
-        width: 120px;
-        height: 120px;
+        width: 150px;
+        height: 150px;
     }
     
     .change-pic-btn {
@@ -1972,8 +1972,8 @@ body {
     }
     
     .profile-pic {
-        width: 100px;
-        height: 100px;
+        width: 120px;
+        height: 120px;
     }
     
     .change-pic-btn {

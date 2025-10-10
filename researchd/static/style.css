@@ -86,6 +86,24 @@
     box-shadow: 0 0 0 0.2rem rgba(88, 166, 255, 0.25);
 }
 
+.select2-container .select2-selection--single {
+    border-radius: 10px;
+    border: 2px solid var(--border-color);
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    background: var(--input-bg);
+    color: var(--text-primary);
+}
+
+.select2-container .select2-selection--single:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.select2-container .select2-selection--single::placeholder {
+    color: #6c757d;
+}
+
 [data-theme="dark"] .form-control {
     background: var(--input-bg);
     border-color: var(--border-color);

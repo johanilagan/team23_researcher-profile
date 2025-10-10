@@ -85,13 +85,23 @@
 
                             <!-- Institution -->
                             <div class="input mb-3">
-                                {{ form.institution(class="form-select", placeholder="Institution") }}
+                                {{ form.institution(class="form-select", placeholder="Institution", id="institution") }}
                                 <i class='bx bx-buildings'></i>
                             </div>
+                            
+                            <script>
+                                $(document).ready(function() {
+                                    $('#institution').select2({
+                                    placeholder: "Search institutions...",
+                                    allowClear: true,
+                                    width: '100%' // makes sure it fits Bootstrap style
+                                    });
+                                });
+                            </script>
 
                             <!-- Position -->
                             <div class="input mb-3">
-                                {{ form.position(class="form-control", placeholder="Position") }}
+                                {{ form.position(class="form-select", placeholder="Position") }}
                                 <i class='bx bx-briefcase'></i>
                             </div>
 

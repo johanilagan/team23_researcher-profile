@@ -73,6 +73,19 @@
     box-shadow: 0 8px 25px rgba(0,0,0,0.4);
 }
 
+[data-theme="dark"] .form-select {
+    background: var(--input-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-select:focus {
+    background: var(--input-bg);
+    border-color: var(--accent-color);
+    color: var(--text-primary);
+    box-shadow: 0 0 0 0.2rem rgba(88, 166, 255, 0.25);
+}
+
 [data-theme="dark"] .form-control {
     background: var(--input-bg);
     border-color: var(--border-color);
@@ -171,6 +184,10 @@ h1, h2, h3, h4, h5, h6, p, span, div, a, label {
     color: #8b949e !important;
 }
 
+[data-theme="dark"] .form-select::placeholder {
+    color: #8b949e !important;
+}
+
 [data-theme="dark"] .form-control::placeholder {
     color: #8b949e !important;
 }
@@ -187,6 +204,11 @@ h1, h2, h3, h4, h5, h6, p, span, div, a, label {
 [data-theme="dark"] .footer span,
 [data-theme="dark"] .footer a {
     color: #f0f6fc !important;
+}
+
+input::placeholder,
+.form-select::placeholder {
+    color: #6c757d;
 }
 
 input::placeholder,
@@ -489,6 +511,22 @@ input::placeholder,
 [data-theme="dark"] .login-page .container .input input::placeholder,
 [data-theme="dark"] .register-page .container .input input::placeholder {
     color: #dee2e6 !important; /* Light grey placeholder for dark mode */
+}
+
+/* Override form select if using Bootstrap classes */
+[data-theme="dark"] .login-page .form-select,
+[data-theme="dark"] .register-page .form-select {
+    background: #6c757d !important;
+    border: 2px solid #adb5bd !important;
+    color: #f8f9fa !important;
+}
+
+[data-theme="dark"] .login-page .form-select:focus,
+[data-theme="dark"] .register-page .form-select:focus {
+    background: #6c757d !important;
+    border-color: #58a6ff !important;
+    color: #f8f9fa !important;
+    box-shadow: 0 0 0 0.2rem rgba(88, 166, 255, 0.25) !important;
 }
 
 /* Override form control if using Bootstrap classes */
@@ -890,6 +928,21 @@ body {
     background: var(--modal-bg);
     transition: background-color 0.3s ease, border-color 0.3s ease;
 }
+
+.form-select {
+    border-radius: 10px;
+    border: 2px solid var(--border-color);
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    background: var(--input-bg);
+    color: var(--text-primary);
+}
+
+.form-select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
 
 .form-control {
     border-radius: 10px;

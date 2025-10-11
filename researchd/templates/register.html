@@ -47,7 +47,9 @@
                             <div class="input mb-3">
                                 <div class="password-container">
                                     {{ form.password(class="form-control", placeholder="Password", required=True, id="password") }}
-                                    <i class='bxr bx-eye-slash toggle-eye' onclick="togglePassword('password')"></i>
+                                    <button type="button" class="toggle-eye-btn" onclick="togglePassword('password')" aria-label="Toggle password visibility">
+                                        <i class='bxr bx-eye-slash toggle-eye'></i>
+                                    </button>
                                 </div>
                                 {% for error in form.password.errors %}
                                     <div class="text-danger">{{ error }}</div>
@@ -85,8 +87,7 @@
 
                             <!-- Institution -->
                             <div class="input mb-3">
-                                {{ form.institution(class="form-select", placeholder="Institution", id="institution") }}
-                                <i class='bx bx-buildings'></i>
+                                {{ form.institution(class="form-select", placeholder="Search institutions...", id="institution") }}
                             </div>
                             
                             <script>
@@ -99,8 +100,7 @@
 
                             <!-- Position -->
                             <div class="input mb-3">
-                                {{ form.position(class="form-select", placeholder="Position") }}
-                                <i class='bx bx-briefcase'></i>
+                                {{ form.position(class="form-select", placeholder="Select a position", id="position") }}
                             </div>
 
                             <!-- Submit button -->
@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
             length: password.length >= 6,
             uppercase: /[A-Z]/.test(password),
             number: /\d/.test(password),
-            special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
+            special: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)
         };
 
         return requirements;

@@ -123,48 +123,101 @@ def search():
     institution_filter = request.args.get("institution", "").strip()
     position_filter = request.args.get("position", "").strip()
     interests_filter = request.args.get("interests", "").strip()
+    journal_filter = request.args.get("journal", "").strip()
+    year_filter = request.args.get("year", "").strip()
     sort_by = request.args.get("sort", "name").strip()
+    search_type = request.args.get("type", "researchers").strip()  # "researchers" or "papers"
     page = request.args.get("page", 1, type=int)
-    per_page = 10  # 10 researchers per page
+    per_page = 10  # 10 results per page
     
-    # Start with base query
-    query = User.query.join(Profile).options(joinedload(User.profile))
+    # Initialize results
+    researcher_results = []
+    paper_results = []
+    researcher_pagination = None
+    paper_pagination = None
     
-    # Apply search query
-    if q:
-        query = query.filter(
-            (User.first_name.ilike(f"%{q}%")) |
-            (User.last_name.ilike(f"%{q}%")) |
-            (Profile.institution.ilike(f"%{q}%")) |
-            (Profile.position.ilike(f"%{q}%")) |
-            (Profile.research_interests.ilike(f"%{q}%"))
+    # Search researchers
+    if search_type in ["researchers", "all"]:
+        # Start with base query for researchers
+        researcher_query = User.query.join(Profile).options(joinedload(User.profile))
+        
+        # Apply search query for researchers
+        if q:
+            researcher_query = researcher_query.filter(
+                (User.first_name.ilike(f"%{q}%")) |
+                (User.last_name.ilike(f"%{q}%")) |
+                (Profile.institution.ilike(f"%{q}%")) |
+                (Profile.position.ilike(f"%{q}%")) |
+                (Profile.research_interests.ilike(f"%{q}%"))
+            )
+        
+        # Apply filters for researchers
+        if institution_filter:
+            researcher_query = researcher_query.filter(Profile.institution == institution_filter)
+        
+        if position_filter:
+            researcher_query = researcher_query.filter(Profile.position == position_filter)
+        
+        if interests_filter:
+            researcher_query = researcher_query.filter(Profile.research_interests.ilike(f"%{interests_filter}%"))
+        
+        # Apply sorting for researchers
+        if sort_by == "institution":
+            researcher_query = researcher_query.order_by(Profile.institution.asc())
+        elif sort_by == "position":
+            researcher_query = researcher_query.order_by(Profile.position.asc())
+        else:  # default to name
+            researcher_query = researcher_query.order_by(User.first_name.asc(), User.last_name.asc())
+        
+        # Apply pagination for researchers
+        researcher_pagination = researcher_query.paginate(
+            page=page, 
+            per_page=per_page, 
+            error_out=False
         )
+        researcher_results = researcher_pagination.items
     
-    # Apply filters
-    if institution_filter:
-        query = query.filter(Profile.institution == institution_filter)
-    
-    if position_filter:
-        query = query.filter(Profile.position == position_filter)
-    
-    if interests_filter:
-        query = query.filter(Profile.research_interests.ilike(f"%{interests_filter}%"))
-    
-    # Apply sorting
-    if sort_by == "institution":
-        query = query.order_by(Profile.institution.asc())
-    elif sort_by == "position":
-        query = query.order_by(Profile.position.asc())
-    else:  # default to name
-        query = query.order_by(User.first_name.asc(), User.last_name.asc())
-    
-    # Apply pagination
-    pagination = query.paginate(
-        page=page, 
-        per_page=per_page, 
-        error_out=False
-    )
-    results = pagination.items
+    # Search papers
+    if search_type in ["papers", "all"]:
+        # Start with base query for papers
+        paper_query = Publication.query.join(Profile).join(User).options(
+            joinedload(Publication.profile).joinedload(Profile.user)
+        )
+        
+        # Apply search query for papers
+        if q:
+            paper_query = paper_query.filter(
+                (Publication.title.ilike(f"%{q}%")) |
+                (Publication.authors.ilike(f"%{q}%")) |
+                (Publication.journal.ilike(f"%{q}%")) |
+                (Publication.abstract.ilike(f"%{q}%")) |
+                (Publication.keywords.ilike(f"%{q}%"))
+            )
+        
+        # Apply filters for papers
+        if journal_filter:
+            paper_query = paper_query.filter(Publication.journal.ilike(f"%{journal_filter}%"))
+        
+        if year_filter:
+            paper_query = paper_query.filter(Publication.year == int(year_filter))
+        
+        # Apply sorting for papers
+        if sort_by == "year":
+            paper_query = paper_query.order_by(Publication.year.desc())
+        elif sort_by == "title":
+            paper_query = paper_query.order_by(Publication.title.asc())
+        elif sort_by == "journal":
+            paper_query = paper_query.order_by(Publication.journal.asc())
+        else:  # default to creation date
+            paper_query = paper_query.order_by(Publication.created_at.desc())
+        
+        # Apply pagination for papers
+        paper_pagination = paper_query.paginate(
+            page=page, 
+            per_page=per_page, 
+            error_out=False
+        )
+        paper_results = paper_pagination.items
     
     # Get unique values for filter dropdowns
     institutions = db.session.query(Profile.institution).filter(Profile.institution.isnot(None), Profile.institution != "").distinct().all()
@@ -182,18 +235,33 @@ def search():
             for interest in interest_row[0].split(','):
                 interests.add(interest.strip())
     interests = sorted(list(interests))
+    
+    # Get unique journals for paper filter
+    journals = db.session.query(Publication.journal).filter(Publication.journal.isnot(None), Publication.journal != "").distinct().all()
+    journals = [journal[0] for journal in journals if journal[0]]
+    
+    # Get unique years for paper filter
+    years = db.session.query(Publication.year).filter(Publication.year.isnot(None)).distinct().order_by(Publication.year.desc()).all()
+    years = [year[0] for year in years if year[0]]
 
     return render_template("search.html", 
-                         results=results, 
-                         pagination=pagination,
+                         researcher_results=researcher_results,
+                         paper_results=paper_results,
+                         researcher_pagination=researcher_pagination,
+                         paper_pagination=paper_pagination,
                          q=q,
                          institution_filter=institution_filter,
                          position_filter=position_filter,
                          interests_filter=interests_filter,
+                         journal_filter=journal_filter,
+                         year_filter=year_filter,
                          sort_by=sort_by,
+                         search_type=search_type,
                          institutions=institutions,
                          positions=positions,
-                         interests=interests)
+                         interests=interests,
+                         journals=journals,
+                         years=years)
 
 @main.route("/help")
 def help_centre():

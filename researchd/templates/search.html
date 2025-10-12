@@ -8,18 +8,18 @@
             <div class="row justify-content-center">
                 <div class="col-lg-10">
                     <div class="text-center mb-4">
-                        <h1 class="h2">Find Researchers</h1>
-                        <p class="text-muted">Search by name, field, institution, or research interests</p>
+                        <h1 class="h2">Search Research'D</h1>
+                        <p class="text-muted">Search by researchers, papers, keywords, institutions, or research interests</p>
                     </div>
                     
                     <!-- Search Form -->
-                    <form action="{{ url_for('main.search') }}" method="GET" id="searchForm">
+                    <form action="{{ url_for('main.search') }}" method="GET" id="searchForm" class="search-interface">
                         <div class="row g-3">
                             <!-- Main Search Bar -->
-                            <div class="col-md-8">
+                            <div class="col-lg-8 col-md-12">
                                 <div class="input-group input-group-lg">
                                     <input type="text" 
-                                           placeholder="Search researchers, papers, or institutions..." 
+                                           placeholder="Search researchers, papers, keywords..." 
                                            class="form-control" 
                                            name="q" 
                                            value="{{ q }}"
@@ -30,12 +30,44 @@
                                 </div>
                             </div>
                             
-                            <!-- Sort Dropdown -->
-                            <div class="col-md-4">
+                            <!-- Search Type Toggle -->
+                            <div class="col-lg-4 col-md-12">
+                                <div class="btn-group w-100" role="group" aria-label="Search type">
+                                    <input type="radio" class="btn-check" name="type" id="typeResearchers" value="researchers" 
+                                           {% if search_type == 'researchers' %}checked{% endif %}>
+                                    <label class="btn btn-outline-primary" for="typeResearchers">
+                                        <i class="fas fa-users me-1"></i>Researchers
+                                    </label>
+                                    
+                                    <input type="radio" class="btn-check" name="type" id="typePapers" value="papers" 
+                                           {% if search_type == 'papers' %}checked{% endif %}>
+                                    <label class="btn btn-outline-primary" for="typePapers">
+                                        <i class="fas fa-file-alt me-1"></i>Papers
+                                    </label>
+                                    
+                                    <input type="radio" class="btn-check" name="type" id="typeAll" value="all" 
+                                           {% if search_type == 'all' %}checked{% endif %}>
+                                    <label class="btn btn-outline-primary" for="typeAll">
+                                        <i class="fas fa-search me-1"></i>All
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Sort Options Row -->
+                        <div class="row g-3 mt-2">
+                            <div class="col-lg-4 col-md-6 col-sm-12">
                                 <select class="form-select form-select-lg" name="sort" id="sortSelect">
-                                    <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Sort by Name</option>
-                                    <option value="institution" {% if sort_by == 'institution' %}selected{% endif %}>Sort by Institution</option>
-                                    <option value="position" {% if sort_by == 'position' %}selected{% endif %}>Sort by Position</option>
+                                    {% if search_type == 'papers' %}
+                                        <option value="created_at" {% if sort_by == 'created_at' %}selected{% endif %}>Sort by Date</option>
+                                        <option value="year" {% if sort_by == 'year' %}selected{% endif %}>Sort by Year</option>
+                                        <option value="title" {% if sort_by == 'title' %}selected{% endif %}>Sort by Title</option>
+                                        <option value="journal" {% if sort_by == 'journal' %}selected{% endif %}>Sort by Journal</option>
+                                    {% else %}
+                                        <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Sort by Name</option>
+                                        <option value="institution" {% if sort_by == 'institution' %}selected{% endif %}>Sort by Institution</option>
+                                        <option value="position" {% if sort_by == 'position' %}selected{% endif %}>Sort by Position</option>
+                                    {% endif %}
                                 </select>
                             </div>
                         </div>
@@ -54,46 +86,80 @@
                                     </div>
                                     <div class="card-body">
                                         <div class="row g-3">
-                                            <!-- Institution Filter -->
-                                            <div class="col-md-4">
-                                                <label for="institutionFilter" class="form-label">Institution</label>
-                                                <select class="form-select" name="institution" id="institutionFilter">
-                                                    <option value="">All Institutions</option>
-                                                    {% for institution in institutions %}
-                                                        <option value="{{ institution }}" 
-                                                                {% if institution_filter == institution %}selected{% endif %}>
-                                                            {{ institution }}
-                                                        </option>
-                                                    {% endfor %}
-                                                </select>
+                                            <!-- Researcher Filters -->
+                                            <div id="researcherFilters" class="row g-3" style="display: {% if search_type == 'papers' %}none{% else %}block{% endif %};">
+                                                <!-- Institution Filter -->
+                                                <div class="col-md-4">
+                                                    <label for="institutionFilter" class="form-label">Institution</label>
+                                                    <select class="form-select" name="institution" id="institutionFilter">
+                                                        <option value="">All Institutions</option>
+                                                        {% for institution in institutions %}
+                                                            <option value="{{ institution }}" 
+                                                                    {% if institution_filter == institution %}selected{% endif %}>
+                                                                {{ institution }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                
+                                                <!-- Position Filter -->
+                                                <div class="col-md-4">
+                                                    <label for="positionFilter" class="form-label">Position</label>
+                                                    <select class="form-select" name="position" id="positionFilter">
+                                                        <option value="">All Positions</option>
+                                                        {% for position in positions %}
+                                                            <option value="{{ position }}" 
+                                                                    {% if position_filter == position %}selected{% endif %}>
+                                                                {{ position }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                
+                                                <!-- Research Interests Filter -->
+                                                <div class="col-md-4">
+                                                    <label for="interestsFilter" class="form-label">Research Interests</label>
+                                                    <select class="form-select" name="interests" id="interestsFilter">
+                                                        <option value="">All Interests</option>
+                                                        {% for interest in interests %}
+                                                            <option value="{{ interest }}" 
+                                                                    {% if interests_filter == interest %}selected{% endif %}>
+                                                                {{ interest }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
                                             </div>
                                             
-                                            <!-- Position Filter -->
-                                            <div class="col-md-4">
-                                                <label for="positionFilter" class="form-label">Position</label>
-                                                <select class="form-select" name="position" id="positionFilter">
-                                                    <option value="">All Positions</option>
-                                                    {% for position in positions %}
-                                                        <option value="{{ position }}" 
-                                                                {% if position_filter == position %}selected{% endif %}>
-                                                            {{ position }}
-                                                        </option>
-                                                    {% endfor %}
-                                                </select>
-                                            </div>
-                                            
-                                            <!-- Research Interests Filter -->
-                                            <div class="col-md-4">
-                                                <label for="interestsFilter" class="form-label">Research Interests</label>
-                                                <select class="form-select" name="interests" id="interestsFilter">
-                                                    <option value="">All Interests</option>
-                                                    {% for interest in interests %}
-                                                        <option value="{{ interest }}" 
-                                                                {% if interests_filter == interest %}selected{% endif %}>
-                                                            {{ interest }}
-                                                        </option>
-                                                    {% endfor %}
-                                                </select>
+                                            <!-- Paper Filters -->
+                                            <div id="paperFilters" class="row g-3" style="display: {% if search_type == 'researchers' %}none{% else %}block{% endif %};">
+                                                <!-- Journal Filter -->
+                                                <div class="col-md-6">
+                                                    <label for="journalFilter" class="form-label">Journal</label>
+                                                    <select class="form-select" name="journal" id="journalFilter">
+                                                        <option value="">All Journals</option>
+                                                        {% for journal in journals %}
+                                                            <option value="{{ journal }}" 
+                                                                    {% if journal_filter == journal %}selected{% endif %}>
+                                                                {{ journal }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                
+                                                <!-- Year Filter -->
+                                                <div class="col-md-6">
+                                                    <label for="yearFilter" class="form-label">Publication Year</label>
+                                                    <select class="form-select" name="year" id="yearFilter">
+                                                        <option value="">All Years</option>
+                                                        {% for year in years %}
+                                                            <option value="{{ year }}" 
+                                                                    {% if year_filter == year|string %}selected{% endif %}>
+                                                                {{ year }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -107,154 +173,289 @@
 
         <!-- Search Results -->
         <div class="container mt-4">
-            <!-- Results Header -->
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <h5 class="mb-0">
-                        {% if results %}
-                            {{ pagination.total }} researcher{{ 's' if pagination.total != 1 else '' }} found
-                            {% if pagination.pages > 1 %}
-                                (Page {{ pagination.page }} of {{ pagination.pages }})
-                            {% endif %}
-                        {% else %}
-                            No researchers found
-                        {% endif %}
-                    </h5>
-                </div>
-                <div class="col-md-6 text-end">
-                    {% if results %}
-                        <small class="text-muted">
-                            Showing {{ ((pagination.page - 1) * pagination.per_page) + 1 }} to {{ pagination.page * pagination.per_page if pagination.page * pagination.per_page < pagination.total else pagination.total }} of {{ pagination.total }} results
-                            {% if q or institution_filter or position_filter or interests_filter %}
-                                for 
-                                {% if q %}"{{ q }}"{% endif %}
-                                {% if institution_filter %}in {{ institution_filter }}{% endif %}
-                                {% if position_filter %}as {{ position_filter }}{% endif %}
-                                {% if interests_filter %}interested in {{ interests_filter }}{% endif %}
-                            {% endif %}
-                        </small>
+            <!-- Researcher Results -->
+            {% if search_type in ['researchers', 'all'] and researcher_results %}
+                <div class="mb-5">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5 class="mb-0">
+                                <i class="fas fa-users me-2"></i>
+                                {{ researcher_pagination.total }} researcher{{ 's' if researcher_pagination.total != 1 else '' }} found
+                                {% if researcher_pagination.pages > 1 %}
+                                    (Page {{ researcher_pagination.page }} of {{ researcher_pagination.pages }})
+                                {% endif %}
+                            </h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <small class="text-muted">
+                                Showing {{ ((researcher_pagination.page - 1) * researcher_pagination.per_page) + 1 }} to {{ researcher_pagination.page * researcher_pagination.per_page if researcher_pagination.page * researcher_pagination.per_page < researcher_pagination.total else researcher_pagination.total }} of {{ researcher_pagination.total }} results
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <!-- Researcher Results Grid -->
+                    <div class="row g-3">
+                        {% for researcher in researcher_results %}
+                            <div class="col-12">
+                                <div class="card h-100">
+                                    <div class="row g-0 align-items-center">
+                                        <div class="col-auto">
+                                            {% if researcher.profile.pfp %}
+                                                <img src="{% if researcher.profile.pfp.startswith('http') %}{{ researcher.profile.pfp }}{% else %}{{ url_for('static', filename=researcher.profile.pfp) }}{% endif %}"
+                                                    class="img-fluid rounded-circle"
+                                                    alt="{{ researcher.first_name }} {{ researcher.last_name }}"
+                                                    style="width: 80px; height: 80px; object-fit: cover;">
+                                            {% else %}
+                                                <img src="{{ url_for('static', filename='placeholder.png') }}"
+                                                    class="img-fluid rounded-circle"
+                                                    alt="{{ researcher.first_name }} {{ researcher.last_name }}"
+                                                    style="width: 80px; height: 80px; object-fit: cover;">
+                                            {% endif %}
+                                        </div>
+                                        <div class="col">
+                                            <div class="card-body">
+                                                <h5 class="card-title">
+                                                    {{ researcher.first_name }} {{ researcher.last_name }}
+                                                </h5>
+                                                <p class="card-text">
+                                                    <i class="fas fa-briefcase me-1"></i>
+                                                    {{ researcher.profile.position or 'Position not specified' }} 
+                                                    {% if researcher.profile.institution %}
+                                                        at {{ researcher.profile.institution }}
+                                                    {% endif %}
+                                                </p>
+                                                {% if researcher.profile.research_interests %}
+                                                    <p class="card-text">
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-flask me-1"></i>
+                                                            Research: {{ researcher.profile.research_interests }}
+                                                        </small>
+                                                    </p>
+                                                {% endif %}
+                                                <a href="{{ url_for('main.researcher_profile', researcher_id=researcher.id) }}"
+                                                class="btn btn-outline-primary btn-sm">
+                                                    <i class="fas fa-user me-1"></i>View Profile
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>  
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Researcher Pagination -->
+                    {% if researcher_pagination.pages > 1 %}
+                        <nav aria-label="Researcher results pages" class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                {% if researcher_pagination.has_prev %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('main.search', page=researcher_pagination.prev_num, q=q, institution=institution_filter, position=position_filter, interests=interests_filter, journal=journal_filter, year=year_filter, sort=sort_by, type=search_type) }}" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                
+                                {% for page_num in researcher_pagination.iter_pages() %}
+                                    {% if page_num %}
+                                        {% if page_num != researcher_pagination.page %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="{{ url_for('main.search', page=page_num, q=q, institution=institution_filter, position=position_filter, interests=interests_filter, journal=journal_filter, year=year_filter, sort=sort_by, type=search_type) }}">{{ page_num }}</a>
+                                            </li>
+                                        {% else %}
+                                            <li class="page-item active">
+                                                <a class="page-link" href="#">{{ page_num }}</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if researcher_pagination.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('main.search', page=researcher_pagination.next_num, q=q, institution=institution_filter, position=position_filter, interests=interests_filter, journal=journal_filter, year=year_filter, sort=sort_by, type=search_type) }}" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
                     {% endif %}
                 </div>
-            </div>
+            {% endif %}
             
-            <!-- Results Grid -->
-            <div class="row g-3">
-                {% if results %}
-                    {% for researcher in results %}
-                        <div class="col-12">
-                            <div class="card h-100">
-                                <div class="row g-0 align-items-center">
-                                    <div class="col-auto">
-                                        {% if researcher.profile.pfp %}
-                                            <img src="{{ url_for('static', filename=researcher.profile.pfp) }}"
-                                                class="img-fluid rounded-circle"
-                                                alt="{{ researcher.first_name }} {{ researcher.last_name }}"
-                                                style="width: 80px; height: 80px; object-fit: cover;">
-                                        {% else %}
-                                            <img src="{{ url_for('static', filename='placeholder.png') }}"
-                                                class="img-fluid rounded-circle"
-                                                alt="{{ researcher.first_name }} {{ researcher.last_name }}"
-                                                style="width: 80px; height: 80px; object-fit: cover;">
-                                        {% endif %}
-                                    </div>
-                                    <div class="col">
-                                        <div class="card-body">
-                                            <h5 class="card-title">
-                                                {{ researcher.first_name }} {{ researcher.last_name }}
-                                            </h5>
+            <!-- Paper Results -->
+            {% if search_type in ['papers', 'all'] and paper_results %}
+                <div class="mb-5">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5 class="mb-0">
+                                <i class="fas fa-file-alt me-2"></i>
+                                {{ paper_pagination.total }} paper{{ 's' if paper_pagination.total != 1 else '' }} found
+                                {% if paper_pagination.pages > 1 %}
+                                    (Page {{ paper_pagination.page }} of {{ paper_pagination.pages }})
+                                {% endif %}
+                            </h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <small class="text-muted">
+                                Showing {{ ((paper_pagination.page - 1) * paper_pagination.per_page) + 1 }} to {{ paper_pagination.page * paper_pagination.per_page if paper_pagination.page * paper_pagination.per_page < paper_pagination.total else paper_pagination.total }} of {{ paper_pagination.total }} results
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <!-- Paper Results Grid -->
+                    <div class="row g-3">
+                        {% for paper in paper_results %}
+                            <div class="col-12">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <a href="{{ url_for('main.paper_detail', paper_id=paper.pubid) }}" class="text-decoration-none">
+                                                {{ paper.title }}
+                                            </a>
+                                        </h5>
+                                        <p class="card-text">
+                                            <i class="fas fa-user me-1"></i>
+                                            <strong>Authors:</strong> {{ paper.authors or 'Not specified' }}
+                                        </p>
+                                        {% if paper.journal %}
                                             <p class="card-text">
-                                                <i class="fas fa-briefcase me-1"></i>
-                                                {{ researcher.profile.position or 'Position not specified' }} 
-                                                {% if researcher.profile.institution %}
-                                                    at {{ researcher.profile.institution }}
-                                                {% endif %}
+                                                <i class="fas fa-book me-1"></i>
+                                                <strong>Journal:</strong> {{ paper.journal }}
+                                                {% if paper.year %} ({{ paper.year }}){% endif %}
                                             </p>
-                                            {% if researcher.profile.research_interests %}
-                                                <p class="card-text">
-                                                    <small class="text-muted">
-                                                        <i class="fas fa-flask me-1"></i>
-                                                        Research: {{ researcher.profile.research_interests }}
-                                                    </small>
-                                                </p>
-                                            {% endif %}
-                                            <a href="{{ url_for('main.researcher_profile', researcher_id=researcher.id) }}"
-                                            class="btn btn-outline-primary btn-sm">
-                                                <i class="fas fa-user me-1"></i>View Profile
+                                        {% endif %}
+                                        {% if paper.abstract %}
+                                            <p class="card-text">
+                                                <small class="text-muted">
+                                                    {{ paper.abstract[:200] }}{% if paper.abstract|length > 200 %}...{% endif %}
+                                                </small>
+                                            </p>
+                                        {% endif %}
+                                        {% if paper.keywords %}
+                                            <div class="d-flex flex-wrap gap-1 mb-2">
+                                                {% for keyword in paper.keywords.split(',')[:5] %}
+                                                    <span class="badge bg-light text-dark">{{ keyword.strip() }}</span>
+                                                {% endfor %}
+                                                {% if paper.keywords.split(',')|length > 5 %}
+                                                    <span class="badge bg-light text-dark">+{{ paper.keywords.split(',')|length - 5 }} more</span>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">
+                                                <i class="fas fa-user-circle me-1"></i>
+                                                By {{ paper.profile.user.first_name }} {{ paper.profile.user.last_name }}
+                                                {% if paper.profile.institution %}
+                                                    ({{ paper.profile.institution }})
+                                                {% endif %}
+                                            </small>
+                                            <a href="{{ url_for('main.paper_detail', paper_id=paper.pubid) }}" class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye me-1"></i>View Paper
                                             </a>
                                         </div>
                                     </div>
-                                </div>  
+                                </div>
                             </div>
-                        </div>
-                    {% endfor %}
-                {% else %}
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Paper Pagination -->
+                    {% if paper_pagination.pages > 1 %}
+                        <nav aria-label="Paper results pages" class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                {% if paper_pagination.has_prev %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('main.search', page=paper_pagination.prev_num, q=q, institution=institution_filter, position=position_filter, interests=interests_filter, journal=journal_filter, year=year_filter, sort=sort_by, type=search_type) }}" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                
+                                {% for page_num in paper_pagination.iter_pages() %}
+                                    {% if page_num %}
+                                        {% if page_num != paper_pagination.page %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="{{ url_for('main.search', page=page_num, q=q, institution=institution_filter, position=position_filter, interests=interests_filter, journal=journal_filter, year=year_filter, sort=sort_by, type=search_type) }}">{{ page_num }}</a>
+                                            </li>
+                                        {% else %}
+                                            <li class="page-item active">
+                                                <a class="page-link" href="#">{{ page_num }}</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if paper_pagination.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('main.search', page=paper_pagination.next_num, q=q, institution=institution_filter, position=position_filter, interests=interests_filter, journal=journal_filter, year=year_filter, sort=sort_by, type=search_type) }}" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    {% endif %}
+                </div>
+            {% endif %}
+            
+            <!-- No Results -->
+            {% if not researcher_results and not paper_results %}
+                <div class="row">
                     <div class="col-12">
                         <div class="text-center py-5">
                             <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">No researchers found</h5>
+                            <h5 class="text-muted">No results found</h5>
                             <p class="text-muted">Try adjusting your search criteria or filters</p>
                         </div>
                     </div>
-                {% endif %}
-            </div>
+                </div>
+            {% endif %}
         </div>
 
+{% endblock %}
 
-        <!-- Pagination -->
-        {% if pagination.pages > 1 %}
-        <nav aria-label="Search results pages" class="mt-4">
-            <ul class="pagination justify-content-center">
-                <!-- Previous Page -->
-                {% if pagination.has_prev %}
-                    <li class="page-item">
-                        <a class="page-link" href="{{ url_for('main.search', page=pagination.prev_num, q=q, institution=institution_filter, position=position_filter, interests=interests_filter, sort=sort_by) }}" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                {% else %}
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                {% endif %}
+{% block extra_css %}
+<style>
+/* Search interface styling */
+.search-interface .btn-group .btn {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+}
 
-                <!-- Page Numbers -->
-                {% for page_num in pagination.iter_pages() %}
-                    {% if page_num %}
-                        {% if page_num != pagination.page %}
-                            <li class="page-item">
-                                <a class="page-link" href="{{ url_for('main.search', page=page_num, q=q, institution=institution_filter, position=position_filter, interests=interests_filter, sort=sort_by) }}">{{ page_num }}</a>
-                            </li>
-                        {% else %}
-                            <li class="page-item active">
-                                <a class="page-link" href="#">{{ page_num }}</a>
-                            </li>
-                        {% endif %}
-                    {% else %}
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#">...</a>
-                        </li>
-                    {% endif %}
-                {% endfor %}
+.search-interface .btn-group .btn i {
+    font-size: 0.8rem;
+}
 
-                <!-- Next Page -->
-                {% if pagination.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="{{ url_for('main.search', page=pagination.next_num, q=q, institution=institution_filter, position=position_filter, interests=interests_filter, sort=sort_by) }}" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                {% else %}
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
-        {% endif %}
+.search-interface .form-control {
+    font-size: 1rem;
+}
+
+.search-interface .form-select {
+    font-size: 1rem;
+}
+
+/* Ensure proper spacing and alignment */
+.search-interface .input-group {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.search-interface .btn-group {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .search-interface .btn-group .btn {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.5rem;
+    }
+    
+    .search-interface .btn-group .btn i {
+        font-size: 0.7rem;
+    }
+}
+</style>
 {% endblock %}
 
 {% block extra_js %}

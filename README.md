@@ -83,11 +83,9 @@ The application will start on http://localhost:5000 by default.
 - Placeholder images from [via.placeholder.com](https://via.placeholder.com)  
 - Open-source libraries listed above  
 
-Favicon Attribution
-===================
+### Favicon Attribution
 
-Graduation cap icons created by Freepik - Flaticon
-Source: https://www.flaticon.com/free-icons/graduation-cap
-
-License: Free for personal and commercial use with attribution
+- Graduation cap icons created by Freepik - Flaticon
+- Source: https://www.flaticon.com/free-icons/graduation-cap
+- License: Free for personal and commercial use with attribution
 

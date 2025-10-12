@@ -82,18 +82,20 @@ function saveSectionOrder() {
 function toggleExternalRoles() {
     const externalSection = document.getElementById('external-roles-section');
     const toggleBtn = document.getElementById('toggle-external-roles-btn');
+
+    externalSection.classList.toggle('d-none');
     
-    if (externalSection.style.display === 'none') {
-        externalSection.style.display = 'block';
-        toggleBtn.innerHTML = '<i class="fas fa-eye-slash me-1"></i> Hide External Roles';
+    if (externalSection.classList.contains('d-none')) {
+        toggleBtn.innerHTML = '<i class="fas fa-users me-1"></i> External Roles';
         toggleBtn.classList.remove('btn-outline-primary');
         toggleBtn.classList.add('btn-outline-secondary');
     } else {
-        externalSection.style.display = 'none';
-        toggleBtn.innerHTML = '<i class="fas fa-users me-1"></i> External Roles';
+        toggleBtn.innerHTML = '<i class="fas fa-eye-slash me-1"></i> Hide External Roles';
         toggleBtn.classList.remove('btn-outline-secondary');
         toggleBtn.classList.add('btn-outline-primary');
     }
+
+    saveSectionOrder();
 }
 
 function toggleAchievements() {
@@ -111,6 +113,8 @@ function toggleAchievements() {
         toggleBtn.classList.remove('btn-outline-primary');
         toggleBtn.classList.add('btn-outline-secondary');
     }
+
+    saveSectionOrder();
 }
 
 // Achievement Management

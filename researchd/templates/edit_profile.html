@@ -114,7 +114,7 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     {{ form.institution.label(class="form-label") }}
-                                    {{ form.institution(class="form-control") }}
+                                    {{ form.institution(class="form-select", id="institution-select-edit") }}
                                     {% if form.institution.errors %}
                                         <div class="text-danger">
                                             {% for error in form.institution.errors %}
@@ -122,6 +122,9 @@
                                             {% endfor %}
                                         </div>
                                     {% endif %}
+                                    <div class="form-text">
+                                        Select your institution from the list or choose "Other"
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -135,6 +138,26 @@
                                             {% endfor %}
                                         </div>
                                     {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Other Institution (shown when "Other" is selected) -->
+                        <div class="row" id="other-institution-row-edit" style="display: none;">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    {{ form.other_institution.label(class="form-label") }}
+                                    {{ form.other_institution(class="form-control", placeholder="Enter your institution name") }}
+                                    {% if form.other_institution.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.other_institution.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        If your institution is not in the dropdown, enter it here
+                                    </div>
                                 </div>
                             </div>
                         </div>

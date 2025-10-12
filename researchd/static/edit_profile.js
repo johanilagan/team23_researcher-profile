@@ -47,5 +47,24 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    
+    // Institution dropdown handler - show/hide other institution field
+    const institutionSelect = document.getElementById('institution-select-edit');
+    const otherInstitutionRow = document.getElementById('other-institution-row-edit');
+    
+    if (institutionSelect && otherInstitutionRow) {
+        institutionSelect.addEventListener('change', function() {
+            if (this.value === 'Other') {
+                otherInstitutionRow.style.display = 'block';
+            } else {
+                otherInstitutionRow.style.display = 'none';
+            }
+        });
+        
+        // Check initial state on page load
+        if (institutionSelect.value === 'Other') {
+            otherInstitutionRow.style.display = 'block';
+        }
+    }
 });
 

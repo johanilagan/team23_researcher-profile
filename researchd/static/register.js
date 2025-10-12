@@ -64,5 +64,24 @@ document.addEventListener('DOMContentLoaded', function() {
     passwordField.addEventListener('input', function() {
         updatePasswordRequirements(this.value);
     });
+    
+    // Institution dropdown handler - show/hide other institution field
+    const institutionSelect = document.getElementById('institution-select');
+    const otherInstitutionDiv = document.getElementById('other-institution-div');
+    
+    if (institutionSelect && otherInstitutionDiv) {
+        institutionSelect.addEventListener('change', function() {
+            if (this.value === 'Other') {
+                otherInstitutionDiv.style.display = 'block';
+            } else {
+                otherInstitutionDiv.style.display = 'none';
+            }
+        });
+        
+        // Check initial state on page load
+        if (institutionSelect.value === 'Other') {
+            otherInstitutionDiv.style.display = 'block';
+        }
+    }
 });
 

@@ -19,6 +19,54 @@ TITLE_CHOICES = [
     ('Other', 'Other')
 ]
 
+# Australian institution options
+INSTITUTION_CHOICES = [
+    ('', 'Select Institution'),
+    ('Australian Catholic University', 'Australian Catholic University'),
+    ('Australian National University', 'Australian National University'),
+    ('Avondale University', 'Avondale University'),
+    ('Bond University', 'Bond University'),
+    ('Central Queensland University', 'Central Queensland University'),
+    ('Charles Darwin University', 'Charles Darwin University'),
+    ('Charles Sturt University', 'Charles Sturt University'),
+    ('Curtin University', 'Curtin University'),
+    ('Deakin University', 'Deakin University'),
+    ('Edith Cowan University', 'Edith Cowan University'),
+    ('Federation University Australia', 'Federation University Australia'),
+    ('Flinders University', 'Flinders University'),
+    ('Griffith University', 'Griffith University'),
+    ('James Cook University', 'James Cook University'),
+    ('La Trobe University', 'La Trobe University'),
+    ('Macquarie University', 'Macquarie University'),
+    ('Monash University', 'Monash University'),
+    ('Murdoch University', 'Murdoch University'),
+    ('Queensland University of Technology', 'Queensland University of Technology'),
+    ('RMIT University', 'RMIT University'),
+    ('Southern Cross University', 'Southern Cross University'),
+    ('Swinburne University of Technology', 'Swinburne University of Technology'),
+    ('Torrens University Australia', 'Torrens University Australia'),
+    ('University of Adelaide', 'University of Adelaide'),
+    ('University of Canberra', 'University of Canberra'),
+    ('University of Divinity', 'University of Divinity'),
+    ('University of Melbourne', 'University of Melbourne'),
+    ('University of New England', 'University of New England'),
+    ('University of New South Wales', 'University of New South Wales'),
+    ('University of Newcastle', 'University of Newcastle'),
+    ('University of Notre Dame Australia', 'University of Notre Dame Australia'),
+    ('University of Queensland', 'University of Queensland'),
+    ('University of South Australia', 'University of South Australia'),
+    ('University of Southern Queensland', 'University of Southern Queensland'),
+    ('University of Sydney', 'University of Sydney'),
+    ('University of Tasmania', 'University of Tasmania'),
+    ('University of Technology Sydney', 'University of Technology Sydney'),
+    ('University of the Sunshine Coast', 'University of the Sunshine Coast'),
+    ('University of Western Australia', 'University of Western Australia'),
+    ('University of Wollongong', 'University of Wollongong'),
+    ('Victoria University', 'Victoria University'),
+    ('Western Sydney University', 'Western Sydney University'),
+    ('Other', 'Other (Not Listed)')
+]
+
 class LoginForm(FlaskForm):
     email = StringField("Email", validators=[InputRequired(), Email(), Length(max=150)])
     password = PasswordField("Password", validators=[InputRequired(), Length(min=4)])
@@ -33,7 +81,8 @@ class RegisterForm(FlaskForm):
     password = PasswordField("Password", validators=[InputRequired(), Length(min=4, message="Password must be at least 4 characters long")])
     confirm_password = PasswordField("Confirm Password", validators=[InputRequired(), EqualTo("password", message="Passwords must match")])
 
-    institution = StringField("Institution", validators=[Length(max=150)])
+    institution = SelectField("Institution", choices=INSTITUTION_CHOICES, validators=[Optional()])
+    other_institution = StringField("Other Institution (if not listed)", validators=[Optional(), Length(max=150)])
     position = StringField("Position", validators=[Length(max=100)])
 
     submit = SubmitField("Register")
@@ -42,7 +91,8 @@ class EditProfileForm(FlaskForm):
     title = SelectField("Title", choices=TITLE_CHOICES, validators=[Optional()])
     first_name = StringField("First Name", validators=[InputRequired(), Length(min=1, max=100)])
     last_name = StringField("Last Name", validators=[InputRequired(), Length(min=1, max=100)])
-    institution = StringField("Institution", validators=[Optional(), Length(max=150)])
+    institution = SelectField("Institution", choices=INSTITUTION_CHOICES, validators=[Optional()])
+    other_institution = StringField("Other Institution (if not listed)", validators=[Optional(), Length(max=150)])
     position = StringField("Position", validators=[Optional(), Length(max=100)])
     bio = TextAreaField("Bio", validators=[Optional(), Length(max=1000)])
     location = StringField("Location", validators=[Optional(), Length(max=150)])

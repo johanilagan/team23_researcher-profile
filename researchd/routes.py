@@ -293,12 +293,19 @@ def edit_profile():
             current_user.first_name = form.first_name.data
             current_user.last_name = form.last_name.data
 
+            # Handle institution - use other_institution if "Other" is selected
+            institution_value = form.institution.data
+            if institution_value == 'Other' and form.other_institution.data:
+                institution_value = form.other_institution.data
+            elif institution_value == 'Other':
+                institution_value = None
+
             # Update Profile fields
-            profile.institution = form.institution.data
+            profile.institution = institution_value
             profile.position = form.position.data
             profile.bio = form.bio.data
             profile.location = form.location.data
-            profile.title = form.title.data
+            profile.title = form.title.data if form.title.data else None
             profile.department = form.department.data
 
             # Handle profile picture upload
@@ -362,7 +369,17 @@ def edit_profile():
         form.last_name.data = current_user.last_name
 
         # Pre-populate Profile fields
-        form.institution.data = profile.institution
+        # Check if institution is in the dropdown list
+        from researchd.forms import INSTITUTION_CHOICES
+        institution_values = [choice[0] for choice in INSTITUTION_CHOICES]
+        
+        if profile.institution and profile.institution in institution_values:
+            form.institution.data = profile.institution
+        elif profile.institution:
+            # Institution not in list, set to "Other" and populate other_institution
+            form.institution.data = 'Other'
+            form.other_institution.data = profile.institution
+        
         form.position.data = profile.position
         form.bio.data = profile.bio
         form.location.data = profile.location
@@ -736,10 +753,17 @@ def register():
         db.session.add(user)
         db.session.commit()
 
+        # Handle institution - use other_institution if "Other" is selected
+        institution_value = form.institution.data
+        if institution_value == 'Other' and form.other_institution.data:
+            institution_value = form.other_institution.data
+        elif institution_value == 'Other':
+            institution_value = None
+        
         profile = Profile(
             user_id=user.id,
             title=form.title.data if form.title.data else None,
-            institution=form.institution.data,
+            institution=institution_value,
             position=form.position.data
         )
 

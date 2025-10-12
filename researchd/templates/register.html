@@ -93,9 +93,21 @@
                             </div>
 
                             <!-- Institution -->
-                            <div class="input mb-3">
-                                {{ form.institution(class="form-control", placeholder="Institution") }}
+                            <div class="mb-3">
+                                <label for="institution" class="form-label">Institution</label>
+                                {{ form.institution(class="form-select", id="institution-select") }}
+                                {% for error in form.institution.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            
+                            <!-- Other Institution (shown when "Other" is selected) -->
+                            <div class="input mb-3" id="other-institution-div" style="display: none;">
+                                {{ form.other_institution(class="form-control", placeholder="Enter your institution name") }}
                                 <i class='bx bx-buildings'></i>
+                                {% for error in form.other_institution.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
                             </div>
 
                             <!-- Position -->

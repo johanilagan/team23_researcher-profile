@@ -7,3 +7,4 @@ Werkzeug
 flask_login
 keybert
 PyMuPDF
+flask_migrate

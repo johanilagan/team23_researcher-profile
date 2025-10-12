@@ -82,6 +82,132 @@ function signOut() {
     window.location.href = "/";
 }
 
+// Initialize FAQ Accordion Functionality
+function initAccordion() {
+    const faqQuestions = document.querySelectorAll('.faq-question');
+    
+    if (faqQuestions.length === 0) {
+        return; // No FAQ accordion on this page
+    }
+    
+    console.log('Initializing FAQ accordion for', faqQuestions.length, 'questions');
+    
+    faqQuestions.forEach(function(button) {
+        button.addEventListener('click', function() {
+            // Toggle active class for styling
+            this.classList.toggle('active');
+            
+            // Get the answer panel (next sibling element)
+            const answer = this.nextElementSibling;
+            
+            if (answer && answer.classList.contains('faq-answer')) {
+                // Toggle the max-height for smooth animation
+                if (answer.style.maxHeight) {
+                    // Close the answer
+                    answer.style.maxHeight = null;
+                } else {
+                    // Open the answer
+                    answer.style.maxHeight = answer.scrollHeight + "px";
+                }
+            }
+        });
+    });
+}
+
+// FAQ Search Functionality
+function initFAQSearch() {
+    const searchInput = document.getElementById('faq-search-input');
+    const searchBtn = document.getElementById('faq-search-btn');
+    const resultsCount = document.getElementById('search-results-count');
+    
+    if (!searchInput || !searchBtn) {
+        return; // Not on help centre page
+    }
+    
+    console.log('Initializing FAQ search functionality');
+    
+    function performSearch() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        const faqQuestions = document.querySelectorAll('.faq-question');
+        const faqAnswers = document.querySelectorAll('.faq-answer');
+        const categoryHeadings = document.querySelectorAll('.faq-category-heading');
+        
+        let visibleCount = 0;
+        let matchedCategories = new Set();
+        
+        if (searchTerm === '') {
+            // Show all FAQs and categories
+            faqQuestions.forEach(function(q, index) {
+                q.classList.remove('hidden');
+                faqAnswers[index].classList.remove('hidden');
+            });
+            categoryHeadings.forEach(function(h) {
+                h.classList.remove('hidden');
+            });
+            resultsCount.textContent = '';
+            return;
+        }
+        
+        // Search through FAQs
+        faqQuestions.forEach(function(question, index) {
+            const questionText = question.querySelector('span').textContent.toLowerCase();
+            const answer = faqAnswers[index];
+            const answerText = answer ? answer.textContent.toLowerCase() : '';
+            const category = question.getAttribute('data-category');
+            
+            // Check if search term matches question or answer
+            if (questionText.includes(searchTerm) || answerText.includes(searchTerm)) {
+                question.classList.remove('hidden');
+                answer.classList.remove('hidden');
+                visibleCount++;
+                matchedCategories.add(category);
+            } else {
+                question.classList.add('hidden');
+                answer.classList.add('hidden');
+            }
+        });
+        
+        // Show/hide category headings based on whether they have visible FAQs
+        categoryHeadings.forEach(function(heading) {
+            const category = heading.getAttribute('data-category');
+            if (matchedCategories.has(category)) {
+                heading.classList.remove('hidden');
+            } else {
+                heading.classList.add('hidden');
+            }
+        });
+        
+        // Update results count
+        if (visibleCount === 0) {
+            resultsCount.textContent = 'No results found. Try different keywords.';
+            resultsCount.style.color = '#dc3545';
+        } else if (visibleCount === 1) {
+            resultsCount.textContent = '1 result found';
+            resultsCount.style.color = '#28a745';
+        } else {
+            resultsCount.textContent = visibleCount + ' results found';
+            resultsCount.style.color = '#28a745';
+        }
+    }
+    
+    // Search on button click
+    searchBtn.addEventListener('click', performSearch);
+    
+    // Search on Enter key
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            performSearch();
+        }
+    });
+    
+    // Real-time search as user types (with slight delay)
+    let searchTimeout;
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(performSearch, 300);
+    });
+}
+
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOMContentLoaded event fired');
@@ -98,6 +224,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Check authentication status
     checkAuthStatus();
+    
+    // Initialize accordion
+    initAccordion();
+    
+    // Initialize FAQ search
+    initFAQSearch();
 });
 
 // Bulletproof mobile menu 

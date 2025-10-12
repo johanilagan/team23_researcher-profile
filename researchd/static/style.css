@@ -639,7 +639,7 @@ body {
 @media (max-width: 991.98px) {
     .navbar-collapse.show,
     #navbarNav.show,
-    .collapse.show {
+    .navbar .collapse.show {
         display: block !important;
         visibility: visible !important;
         opacity: 1 !important;
@@ -649,18 +649,18 @@ body {
     
     .navbar-collapse:not(.show),
     #navbarNav:not(.show),
-    .collapse:not(.show) {
+    .navbar .collapse:not(.show) {
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
     }
 }
 
-.navbar-collapse.collapse {
+.navbar .navbar-collapse.collapse {
     display: none;
 }
 
-.navbar-collapse.collapse.show {
+.navbar .navbar-collapse.collapse.show {
     display: block !important;
 }
 
@@ -1508,58 +1508,122 @@ body {
     border-radius: 15px;
 }
 
-/* Accordion Styles */
-.accordion-item {
+/* FAQ Accordion Styles */
+.faq-accordion {
+    width: 100%;
+}
+
+.faq-category-heading {
+    color: #667eea;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 3px solid #FF1493;
+}
+
+.faq-category-heading:first-of-type {
+    margin-top: 0;
+}
+
+.faq-question {
+    background: white;
+    color: #2c3e50;
+    cursor: pointer;
+    padding: 1.25rem;
+    width: 100%;
     border: 1px solid #ffb3d9;
     border-radius: 10px;
-    margin-bottom: 1rem;
-    overflow: hidden;
-}
-
-.accordion-button {
-    background: white;
-    border: none;
-    color: #2c3e50;
+    text-align: left;
+    outline: none;
+    font-size: 16px;
     font-weight: 600;
-    padding: 1.25rem;
-    cursor: pointer;
     transition: all 0.3s ease;
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.accordion-button:hover {
+.faq-question.hidden {
+    display: none;
+}
+
+.faq-category-heading.hidden {
+    display: none;
+}
+
+.faq-question:hover {
     background-color: #fff0f5;
 }
 
-.accordion-button:not(.collapsed) {
+.faq-question.active {
     background: linear-gradient(135deg, #FF1493 0%, #FF69B4 100%);
     color: white;
 }
 
-.accordion-button:focus {
-    box-shadow: none;
-    border-color: #FF1493;
+.faq-question i {
+    transition: transform 0.3s ease;
 }
 
-.accordion-body {
-    background: #fff0f5;
+.faq-question.active i {
+    transform: rotate(180deg);
+}
+
+.faq-answer {
+    background-color: #fff0f5;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    border-left: 3px solid #FF1493;
+    margin-bottom: 1rem;
+}
+
+.faq-answer-content {
+    padding: 1.25rem;
     color: #555;
     line-height: 1.6;
-    padding: 1.25rem;
 }
 
-/* Ensure accordion collapse works properly */
-.accordion-collapse {
-    transition: height 0.3s ease;
+.faq-answer-content a {
+    color: #FF1493;
+    text-decoration: none;
 }
 
-/* Remove these display overrides as they interfere with Bootstrap's collapse functionality */
-/* .accordion-collapse.show {
-    display: block;
+.faq-answer-content a:hover {
+    text-decoration: underline;
 }
 
-.accordion-collapse:not(.show) {
-    display: none;
-} */
+/* Dark theme support for FAQ */
+[data-theme="dark"] .faq-category-heading {
+    color: #9f7aea;
+    border-bottom-color: #FF69B4;
+}
+
+[data-theme="dark"] .faq-question {
+    background: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #444;
+}
+
+[data-theme="dark"] .faq-question:hover {
+    background-color: #333;
+}
+
+[data-theme="dark"] .faq-question.active {
+    background: linear-gradient(135deg, #FF1493 0%, #FF69B4 100%);
+    color: white;
+}
+
+[data-theme="dark"] .faq-answer {
+    background-color: #1a1a1a;
+    border-left-color: #FF1493;
+}
+
+[data-theme="dark"] .faq-answer-content {
+    color: #b0b0b0;
+}
 
 /* Form Enhancements */
 .form-control:focus,

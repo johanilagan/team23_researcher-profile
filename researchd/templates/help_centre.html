@@ -20,11 +20,12 @@
             <div class="row justify-content-center">
                 <div class="col-lg-6">
                     <div class="input-group input-group-lg">
-                        <input type="text" class="form-control" placeholder="Search for help topics...">
-                        <button class="btn btn-primary" type="button">
+                        <input type="text" class="form-control" id="faq-search-input" placeholder="Search for help topics...">
+                        <button class="btn btn-primary" type="button" id="faq-search-btn">
                             <i class="fas fa-search"></i> Search
                         </button>
                     </div>
+                    <div id="search-results-count" class="text-center mt-2 text-muted"></div>
                 </div>
             </div>
         </div>
@@ -40,7 +41,6 @@
                             </div>
                             <h5 class="card-title">Getting Started</h5>
                             <p class="card-text text-muted">Learn how to create an account, set up your profile, and make your first connections.</p>
-                            <a href="#" class="btn btn-outline-primary">View Guide</a>
                         </div>
                     </div>
                 </div>
@@ -53,7 +53,6 @@
                             </div>
                             <h5 class="card-title">Search & Discovery</h5>
                             <p class="card-text text-muted">Master the search features to find researchers, papers, and collaboration opportunities.</p>
-                            <a href="#" class="btn btn-outline-primary">View Guide</a>
                         </div>
                     </div>
                 </div>
@@ -66,7 +65,6 @@
                             </div>
                             <h5 class="card-title">Profile Management</h5>
                             <p class="card-text text-muted">Keep your profile updated, add publications, and showcase your research.</p>
-                            <a href="#" class="btn btn-outline-primary">View Guide</a>
                         </div>
                     </div>
                 </div>
@@ -74,61 +72,469 @@
         </div>
 
         <!-- FAQ Section -->
-        <div class="container mt-5">
+        <div class="container mt-5 mb-5">
             <div class="row justify-content-center">
-                <div class="col-lg-8">
+                <div class="col-lg-10">
                     <h2 class="text-center mb-5">Frequently Asked Questions</h2>
                     
-                    <div class="accordion" id="faqAccordion">
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="faq1">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
-                                    How do I create a Research'D account?
-                                </button>
-                            </h2>
-                            <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="faq1" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    Creating an account is simple! Click the "Register" button in the top navigation, fill in your details, and verify your email address. You'll be able to start building your research profile immediately.
-                                </div>
+                    <div class="faq-accordion">
+                        <!-- GETTING STARTED -->
+                        <h3 class="faq-category-heading" data-category="getting-started">
+                            <i class="fas fa-rocket me-2"></i>Getting Started
+                        </h3>
+                        
+                        <button class="faq-question" data-category="getting-started">
+                            <span>How do I create a Research'D account?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Creating an account is simple! Click the "Register" button in the top navigation bar, fill in your details including your email, password, first and last name, institution, and position. Once you submit the form, you'll be redirected to the login page where you can sign in and start building your research profile immediately.
                             </div>
                         </div>
                         
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="faq2">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
-                                    Can I edit my profile after creation?
-                                </button>
-                            </h2>
-                            <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="faq2" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    Yes! You can edit your profile at any time. Simply go to your profile page and click the "Edit Profile" button. You can update your information, add publications, and modify your research interests.
-                                </div>
+                        <button class="faq-question" data-category="getting-started">
+                            <span>What information is required vs optional on my profile?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Required information includes: email, password, first name, last name, institution, and position. Optional fields include: title, department, bio, location, profile picture, research interests, social media links, achievements, and external roles. While optional, filling out these fields makes your profile more comprehensive and discoverable.
                             </div>
                         </div>
                         
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="faq3">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
-                                    How do I find other researchers?
-                                </button>
-                            </h2>
-                            <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="faq3" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    Use the search function to find researchers by name, institution, research field, or keywords. You can also browse through search results and filter by various criteria to find the perfect collaboration partners.
-                                </div>
+                        <!-- PROFILE MANAGEMENT -->
+                        <h3 class="faq-category-heading" data-category="profile-management">
+                            <i class="fas fa-user-edit me-2"></i>Profile Management
+                        </h3>
+                        
+                        <button class="faq-question" data-category="profile-management">
+                            <span>How do I edit my profile?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                To edit your profile, click on "Profile" in the navigation menu, then click the "Edit Profile" button. You can update your personal information, institution, position, department, bio, location, and social media links. Don't forget to save your changes when you're done!
                             </div>
                         </div>
                         
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="faq4">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
-                                    Is Research'D free to use?
+                        <button class="faq-question" data-category="profile-management">
+                            <span>How do I change my profile picture?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                You can change your profile picture in two ways: 1) Go to your profile page and click the camera icon on your profile picture, or 2) Use the "Edit Profile" page and upload a new profile picture there. Supported formats include JPG, PNG, and GIF.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="profile-management">
+                            <span>How do I add or edit my research interests?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                On your profile page, look for the "Research Interests" section. If you're the profile owner, you can click the edit icon to modify your research interests. Simply enter your interests separated by commas, and click save. These interests will be visible to other researchers and used in search functionality.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="profile-management">
+                            <span>How often should I update my profile?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Update your profile whenever there are significant changes: when you publish new papers, receive awards or grants, change institutions, take on new roles, or shift your research focus. Keeping your profile current ensures other researchers can find accurate information about your work and interests.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="profile-management">
+                            <span>What if my institution isn't showing up in searches?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                You can manually type your institution name in the institution field. Make sure to use the full official name of your institution for consistency. If you move to a new institution, simply update your profile with the new information.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="profile-management">
+                            <span>What makes a good researcher profile?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                A strong profile includes: 1) A clear, professional profile picture, 2) A comprehensive bio highlighting your research focus and background, 3) Detailed research interests with specific keywords, 4) Up-to-date publications with complete information, 5) Achievements and awards, 6) External roles that showcase your involvement in the research community, and 7) Contact information and social media links. Complete profiles are more discoverable and appear more credible to potential collaborators.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="profile-management">
+                            <span>Can I customize which sections appear on my profile?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Yes! You can show or hide certain sections on your profile. Look for the "Add/Delete Section" buttons on your profile page. You can toggle the visibility of sections like Papers and Research Interests. You can also drag and drop sections to reorder them on your profile page.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="profile-management">
+                            <span>How do I add social media links to my profile?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Go to "Edit Profile" and scroll down to the Social Media Links section. You can add URLs for LinkedIn, Twitter, Instagram, and GitHub. These links will appear on your profile page, making it easy for other researchers to connect with you on different platforms.
+                            </div>
+                        </div>
+                        
+                        <!-- ACHIEVEMENTS & EXTERNAL ROLES -->
+                        <h3 class="faq-category-heading" data-category="achievements">
+                            <i class="fas fa-trophy me-2"></i>Achievements & External Roles
+                        </h3>
+                        
+                        <button class="faq-question" data-category="achievements">
+                            <span>What are External Roles and how do I add them?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                External Roles are positions you hold outside your primary institution, such as visiting professor positions, editorial board memberships, committee roles, or advisory positions. To add them, go to your profile and click the "External Roles" button. You can add multiple roles with details including role title, organization, start/end year, and description. You can also reorder them by dragging and dropping.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="achievements">
+                            <span>How do I add achievements to my profile?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                On your profile page, click the "Achievements" button. You can add various types of achievements including awards, grants, honors, certifications, and other recognitions. For each achievement, provide a title, type, year received, and optional description. You can reorder achievements by dragging them to emphasize your most important accomplishments.
+                            </div>
+                        </div>
+                        
+                        <!-- PAPER MANAGEMENT -->
+                        <h3 class="faq-category-heading" data-category="papers">
+                            <i class="fas fa-file-alt me-2"></i>Paper Management
+                        </h3>
+                        
+                        <button class="faq-question" data-category="papers">
+                            <span>How do I upload a research paper?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Click on "Profile" and then the "Upload Paper" button. Fill in the paper details including title, authors, journal, publication year, DOI, URL, abstract, and keywords. You can also upload a PDF file of your paper. The system supports automatic keyword extraction from PDF files to make the process easier. Once submitted, your paper will appear on your profile and in search results.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="papers">
+                            <span>Can I edit or delete papers I've uploaded?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Yes! Navigate to "My Papers" from your profile to see all your uploaded papers. From there, you can click on individual papers to view details, edit information, or delete them if needed. When editing, you can update all paper details and even replace the PDF file.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="papers">
+                            <span>What file formats are supported for paper uploads?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Currently, Research'D supports PDF files for paper uploads. Make sure your file is in PDF format before uploading. The system can also extract keywords automatically from your PDF to help populate the keywords field.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="papers">
+                            <span>Can I add multiple authors to a paper?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Yes! When uploading or editing a paper, use the "Authors" field to list all co-authors. Separate multiple authors with commas. Include yourself in the author list if you contributed to the paper.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="papers">
+                            <span>How do I add keywords to my papers?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                When uploading or editing a paper, you can manually enter keywords in the keywords field, or use the automatic keyword extraction feature if you've uploaded a PDF. Keywords help other researchers find your papers through search. Separate multiple keywords with commas.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="papers">
+                            <span>Should I add papers I co-authored but didn't lead?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Yes! Add all papers you contributed to, regardless of your author position. Make sure to list all co-authors accurately in the authors field. This provides a complete picture of your research contributions and helps others find your collaborative work.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="papers">
+                            <span>Can I link my papers to external databases like Google Scholar or ORCID?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                While direct integration with Google Scholar or ORCID is not currently available, you can include DOIs and URLs for your papers, which link to official publication sources. You can also add links to your Google Scholar profile or ORCID in your bio or social media links section.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="papers">
+                            <span>How do I download or view papers uploaded by other researchers?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                When viewing a paper's details, if a PDF is available, you'll see a download or view button. Click it to open the paper in your browser. You can also use any DOI or URL links provided to access the paper through official publication channels.
+                            </div>
+                        </div>
+                        
+                        <!-- SEARCH & DISCOVERY -->
+                        <h3 class="faq-category-heading" data-category="search">
+                            <i class="fas fa-search me-2"></i>Search & Discovery
+                        </h3>
+                        
+                        <button class="faq-question" data-category="search">
+                            <span>How do I search for researchers?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Click on "Search" in the navigation menu. You can search by researcher name, institution, position, or research interests. Use the filter options on the left to narrow down results by institution, position, or specific research interests. You can also sort results by name, institution, or position.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="search">
+                            <span>How do I search for research papers?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                On the Search page, switch to the "Papers" tab. You can search papers by title, authors, journal, abstract, or keywords. Filter results by journal name or publication year. Sort options include year, title, journal, or creation date to help you find the most relevant research.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="search">
+                            <span>Can I search for both researchers and papers at the same time?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Yes! On the Search page, select the "All" tab to search both researchers and papers simultaneously. This is useful when you're exploring a research topic and want to find both the people working in the field and their published work.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="search">
+                            <span>What should I do if I can't find a specific researcher?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                If you can't find a researcher, try different search terms: use their full name, try alternative spellings, search by their institution, or look for their published papers. The researcher may not have created an account yet, or they might be listed under a different name variation.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="search">
+                            <span>Why isn't my profile appearing in search results?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                If your profile isn't showing up in searches, check that: 1) You've completed your basic profile information (name, institution, position), 2) Your research interests contain relevant keywords, 3) You've added content like papers or achievements. Newly created profiles should appear in search results immediately, but having more complete information improves visibility.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="search">
+                            <span>How can I make my profile more visible to other researchers?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                To increase your profile's visibility: 1) Complete all profile sections including bio, research interests, and institution, 2) Upload your research papers with detailed abstracts and keywords, 3) Add achievements and external roles, 4) Include social media links, and 5) Keep your information up-to-date. Profiles with more complete information appear more prominently in search results.
+                            </div>
+                        </div>
+                        
+                        <!-- COLLABORATION & NETWORKING -->
+                        <h3 class="faq-category-heading" data-category="networking">
+                            <i class="fas fa-users me-2"></i>Collaboration & Networking
+                        </h3>
+                        
+                        <button class="faq-question" data-category="networking">
+                            <span>How do I contact other researchers?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                You can find researchers' contact information on their profile pages. Many researchers include their email addresses, social media links (LinkedIn, Twitter, GitHub), and institutional affiliations. Use these channels to reach out for collaboration or networking opportunities.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="networking">
+                            <span>Can I view other researchers' profiles?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Yes! You can view any researcher's profile by clicking on their name in search results or paper listings. Their public profile will show their bio, research interests, publications, achievements, external roles, and contact information if they've chosen to share it.
+                            </div>
+                        </div>
+                        
+                        <!-- ACCOUNT MANAGEMENT -->
+                        <h3 class="faq-category-heading" data-category="account">
+                            <i class="fas fa-user-cog me-2"></i>Account Management
+                        </h3>
+                        
+                        <button class="faq-question" data-category="account">
+                            <span>How do I change my password?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Password management features are currently being developed. In the meantime, please keep your current password secure and use a strong, unique password for your account.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="account">
+                            <span>What should I do if I forgot my password?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Password recovery features are currently being developed. Make sure to remember your password or store it securely. We recommend using a password manager to keep track of your login credentials.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="account">
+                            <span>Can I have multiple accounts?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Each user should maintain only one Research'D account. If you need to update your information (such as changing institutions or positions), simply edit your existing profile rather than creating a new account. This helps maintain profile continuity and prevents confusion.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="account">
+                            <span>How do I delete my account?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Account deletion features are currently being developed. If you urgently need to delete your account, you can remove all personal information from your profile as a temporary measure. Be aware that deleting your account will remove all your profile information, papers, and associated data permanently.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="account">
+                            <span>Can I export my data from Research'D?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Data export features are being developed. In the meantime, you can manually copy your profile information and download any papers you've uploaded directly from your profile and papers pages.
+                            </div>
+                        </div>
+                        
+                        <!-- PRIVACY & SECURITY -->
+                        <h3 class="faq-category-heading" data-category="privacy">
+                            <i class="fas fa-shield-alt me-2"></i>Privacy & Security
+                        </h3>
+                        
+                        <button class="faq-question" data-category="privacy">
+                            <span>Is my information private and secure?</span>
+                            <i class="fas fa-chevron-down"></i>
                                 </button>
-                            </h2>
-                            <div id="collapse4" class="accordion-collapse collapse" aria-labelledby="faq4" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    Research'D offers both free and premium features. Basic account creation, profile management, and search functionality are completely free. Premium features include advanced analytics and enhanced collaboration tools.
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Research'D takes your privacy and security seriously. Your password is securely hashed and stored. Profile information you choose to share is visible to other users to facilitate academic networking, but you control what information you add. For more details, please review our <a href="{{ url_for('main.privacy') }}">Privacy Policy</a>.
+                            </div>
                                 </div>
+                        
+                        <button class="faq-question" data-category="privacy">
+                            <span>Is Research'D free to use?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Yes! All current features of Research'D are completely free to use. This includes account creation, profile management, paper uploads, search functionality, and all networking features.
+                            </div>
+                        </div>
+                        
+                        <!-- TECHNICAL SUPPORT -->
+                        <h3 class="faq-category-heading" data-category="technical">
+                            <i class="fas fa-cog me-2"></i>Technical Information
+                        </h3>
+                        
+                        <button class="faq-question" data-category="technical">
+                            <span>Which browsers are supported?</span>
+                            <i class="fas fa-chevron-down"></i>
+                                </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Research'D works best on modern browsers including Google Chrome, Mozilla Firefox, Safari, and Microsoft Edge. Make sure your browser is updated to the latest version for the best experience. Most features also work on mobile browsers.
+                            </div>
+                                </div>
+                        
+                        <button class="faq-question" data-category="technical">
+                            <span>Can I access Research'D on my mobile device?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Yes! Research'D is fully responsive and works on mobile phones and tablets. You can browse profiles, search for researchers and papers, and even upload content from your mobile device. The interface automatically adapts to your screen size.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="technical">
+                            <span>How do I switch between light and dark mode?</span>
+                            <i class="fas fa-chevron-down"></i>
+                                </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Click the moon/sun icon in the navigation bar to toggle between light and dark themes. Your preference will be saved and applied automatically when you return to the site.
+                            </div>
+                                </div>
+                        
+                        <!-- TROUBLESHOOTING -->
+                        <h3 class="faq-category-heading" data-category="troubleshooting">
+                            <i class="fas fa-tools me-2"></i>Troubleshooting
+                        </h3>
+                        
+                        <button class="faq-question" data-category="troubleshooting">
+                            <span>What should I do if I find a duplicate or incorrect profile?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                If you find a duplicate profile of yourself, you can simply use one profile and leave the other inactive. Make sure your primary profile is complete and up-to-date. For incorrect information on other profiles, remember that users are responsible for maintaining their own profile information.
+                            </div>
+                        </div>
+                        
+                        <button class="faq-question" data-category="troubleshooting">
+                            <span>My uploaded file isn't showing correctly. What should I do?</span>
+                            <i class="fas fa-chevron-down"></i>
+                                </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                If you're having trouble with uploaded files: 1) Ensure the file is in PDF format and not corrupted, 2) Check that the file size isn't too large (try compressing large files), 3) Try uploading again with a fresh copy of the file, 4) Clear your browser cache and cookies, then try again. If problems persist, try using a different browser.
+                            </div>
+                                </div>
+                        
+                        <button class="faq-question" data-category="troubleshooting">
+                            <span>The site isn't working properly. What should I do?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                If you experience technical issues: 1) Try refreshing the page (Ctrl+R or Cmd+R), 2) Clear your browser cache and cookies, 3) Try a different browser, 4) Check your internet connection, 5) Ensure your browser is up-to-date. Most issues can be resolved with these basic troubleshooting steps.
                             </div>
                         </div>
                     </div>
@@ -137,12 +543,12 @@
         </div>
 
         <!-- Contact Support Section -->
-        <div class="container mt-5">
+        <div class="container mt-5 mb-5">
             <div class="row justify-content-center">
                 <div class="col-lg-8 text-center">
                     <div class="support-section p-5 bg-light rounded">
                         <h3 class="mb-4">Still Need Help?</h3>
-                        <p class="text-muted mb-4">If you can't find what you're looking for, please refer to the FAQs above or browse through the available documentation.</p>
+                        <p class="text-muted mb-4">Browse through the FAQ categories above or use the search function to find answers to your questions. Most common issues can be resolved by following the troubleshooting steps provided.</p>
                     </div>
                 </div>
             </div>

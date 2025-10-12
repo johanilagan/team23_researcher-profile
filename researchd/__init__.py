@@ -2,12 +2,14 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
+from flask_migrate import Migrate
 import os
 from sqlalchemy import inspect
 from flask_login import current_user
 
 db = SQLAlchemy()
 csrf = CSRFProtect()
+migrate = Migrate()
 
 def create_app():
     app = Flask(__name__)
@@ -23,6 +25,9 @@ def create_app():
 
     # CSRF Protection setup
     csrf.init_app(app)
+
+    # Flask-Migrate setup
+    migrate.init_app(app, db)
 
     # Flask-Login setup
     login_manager = LoginManager()
@@ -45,7 +50,6 @@ def create_app():
     app.register_blueprint(main)
 
     with app.app_context():
-        db.create_all()
         inspector = inspect(db.engine)
         print("Tables created:", inspector.get_table_names())
 

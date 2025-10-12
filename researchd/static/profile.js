@@ -82,18 +82,20 @@ function saveSectionOrder() {
 function toggleExternalRoles() {
     const externalSection = document.getElementById('external-roles-section');
     const toggleBtn = document.getElementById('toggle-external-roles-btn');
+
+    externalSection.classList.toggle('d-none');
     
-    if (externalSection.style.display === 'none') {
-        externalSection.style.display = 'block';
-        toggleBtn.innerHTML = '<i class="fas fa-eye-slash me-1"></i> Hide External Roles';
+    if (externalSection.classList.contains('d-none')) {
+        toggleBtn.innerHTML = '<i class="fas fa-users me-1"></i> External Roles';
         toggleBtn.classList.remove('btn-outline-primary');
         toggleBtn.classList.add('btn-outline-secondary');
     } else {
-        externalSection.style.display = 'none';
-        toggleBtn.innerHTML = '<i class="fas fa-users me-1"></i> External Roles';
+        toggleBtn.innerHTML = '<i class="fas fa-eye-slash me-1"></i> Hide External Roles';
         toggleBtn.classList.remove('btn-outline-secondary');
         toggleBtn.classList.add('btn-outline-primary');
     }
+
+    saveSectionOrder();
 }
 
 function toggleAchievements() {
@@ -111,6 +113,8 @@ function toggleAchievements() {
         toggleBtn.classList.remove('btn-outline-primary');
         toggleBtn.classList.add('btn-outline-secondary');
     }
+
+    saveSectionOrder();
 }
 
 // Achievement Management
@@ -403,6 +407,45 @@ function addAchievementWithModal() {
     }, 100);
 }
 
+function addAchievementToDOM(ach) {
+    const list = document.getElementById('achievements-list');
+    if (!list) return;
+
+    const emptyState = list.querySelector('.empty-state');
+    if (emptyState) emptyState.remove();
+
+    const div = document.createElement('div');
+    div.className = 'list-group-item d-flex justify-content-between align-items-center';
+    div.dataset.achid = ach.aid;
+    div.style.cursor = 'move';
+
+    let year = ach.year ? `<small class="text-muted">(${ach.year})</small>` : '';
+    let typeBadge = ach.type ? `<span class="badge bg-secondary">${ach.type}</span>` : '';
+
+    div.innerHTML = `
+        <div>
+            <strong>${escapeHtml(ach.title)}</strong> ${typeBadge} ${year}
+            ${ach.description ? `<p class="mb-0 text-muted">${escapeHtml(ach.description)}</p>` : ''}
+        </div>
+        <div>
+            <button class="btn btn-sm btn-danger" onclick="deleteAchievement('${ach.aid}')" title="Delete this achievement">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `;
+
+    list.appendChild(div);
+
+    // Add drag instructions if more than 1 item
+    const instructions = document.querySelector('.drag-instructions-achievements');
+    if (!instructions && list.children.length > 1) {
+        const small = document.createElement('small');
+        small.className = 'text-muted mt-2 d-block drag-instructions-achievements';
+        small.innerHTML = '<i class="fas fa-grip-vertical me-1"></i>Drag and drop to reorder achievements';
+        list.parentNode.appendChild(small);
+    }
+}
+
 function closeAchievementModal() {
     const modal = document.getElementById('addAchievementModal');
     if (modal) {
@@ -441,16 +484,9 @@ async function submitAchievement() {
             document.getElementById("achievementYear").value = "";
             document.getElementById("achievementDescription").value = "";
 
-            // Append to list
-            const list = document.getElementById("achievements-list");
-            if (list) {
-                const item = document.createElement("li");
-                item.className = "list-group-item";
-                item.innerHTML = `
-                    <strong>${result.title}</strong> (${result.year || "N/A"}) - ${result.type}
-                    <p class="text-muted mb-0">${result.description || ""}</p>
-                `;
-                list.appendChild(item);
+            // Append to list via helper
+            if (typeof addAchievementToDOM === 'function') {
+                addAchievementToDOM(result);
             }
 
             // Close modal

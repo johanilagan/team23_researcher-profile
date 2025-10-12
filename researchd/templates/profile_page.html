@@ -220,13 +220,11 @@
                 </div>
             </div>
         </div>
-        {% endif %}
-        {% endfor %}
 
-        
+        {% elif s.section == 'external-roles-section' %}        
         <!-- External Positions / Roles (placed under buttons section) -->
-        <div class="papers-section external-roles-section mt-4" id="external-roles-section" style="display: none;">
-            <div class="profile-section" data-section="external-roles-section">
+        <div class="external-roles-section mt-4 {% if not s.visible %}d-none{% endif %}" id="external-roles-section" data-section="external-roles-section">
+            <div class="profile-section">
                 <div class="section-header">
                     <h2><i class="fas fa-users me-2"></i>External Roles</h2>
                     {% if is_owner %}
@@ -283,9 +281,10 @@
             </div>
         </div>
 
+        {% elif s.section == 'achievements-section' %}
         <!-- Achievements Section -->
-        <div class="papers-section achievements-section mt-4 {% if profile.achievements %}d-block{% else %}d-none{% endif %}" id="achievements-section">
-            <div class="profile-section" data-section="achievements-section">
+        <div class="achievements-section mt-4 {% if not s.visible %}d-none{% endif %}" id="achievements-section" data-section="achievements-section">
+            <div class="profile-section">
                 <div class="section-header">
                     <h2><i class="fas fa-trophy me-2"></i>Achievements</h2>
                     {% if is_owner %}
@@ -301,9 +300,9 @@
                 </div>
 
                 <div id="achievements-list" class="list-group">
-                    {% if profile.achievements %}
-                        {% for ach in profile.achievements %}
-                        <div class="list-group-item d-flex justify-content-between align-items-center" data-achid="{{ ach.achid }}" style="cursor: move;">
+                    {% if achievements %}
+                        {% for ach in achievements %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center" data-achid="{{ ach.aid }}" style="cursor: move;">
                             <div>
                                 <strong>{{ ach.title }}</strong>
                                 {% if ach.type %}<span class="badge bg-secondary">{{ ach.type }}</span>{% endif %}
@@ -342,7 +341,10 @@
                 </div>
             </div>
         </div>
+        {% endif %}
+        {% endfor %}
     </div>
+
 
     <!-- Modals -->
 

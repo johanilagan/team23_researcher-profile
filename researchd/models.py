@@ -49,7 +49,7 @@ class Profile(db.Model):
     files = db.relationship("File", back_populates="profile", cascade="all, delete-orphan", passive_deletes=True)
     photos = db.relationship("Photo", back_populates="profile", cascade="all, delete-orphan", passive_deletes=True)
     socials = db.relationship("Social", back_populates="profile", cascade="all, delete-orphan", passive_deletes=True)
-    achievements = db.relationship("Achievement", back_populates="profile", cascade="all, delete-orphan", passive_deletes=True)
+    achievements = db.relationship("Achievement", back_populates="profile", cascade="all, delete-orphan", passive_deletes=True, order_by="Achievement.sort_order")
     external_roles = db.relationship("ExternalRole", back_populates="profile", cascade="all, delete-orphan", passive_deletes=True, order_by="ExternalRole.sort_order")
 
 
@@ -84,6 +84,7 @@ class Achievement(db.Model):
     description = db.Column(db.Text)
     year = db.Column(db.Integer)
     type = db.Column(db.String(100))  # e.g., 'Award', 'Grant', or 'Funds'
+    sort_order = db.Column(db.Integer, nullable=True, index=True)
 
     profile = db.relationship("Profile", back_populates="achievements")
 

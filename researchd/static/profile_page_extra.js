@@ -40,6 +40,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }
+
+        // Initialize sortable for Achievements list if present
+        const achList = document.getElementById('achievements-list');
+        if (achList) {
+            new Sortable(achList, {
+                animation: 150,
+                handle: '.list-group-item',
+                onEnd: function () {
+                    console.log("Achievement dragged!");
+                    const order = Array.from(achList.querySelectorAll('.list-group-item[data-achid]'))
+                        .map(item => item.dataset.achid)
+                        .filter(id => id); // Filter out any undefined or null ids
+                    console.log("New order to send:", order);
+
+                    if (order.length && typeof makeCSRFRequest === 'function') {
+                        makeCSRFRequest('/update_achievement_order', {
+                            method: 'POST',
+                            body: JSON.stringify({ order: order })
+                        })
+                        .then(r => r.json())
+                        .then(data => {
+                            console.log("Response from server:", data);
+                            if (data.success) showNotification('Achievements order updated!', 'success');
+                            else showNotification('Error updating achievements order', 'error');
+                        })
+                        .catch(err => console.error("Request failed:", err));
+                    }
+                }
+            })
+        }
     }
 });
 

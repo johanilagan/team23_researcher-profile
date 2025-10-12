@@ -31,7 +31,6 @@ def home():
 @main.route("/profile")
 @login_required
 def my_profile():
-    print(">>> Running MY_PROFILE route <<<")
     # Get fresh user data with profile
     user = User.query.get(current_user.id)
     
@@ -68,11 +67,14 @@ def my_profile():
     # Load external roles
     external_roles = ExternalRole.query.filter_by(pid=profile.pid).order_by(ExternalRole.sort_order.nulls_last(), ExternalRole.start_year.desc().nulls_last()).all()
 
+    # Load achievements in saved order
+    achievements = Achievement.query.filter_by(pid=profile.pid).order_by(Achievement.sort_order.nulls_last()).all()
+
     print("Loaded section_order:", section_order)
     for s in section_order:
         print(s['section'], s['visible'], type(s['visible']))
     
-    return render_template("profile_page.html", profile=profile, is_owner=True, publications=publications, section_order=section_order, external_roles=external_roles)
+    return render_template("profile_page.html", profile=profile, is_owner=True, publications=publications, section_order=section_order, external_roles=external_roles, achievements=achievements)
 
 @main.route("/profile/<int:researcher_id>")
 def researcher_profile(researcher_id):
@@ -114,8 +116,11 @@ def researcher_profile(researcher_id):
 
     # Load external roles
     external_roles = ExternalRole.query.filter_by(pid=profile.pid).order_by(ExternalRole.sort_order.nulls_last(), ExternalRole.start_year.desc().nulls_last()).all()
+
+    # Load achievements
+    achievements = Achievement.query.filter_by(pid=profile.pid).order_by(Achievement.sort_order.nulls_last()).all()
     
-    return render_template("profile_page.html", profile=profile, is_owner=is_owner, publications=publications, section_order=section_order, external_roles=external_roles)
+    return render_template("profile_page.html", profile=profile, is_owner=is_owner, publications=publications, section_order=section_order, external_roles=external_roles, achievements=achievements)
 
 @main.route("/search")
 def search():
@@ -942,29 +947,18 @@ def delete_achievement(aid):
 @main.route("/update_achievement_order", methods=["POST"])
 @login_required
 def update_achievement_order():
-    if not validate_csrf_token():
-        return jsonify({'success': False, 'error': 'Invalid CSRF token'}), 400
-    
     try:
         data = request.get_json()
         order = data.get("order", [])
-        if not isinstance(order, list):
-            return jsonify({"success": False, "error": "Invalid order"}), 400
-
-        profile = Profile.query.filter_by(user_id=current_user.id).first()
-        if not profile:
-            return jsonify({"success": False, "error": "Profile not found"}), 404
-
-        # Assign sort_order based on incoming order list of aids
-        for index, aid in enumerate(order, start=1):
-            ach = Achievement.query.filter_by(aid=int(aid), pid=profile.pid).first()
+        for idx, achid in enumerate(order, start=1):
+            ach = Achievement.query.get(int(achid))
             if ach:
-                ach.sort_order = index
+                ach.sort_order = idx
         db.session.commit()
         return jsonify({"success": True})
     except Exception as e:
-        db.session.rollback()
-        return jsonify({"success": False, "error": str(e)}), 500
+        print("Error updating achievements:", e)
+        return jsonify({"success": False, "error": str(e)})
     
 @main.route('/extract_keywords', methods=['POST'])
 @csrf.exempt

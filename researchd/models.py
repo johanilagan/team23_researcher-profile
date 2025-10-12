@@ -34,13 +34,19 @@ class Profile(db.Model):
     institution = db.Column(db.String(150))
     department = db.Column(db.String(150))
     bio = db.Column(db.Text)
-    pfp = db.Column(db.String(255))  # profile picture URL
+    pfp = db.Column(db.String(255), default='default_pfp.png')  # profile picture URL
     location = db.Column(db.String(150))
     research_interests = db.Column(db.Text)  # comma-separated research interests
     section_order = db.Column(db.Text, nullable=True) #JSON-encoded list of section keys
     position = db.Column(db.String(150))
     
     user = db.relationship('User', backref=db.backref('profile', uselist=False))
+
+    def get_profile_picture(self):
+        """Return profile picture path, or default if not set"""
+        if self.pfp and self.pfp.strip():
+            return self.pfp
+        return 'default_pfp.png'
 
     # collections
     educations = db.relationship("Education", back_populates="profile", cascade="all, delete-orphan", passive_deletes=True)

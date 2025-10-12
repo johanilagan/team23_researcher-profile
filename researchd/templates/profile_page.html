@@ -69,7 +69,7 @@
                                 <img id="profile-pic" src="{% if profile.pfp.startswith('http') %}{{ profile.pfp }}{% else %}{{ url_for('static', filename=profile.pfp) }}{% endif %}" 
                                     alt="Profile Picture" class="profile-pic">
                             {% else %}
-                                <img id="profile-pic" src="{{ url_for('static', filename='placeholder.png') }}" 
+                                <img id="profile-pic" src="{{ url_for('static', filename='default_pfp.png') }}" 
                                     alt="Profile Picture" class="profile-pic">
                             {% endif %}
                             {% if is_owner %}

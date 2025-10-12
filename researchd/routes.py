@@ -37,7 +37,7 @@ def my_profile():
     # Ensure profile exists for current user
     profile = Profile.query.filter_by(user_id=user.id).first()
     if not profile:
-        profile = Profile(user_id=user.id)
+        profile = Profile(user_id=user.id, pfp='default_pfp.png')
         db.session.add(profile)
         db.session.commit()
     
@@ -89,7 +89,7 @@ def researcher_profile(researcher_id):
     # Ensure profile exists for the researcher
     profile = Profile.query.filter_by(user_id=researcher.id).first()
     if not profile:
-        profile = Profile(user_id=researcher.id)
+        profile = Profile(user_id=researcher.id, pfp='default_pfp.png')
         db.session.add(profile)
         db.session.commit()
 
@@ -283,7 +283,7 @@ def edit_profile():
     
     profile = Profile.query.filter_by(user_id=current_user.id).first()
     if not profile:
-        profile = Profile(user_id=current_user.id)
+        profile = Profile(user_id=current_user.id, pfp='default_pfp.png')
         db.session.add(profile)
         db.session.flush()  # Ensures profile.pid is available for achievements/socials
 
@@ -427,7 +427,7 @@ def update_interests():
         # Get or create profile
         profile = Profile.query.filter_by(user_id=current_user.id).first()
         if not profile:
-            profile = Profile(user_id=current_user.id)
+            profile = Profile(user_id=current_user.id, pfp='default_pfp.png')
             db.session.add(profile)
         
         # Update research interests
@@ -470,7 +470,7 @@ def upload_profile_picture():
         # Get or create profile
         profile = Profile.query.filter_by(user_id=current_user.id).first()
         if not profile:
-            profile = Profile(user_id=current_user.id)
+            profile = Profile(user_id=current_user.id, pfp='default_pfp.png')
             db.session.add(profile)
             db.session.flush()
         
@@ -525,7 +525,7 @@ def upload_paper():
             # Get or create profile
             profile = Profile.query.filter_by(user_id=current_user.id).first()
             if not profile:
-                profile = Profile(user_id=current_user.id)
+                profile = Profile(user_id=current_user.id, pfp='default_pfp.png')
                 db.session.add(profile)
                 db.session.commit()
             
@@ -600,7 +600,7 @@ def my_papers():
     """Display user's uploaded papers"""
     profile = Profile.query.filter_by(user_id=current_user.id).first()
     if not profile:
-        profile = Profile(user_id=current_user.id)
+        profile = Profile(user_id=current_user.id, pfp='default_pfp.png')
         db.session.add(profile)
         db.session.commit()
     
@@ -786,7 +786,8 @@ def register():
             user_id=user.id,
             title=form.title.data if form.title.data else None,
             institution=institution_value,
-            position=position_value
+            position=position_value,
+            pfp='default_pfp.png'
         )
 
         db.session.add(profile)
@@ -838,7 +839,7 @@ def add_external_role():
 
         profile = Profile.query.filter_by(user_id=current_user.id).first()
         if not profile:
-            profile = Profile(user_id=current_user.id)
+            profile = Profile(user_id=current_user.id, pfp='default_pfp.png')
             db.session.add(profile)
             db.session.flush()
 
@@ -940,7 +941,7 @@ def add_achievement():
 
         profile = Profile.query.filter_by(user_id=current_user.id).first()
         if not profile:
-            profile = Profile(user_id=current_user.id)
+            profile = Profile(user_id=current_user.id, pfp='default_pfp.png')
             db.session.add(profile)
             db.session.flush()
 

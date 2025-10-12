@@ -31,7 +31,7 @@
                                     {% if profile and profile.pfp %}
                                         <img id="profile-pic-preview" src="{% if profile.pfp.startswith('http') %}{{ profile.pfp }}{% else %}{{ url_for('static', filename=profile.pfp) }}{% endif %}" alt="Profile Picture" class="img-fluid rounded-circle" style="width: 150px; height: 150px; object-fit: cover; border: 3px solid #dee2e6;">
                                     {% else %}
-                                        <img id="profile-pic-preview" src="{{ url_for('static', filename='placeholder.png') }}" alt="Profile Picture" class="img-fluid rounded-circle" style="width: 150px; height: 150px; object-fit: cover; border: 3px solid #dee2e6;">
+                                        <img id="profile-pic-preview" src="{{ url_for('static', filename='default_pfp.png') }}" alt="Profile Picture" class="img-fluid rounded-circle" style="width: 150px; height: 150px; object-fit: cover; border: 3px solid #dee2e6;">
                                     {% endif %}
                                 </div>
                             </div>

@@ -111,9 +111,21 @@
                             </div>
 
                             <!-- Position -->
-                            <div class="input mb-3">
-                                {{ form.position(class="form-control", placeholder="Position") }}
+                            <div class="mb-3">
+                                <label for="position" class="form-label">Position</label>
+                                {{ form.position(class="form-select", id="position-select") }}
+                                {% for error in form.position.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            
+                            <!-- Other Position (shown when "Other" is selected) -->
+                            <div class="input mb-3" id="other-position-div" style="display: none;">
+                                {{ form.other_position(class="form-control", placeholder="Enter your position") }}
                                 <i class='bx bx-briefcase'></i>
+                                {% for error in form.other_position.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
                             </div>
 
                             <!-- Submit button -->

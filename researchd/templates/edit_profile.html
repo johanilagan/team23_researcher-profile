@@ -130,7 +130,7 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     {{ form.position.label(class="form-label") }}
-                                    {{ form.position(class="form-control") }}
+                                    {{ form.position(class="form-select", id="position-select-edit") }}
                                     {% if form.position.errors %}
                                         <div class="text-danger">
                                             {% for error in form.position.errors %}
@@ -138,6 +138,9 @@
                                             {% endfor %}
                                         </div>
                                     {% endif %}
+                                    <div class="form-text">
+                                        Select your position from the list or choose "Other"
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -157,6 +160,26 @@
                                     {% endif %}
                                     <div class="form-text">
                                         If your institution is not in the dropdown, enter it here
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Other Position (shown when "Other" is selected) -->
+                        <div class="row" id="other-position-row-edit" style="display: none;">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    {{ form.other_position.label(class="form-label") }}
+                                    {{ form.other_position(class="form-control", placeholder="Enter your position") }}
+                                    {% if form.other_position.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.other_position.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        If your position is not in the dropdown, enter it here
                                     </div>
                                 </div>
                             </div>

@@ -300,9 +300,16 @@ def edit_profile():
             elif institution_value == 'Other':
                 institution_value = None
 
+            # Handle position - use other_position if "Other" is selected
+            position_value = form.position.data
+            if position_value == 'Other' and form.other_position.data:
+                position_value = form.other_position.data
+            elif position_value == 'Other':
+                position_value = None
+
             # Update Profile fields
             profile.institution = institution_value
-            profile.position = form.position.data
+            profile.position = position_value
             profile.bio = form.bio.data
             profile.location = form.location.data
             profile.title = form.title.data if form.title.data else None
@@ -370,8 +377,9 @@ def edit_profile():
 
         # Pre-populate Profile fields
         # Check if institution is in the dropdown list
-        from researchd.forms import INSTITUTION_CHOICES
+        from researchd.forms import INSTITUTION_CHOICES, POSITION_CHOICES
         institution_values = [choice[0] for choice in INSTITUTION_CHOICES]
+        position_values = [choice[0] for choice in POSITION_CHOICES]
         
         if profile.institution and profile.institution in institution_values:
             form.institution.data = profile.institution
@@ -380,7 +388,14 @@ def edit_profile():
             form.institution.data = 'Other'
             form.other_institution.data = profile.institution
         
-        form.position.data = profile.position
+        # Check if position is in the dropdown list
+        if profile.position and profile.position in position_values:
+            form.position.data = profile.position
+        elif profile.position:
+            # Position not in list, set to "Other" and populate other_position
+            form.position.data = 'Other'
+            form.other_position.data = profile.position
+        
         form.bio.data = profile.bio
         form.location.data = profile.location
         form.title.data = profile.title
@@ -760,11 +775,18 @@ def register():
         elif institution_value == 'Other':
             institution_value = None
         
+        # Handle position - use other_position if "Other" is selected
+        position_value = form.position.data
+        if position_value == 'Other' and form.other_position.data:
+            position_value = form.other_position.data
+        elif position_value == 'Other':
+            position_value = None
+        
         profile = Profile(
             user_id=user.id,
             title=form.title.data if form.title.data else None,
             institution=institution_value,
-            position=form.position.data
+            position=position_value
         )
 
         db.session.add(profile)

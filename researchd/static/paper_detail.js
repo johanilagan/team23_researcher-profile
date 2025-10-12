@@ -1,5 +1,5 @@
 // PDF.js viewer functionality
-// Note: This file expects pdfUrl to be defined globally before this script loads
+// Get PDF URL from data attribute
 
 let pdfDoc = null,
     pageNum = 1,
@@ -8,6 +8,10 @@ let pdfDoc = null,
     scale = 1,
     canvas = document.getElementById('pdf-canvas'),
     ctx = canvas.getContext('2d');
+
+// Get PDF URL from the pdf-viewer data attribute
+const pdfViewer = document.getElementById('pdf-viewer');
+const pdfUrl = pdfViewer ? pdfViewer.getAttribute('data-pdf-url') : null;
 
 function renderPage(num) {
     pageRendering = true;
@@ -90,8 +94,8 @@ document.getElementById('next').addEventListener('click', onNextPage);
 document.getElementById('zoom_in').addEventListener('click', zoomIn);
 document.getElementById('zoom_out').addEventListener('click', zoomOut);
 
-// Load the PDF - expects pdfUrl to be defined
-if (typeof pdfUrl !== 'undefined') {
+// Load the PDF from data attribute
+if (pdfUrl) {
     pdfjsLib.getDocument(pdfUrl).promise.then(function(pdfDoc_) {
         pdfDoc = pdfDoc_;
         document.getElementById('page_count').textContent = pdfDoc.numPages;

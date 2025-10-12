@@ -203,7 +203,7 @@
                             <div class="col-12">
                                 <div class="card h-100">
                                     <div class="row g-0 align-items-center">
-                                        <div class="col-auto">
+                                        <div class="col-auto ps-3 py-3">
                                             {% if researcher.profile.pfp %}
                                                 <img src="{% if researcher.profile.pfp.startswith('http') %}{{ researcher.profile.pfp }}{% else %}{{ url_for('static', filename=researcher.profile.pfp) }}{% endif %}"
                                                     class="img-fluid rounded-circle"
@@ -417,49 +417,6 @@
             {% endif %}
         </div>
 
-{% endblock %}
-
-{% block extra_css %}
-<style>
-/* Search interface styling */
-.search-interface .btn-group .btn {
-    font-size: 0.9rem;
-    padding: 0.5rem 0.75rem;
-}
-
-.search-interface .btn-group .btn i {
-    font-size: 0.8rem;
-}
-
-.search-interface .form-control {
-    font-size: 1rem;
-}
-
-.search-interface .form-select {
-    font-size: 1rem;
-}
-
-/* Ensure proper spacing and alignment */
-.search-interface .input-group {
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.search-interface .btn-group {
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .search-interface .btn-group .btn {
-        font-size: 0.8rem;
-        padding: 0.4rem 0.5rem;
-    }
-    
-    .search-interface .btn-group .btn i {
-        font-size: 0.7rem;
-    }
-}
-</style>
 {% endblock %}
 
 {% block extra_js %}

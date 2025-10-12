@@ -66,5 +66,24 @@ document.addEventListener('DOMContentLoaded', function() {
             otherInstitutionRow.style.display = 'block';
         }
     }
+    
+    // Position dropdown handler - show/hide other position field
+    const positionSelect = document.getElementById('position-select-edit');
+    const otherPositionRow = document.getElementById('other-position-row-edit');
+    
+    if (positionSelect && otherPositionRow) {
+        positionSelect.addEventListener('change', function() {
+            if (this.value === 'Other') {
+                otherPositionRow.style.display = 'block';
+            } else {
+                otherPositionRow.style.display = 'none';
+            }
+        });
+        
+        // Check initial state on page load
+        if (positionSelect.value === 'Other') {
+            otherPositionRow.style.display = 'block';
+        }
+    }
 });
 

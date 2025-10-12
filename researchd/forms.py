@@ -19,6 +19,33 @@ TITLE_CHOICES = [
     ('Other', 'Other')
 ]
 
+# Position options for researchers
+POSITION_CHOICES = [
+    ('', 'Select Position'),
+    ('Undergraduate Student', 'Undergraduate Student'),
+    ('Postgraduate Student', 'Postgraduate Student'),
+    ('PhD Candidate', 'PhD Candidate'),
+    ('Research Assistant', 'Research Assistant'),
+    ('Research Associate', 'Research Associate'),
+    ('Postdoctoral Researcher', 'Postdoctoral Researcher'),
+    ('Lecturer', 'Lecturer'),
+    ('Senior Lecturer', 'Senior Lecturer'),
+    ('Associate Professor', 'Associate Professor'),
+    ('Professor', 'Professor'),
+    ('Emeritus Professor', 'Emeritus Professor'),
+    ('Adjunct Professor', 'Adjunct Professor'),
+    ('Visiting Professor', 'Visiting Professor'),
+    ('Research Fellow', 'Research Fellow'),
+    ('Senior Research Fellow', 'Senior Research Fellow'),
+    ('Principal Research Fellow', 'Principal Research Fellow'),
+    ('Research Scientist', 'Research Scientist'),
+    ('Senior Research Scientist', 'Senior Research Scientist'),
+    ('Lab Manager', 'Lab Manager'),
+    ('Department Head', 'Department Head'),
+    ('Dean', 'Dean'),
+    ('Other', 'Other (Not Listed)')
+]
+
 # Australian institution options
 INSTITUTION_CHOICES = [
     ('', 'Select Institution'),
@@ -83,7 +110,8 @@ class RegisterForm(FlaskForm):
 
     institution = SelectField("Institution", choices=INSTITUTION_CHOICES, validators=[Optional()])
     other_institution = StringField("Other Institution (if not listed)", validators=[Optional(), Length(max=150)])
-    position = StringField("Position", validators=[Length(max=100)])
+    position = SelectField("Position", choices=POSITION_CHOICES, validators=[Optional()])
+    other_position = StringField("Other Position (if not listed)", validators=[Optional(), Length(max=100)])
 
     submit = SubmitField("Register")
 
@@ -93,7 +121,8 @@ class EditProfileForm(FlaskForm):
     last_name = StringField("Last Name", validators=[InputRequired(), Length(min=1, max=100)])
     institution = SelectField("Institution", choices=INSTITUTION_CHOICES, validators=[Optional()])
     other_institution = StringField("Other Institution (if not listed)", validators=[Optional(), Length(max=150)])
-    position = StringField("Position", validators=[Optional(), Length(max=100)])
+    position = SelectField("Position", choices=POSITION_CHOICES, validators=[Optional()])
+    other_position = StringField("Other Position (if not listed)", validators=[Optional(), Length(max=100)])
     bio = TextAreaField("Bio", validators=[Optional(), Length(max=1000)])
     location = StringField("Location", validators=[Optional(), Length(max=150)])
     department = StringField("Department", validators=[Optional(), Length(max=150)])

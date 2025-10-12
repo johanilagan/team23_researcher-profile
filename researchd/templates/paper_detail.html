@@ -119,7 +119,7 @@
                 </div>
 
                 <!-- PDF.js Viewer -->
-                <div id="pdf-viewer" class="p-3 text-center" style="background:#1e1e2f; border-radius:0 0 8px 8px;">
+                <div id="pdf-viewer" class="p-3 text-center" style="background:#1e1e2f; border-radius:0 0 8px 8px;" data-pdf-url="{{ url_for('main.download_file', filename=paper.file.file_path) }}">
                     <canvas id="pdf-canvas" class="shadow-sm rounded"></canvas>
                 </div>
             </div>
@@ -130,9 +130,5 @@
 
 {% block extra_js %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script>
-    // Define the PDF URL globally for paper_detail.js to use
-    const pdfUrl = "{{ url_for('main.download_file', filename=paper.file.file_path) }}";
-</script>
 <script src="{{ url_for('static', filename='paper_detail.js') }}"></script>
 {% endblock %}

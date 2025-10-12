@@ -83,5 +83,24 @@ document.addEventListener('DOMContentLoaded', function() {
             otherInstitutionDiv.style.display = 'block';
         }
     }
+    
+    // Position dropdown handler - show/hide other position field
+    const positionSelect = document.getElementById('position-select');
+    const otherPositionDiv = document.getElementById('other-position-div');
+    
+    if (positionSelect && otherPositionDiv) {
+        positionSelect.addEventListener('change', function() {
+            if (this.value === 'Other') {
+                otherPositionDiv.style.display = 'block';
+            } else {
+                otherPositionDiv.style.display = 'none';
+            }
+        });
+        
+        // Check initial state on page load
+        if (positionSelect.value === 'Other') {
+            otherPositionDiv.style.display = 'block';
+        }
+    }
 });
 

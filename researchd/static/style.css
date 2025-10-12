@@ -909,7 +909,7 @@ body {
 }
 
 .social-link.linkedin { background: linear-gradient(135deg, #0077b5 0%, #005885 100%); }
-.social-link.twitter { background: linear-gradient(135deg, #1da1f2 0%, #0d8bd9 100%); }
+.social-link.twitter { background: linear-gradient(135deg, #000000 0%, #14171a 100%); color: white; }
 .social-link.instagram { background: linear-gradient(135deg, #e4405f 0%, #c13584 100%); }
 .social-link.github { background: linear-gradient(135deg, #333 0%, #24292e 100%); }
 

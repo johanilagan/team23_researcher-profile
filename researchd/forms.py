@@ -134,7 +134,7 @@ class EditProfileForm(FlaskForm):
     
     # Social media links
     linkedin_url = URLField("LinkedIn URL", validators=[Optional()])
-    twitter_url = URLField("Twitter URL", validators=[Optional()])
+    twitter_url = URLField("X (Twitter) URL", validators=[Optional()])
     instagram_url = URLField("Instagram URL", validators=[Optional()])
     github_url = URLField("GitHub URL", validators=[Optional()])
     

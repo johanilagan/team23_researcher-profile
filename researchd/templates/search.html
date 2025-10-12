@@ -76,18 +76,20 @@
                         <div class="row mt-3">
                             <div class="col-12">
                                 <div class="card">
-                                    <div class="card-header">
-                                        <h6 class="mb-0">
-                                            <i class="fas fa-filter me-2"></i>Filters
-                                            <button type="button" class="btn btn-sm btn-outline-secondary float-end" onclick="clearFilters()">
-                                                <i class="fas fa-times"></i> Clear All
-                                            </button>
-                                        </h6>
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-filter me-2"></i>
+                                            <span>Filters</span>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearFilters()">
+                                            <i class="fas fa-times"></i> Clear All
+                                        </button>
                                     </div>
+
                                     <div class="card-body">
-                                        <div class="row g-3">
-                                            <!-- Researcher Filters -->
-                                            <div id="researcherFilters" class="row g-3" style="display: {% if search_type == 'papers' %}none{% else %}block{% endif %};">
+                                        <!-- Researcher Filters -->
+                                        <div id="researcherFilters" class="{% if search_type == 'papers' %}d-none{% endif %} mb-3">
+                                            <div class="row g-3">
                                                 <!-- Institution Filter -->
                                                 <div class="col-md-4">
                                                     <label for="institutionFilter" class="form-label">Institution</label>
@@ -101,7 +103,7 @@
                                                         {% endfor %}
                                                     </select>
                                                 </div>
-                                                
+
                                                 <!-- Position Filter -->
                                                 <div class="col-md-4">
                                                     <label for="positionFilter" class="form-label">Position</label>
@@ -115,7 +117,7 @@
                                                         {% endfor %}
                                                     </select>
                                                 </div>
-                                                
+
                                                 <!-- Research Interests Filter -->
                                                 <div class="col-md-4">
                                                     <label for="interestsFilter" class="form-label">Research Interests</label>
@@ -130,10 +132,12 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            
-                                            <!-- Paper Filters -->
-                                            <div id="paperFilters" class="row g-3" style="display: {% if search_type == 'researchers' %}none{% else %}block{% endif %};">
-                                                <!-- Journal Filter -->
+                                        </div>
+
+                                        <!-- Paper Filters -->
+                                        <div id="paperFilters" class="{% if search_type == 'researchers' %}d-none{% endif %}">
+                                            <!-- Journal Filter -->
+                                            <div class="row g-3">
                                                 <div class="col-md-6">
                                                     <label for="journalFilter" class="form-label">Journal</label>
                                                     <select class="form-select" name="journal" id="journalFilter">
@@ -146,7 +150,7 @@
                                                         {% endfor %}
                                                     </select>
                                                 </div>
-                                                
+
                                                 <!-- Year Filter -->
                                                 <div class="col-md-6">
                                                     <label for="yearFilter" class="form-label">Publication Year</label>

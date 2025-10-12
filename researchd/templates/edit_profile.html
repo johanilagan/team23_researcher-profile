@@ -63,6 +63,25 @@
                         </div>
                         
                         <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    {{ form.title.label(class="form-label") }}
+                                    {{ form.title(class="form-select") }}
+                                    {% if form.title.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.title.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Select your professional title (e.g., Dr, Prof, Mr, Ms)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     {{ form.first_name.label(class="form-label") }}

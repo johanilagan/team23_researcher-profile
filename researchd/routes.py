@@ -738,6 +738,7 @@ def register():
 
         profile = Profile(
             user_id=user.id,
+            title=form.title.data if form.title.data else None,
             institution=form.institution.data,
             position=form.position.data
         )

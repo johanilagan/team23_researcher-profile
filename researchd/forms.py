@@ -3,12 +3,29 @@ from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, URLField, DateField, IntegerField, SelectField
 from wtforms.validators import InputRequired, Length, Email, EqualTo, Optional, NumberRange, DataRequired
 
+# Title options for researchers
+TITLE_CHOICES = [
+    ('', 'Select Title (Optional)'),
+    ('Mr', 'Mr'),
+    ('Ms', 'Ms'),
+    ('Mrs', 'Mrs'),
+    ('Miss', 'Miss'),
+    ('Dr', 'Dr'),
+    ('Prof', 'Prof'),
+    ('Assoc Prof', 'Assoc Prof'),
+    ('Asst Prof', 'Asst Prof'),
+    ('Prof Dr', 'Prof Dr'),
+    ('Rev', 'Rev'),
+    ('Other', 'Other')
+]
+
 class LoginForm(FlaskForm):
     email = StringField("Email", validators=[InputRequired(), Email(), Length(max=150)])
     password = PasswordField("Password", validators=[InputRequired(), Length(min=4)])
     submit = SubmitField("Sign In")
 
 class RegisterForm(FlaskForm):
+    title = SelectField("Title", choices=TITLE_CHOICES, validators=[Optional()])
     first_name = StringField("First Name", validators=[InputRequired(), Length(min=1, max=100)])
     last_name = StringField("Last Name", validators=[InputRequired(), Length(min=1, max=100)])
 
@@ -22,13 +39,13 @@ class RegisterForm(FlaskForm):
     submit = SubmitField("Register")
 
 class EditProfileForm(FlaskForm):
+    title = SelectField("Title", choices=TITLE_CHOICES, validators=[Optional()])
     first_name = StringField("First Name", validators=[InputRequired(), Length(min=1, max=100)])
     last_name = StringField("Last Name", validators=[InputRequired(), Length(min=1, max=100)])
     institution = StringField("Institution", validators=[Optional(), Length(max=150)])
     position = StringField("Position", validators=[Optional(), Length(max=100)])
     bio = TextAreaField("Bio", validators=[Optional(), Length(max=1000)])
     location = StringField("Location", validators=[Optional(), Length(max=150)])
-    title = StringField("Title", validators=[Optional(), Length(max=150)])
     department = StringField("Department", validators=[Optional(), Length(max=150)])
     
     # Profile picture

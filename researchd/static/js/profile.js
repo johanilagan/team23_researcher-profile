@@ -18,9 +18,7 @@ function makeCSRFRequest(url, options = {}) {
 
 // Section Management Functions
 function addSection(sect) {
-    console.log("Button clicked for:", sect);
     const section = document.querySelector(`[data-section="${sect}"]`);
-    console.log("Section found?", section);
     if (section) {
         section.classList.remove('d-none');
         toggleSectionButtons(sect, true);

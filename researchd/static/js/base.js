@@ -42,13 +42,6 @@ function checkAuthStatus() {
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
     const username = localStorage.getItem('username') || 'User';
     
-    console.log('checkAuthStatus called');
-    console.log('isLoggedIn:', isLoggedIn);
-    console.log('username:', username);
-    console.log('Type of isLoggedIn:', typeof isLoggedIn);
-    console.log('isLoggedIn === true:', isLoggedIn === true);
-    console.log('isLoggedIn === "true":', isLoggedIn === 'true');
-    
     if (isLoggedIn) {
         console.log('User is logged in, showing user menu');
         const authButtons = document.getElementById('auth-buttons');
@@ -245,9 +238,7 @@ function makeMobileMenuWork() {
         setTimeout(makeMobileMenuWork, 500);
         return;
     }
-    
-    console.log('Found menu elements, setting up click handler...');
-    
+        
     const newHamburger = hamburger.cloneNode(true);
     hamburger.parentNode.replaceChild(newHamburger, hamburger);
     
@@ -255,21 +246,17 @@ function makeMobileMenuWork() {
     newHamburger.onclick = function(e) {
         e.preventDefault();
         e.stopPropagation();
-        console.log('Hamburger clicked!');
         
         // Toggle the menu
         if (menu.classList.contains('show')) {
             menu.classList.remove('show');
             newHamburger.setAttribute('aria-expanded', 'false');
-            console.log('Menu closed');
         } else {
             menu.classList.add('show');
             newHamburger.setAttribute('aria-expanded', 'true');
-            console.log('Menu opened');
         }
     };
     
-    console.log('Mobile menu is now working!');
 }
 
 // Alternative approach - direct event listener on the toggler
@@ -322,11 +309,8 @@ function forceMobileMenuToWork() {
     const hamburgers = document.querySelectorAll('.navbar-toggler, [data-bs-toggle="collapse"]');
     const menus = document.querySelectorAll('.navbar-collapse, #navbarNav');
     
-    console.log('Found hamburgers:', hamburgers.length);
-    console.log('Found menus:', menus.length);
     
     hamburgers.forEach((hamburger, index) => {
-        console.log(`Setting up hamburger ${index + 1}`);
         
         // Remove all existing event listeners
         const newHamburger = hamburger.cloneNode(true);
@@ -336,7 +320,6 @@ function forceMobileMenuToWork() {
         newHamburger.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log(`Hamburger ${index + 1} clicked!`);
             
             menus.forEach(menu => {
                 if (menu.classList.contains('show')) {

@@ -63,7 +63,64 @@ document.addEventListener('DOMContentLoaded', function() {
     // Real-time password validation
     passwordField.addEventListener('input', function() {
         updatePasswordRequirements(this.value);
+        
+        // Clear error message if present
+        const passwordContainer = passwordField.closest('.password-container');
+        const inputDiv = passwordContainer.parentElement;
+        const errorMessage = inputDiv.querySelector('.password-error');
+        
+        if (errorMessage) {
+            const requirements = checkPasswordRequirements(this.value);
+            const allRequirementsMet = requirements.length && 
+                                      requirements.uppercase && 
+                                      requirements.number && 
+                                      requirements.special;
+            if (allRequirementsMet) {
+                errorMessage.remove();
+            }
+        }
     });
+    
+    // Form submission validation
+    const registerForm = document.getElementById('register-form');
+    if (registerForm) {
+        registerForm.addEventListener('submit', function(e) {
+            const password = passwordField.value;
+            const requirements = checkPasswordRequirements(password);
+            
+            // Check if all requirements are met
+            const allRequirementsMet = requirements.length && 
+                                      requirements.uppercase && 
+                                      requirements.number && 
+                                      requirements.special;
+            
+            if (!allRequirementsMet) {
+                e.preventDefault();
+                
+                // Show password requirements
+                passwordRequirements.style.display = 'block';
+                
+                // Show error message (insert after password-container, not inside it)
+                const passwordContainer = passwordField.closest('.password-container');
+                const inputDiv = passwordContainer.parentElement;
+                let errorMessage = inputDiv.querySelector('.password-error');
+                
+                if (!errorMessage) {
+                    errorMessage = document.createElement('div');
+                    errorMessage.className = 'text-danger password-error mt-2';
+                    // Insert after the password-container div
+                    passwordContainer.parentNode.insertBefore(errorMessage, passwordContainer.nextSibling);
+                }
+                errorMessage.textContent = 'Password does not meet all requirements. Please check the requirements above.';
+                
+                // Scroll to password field
+                passwordField.focus();
+                passwordField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                return false;
+            }
+        });
+    }
     
     // Institution dropdown handler - show/hide other institution field
     const institutionSelect = document.getElementById('institution-select');

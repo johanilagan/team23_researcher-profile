@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, URLField, DateField, IntegerField, SelectField
-from wtforms.validators import InputRequired, Length, Email, EqualTo, Optional, NumberRange, DataRequired
+from wtforms.validators import InputRequired, Length, Email, EqualTo, Optional, NumberRange, DataRequired, ValidationError
+import re
 
 # Title options for researchers
 TITLE_CHOICES = [
@@ -94,6 +95,22 @@ INSTITUTION_CHOICES = [
     ('Other', 'Other (Not Listed)')
 ]
 
+def validate_password_strength(form, field):
+    """Custom validator to enforce password requirements"""
+    password = field.data
+    
+    if len(password) < 6:
+        raise ValidationError("Password must be at least 6 characters long")
+    
+    if not re.search(r'[A-Z]', password):
+        raise ValidationError("Password must contain at least one uppercase letter")
+    
+    if not re.search(r'\d', password):
+        raise ValidationError("Password must contain at least one number")
+    
+    if not re.search(r'[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]', password):
+        raise ValidationError("Password must contain at least one special character")
+
 class LoginForm(FlaskForm):
     email = StringField("Email", validators=[InputRequired(), Email(), Length(max=150)])
     password = PasswordField("Password", validators=[InputRequired(), Length(min=4)])
@@ -105,7 +122,7 @@ class RegisterForm(FlaskForm):
     last_name = StringField("Last Name", validators=[InputRequired(), Length(min=1, max=100)])
 
     email = StringField("Email", validators=[InputRequired(), Email(), Length(max=150)])
-    password = PasswordField("Password", validators=[InputRequired(), Length(min=4, message="Password must be at least 4 characters long")])
+    password = PasswordField("Password", validators=[InputRequired(), Length(min=6), validate_password_strength])
     confirm_password = PasswordField("Confirm Password", validators=[InputRequired(), EqualTo("password", message="Passwords must match")])
 
     institution = SelectField("Institution", choices=INSTITUTION_CHOICES, validators=[Optional()])

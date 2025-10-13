@@ -2826,3 +2826,15 @@ body {
 .pagination .page-item.active .page-link span[aria-hidden="true"] {
     color: #fff !important;
 }
+
+[data-theme="dark"] .custom-model-content,
+[data-theme="dark"] .custom-modal-body,
+[data-theme="dark"] .custom-modal-footer {
+    background: var(--modal-bg) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .custom-modal-header {
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%) !important;
+    color: #fff !important;
+}

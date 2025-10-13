@@ -85,12 +85,12 @@ function toggleExternalRoles() {
     
     if (externalSection.classList.contains('d-none')) {
         toggleBtn.innerHTML = '<i class="fas fa-users me-1"></i> External Roles';
-        toggleBtn.classList.remove('btn-outline-primary');
-        toggleBtn.classList.add('btn-outline-secondary');
-    } else {
-        toggleBtn.innerHTML = '<i class="fas fa-eye-slash me-1"></i> Hide External Roles';
         toggleBtn.classList.remove('btn-outline-secondary');
         toggleBtn.classList.add('btn-outline-primary');
+    } else {
+        toggleBtn.innerHTML = '<i class="fas fa-eye-slash me-1"></i> Hide External Roles';
+        toggleBtn.classList.remove('btn-outline-primary');
+        toggleBtn.classList.add('btn-outline-secondary');
     }
 
     saveSectionOrder();

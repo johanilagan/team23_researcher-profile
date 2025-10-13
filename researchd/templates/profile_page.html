@@ -23,14 +23,30 @@
                     </a>
                 </div>
                 <div class="col-auto">
-                    <button class="btn btn-outline-primary w-100" onclick="toggleExternalRoles()" id="toggle-external-roles-btn">
-                        <i class="fas fa-users me-1"></i><span class="d-none d-sm-inline">External Roles</span><span class="d-sm-none">Roles</span>
-                    </button>
+                    {% set ach_section = section_order | selectattr('section', 'equalto', 'external-roles-section') | list %}
+                    {% set ach_visible = ach_section[0].visible if ach_section|length > 0 else True %}
+                        {% if ach_visible %}
+                        <button class="btn btn-outline-secondary w-100" onclick="toggleExternalRoles()" id="toggle-external-roles-btn">
+                            <i class="fas fa-eye-slash me-1"></i><span class="d-none d-sm-inline">Hide External Roles</span><span class="d-sm-none">Hide</span>
+                        </button>
+                        {% else %}
+                        <button class="btn btn-outline-primary w-100" onclick="toggleExternalRoles()" id="toggle-external-roles-btn">
+                            <i class="fas fa-trophy me-1"></i><span class="d-none d-sm-inline">External Roles</span><span class="d-sm-none">Roles</span>
+                        </button>
+                        {% endif %}
                 </div>
                 <div class="col-auto">
-                    <button class="btn btn-outline-primary w-100" onclick="toggleAchievements()" id="toggle-achievements-btn">
-                        <i class="fas fa-trophy me-1"></i><span class="d-none d-sm-inline">Achievements</span><span class="d-sm-none">Awards</span>
-                    </button>
+                    {% set ach_section = section_order | selectattr('section', 'equalto', 'achievements-section') | list %}
+                    {% set ach_visible = ach_section[0].visible if ach_section|length > 0 else True %}
+                        {% if ach_visible %}
+                        <button class="btn btn-outline-secondary w-100" onclick="toggleAchievements()" id="toggle-achievements-btn">
+                            <i class="fas fa-eye-slash me-1"></i><span class="d-none d-sm-inline">Hide Achievements</span><span class="d-sm-none">Hide</span>
+                        </button>
+                        {% else %}
+                        <button class="btn btn-outline-primary w-100" onclick="toggleAchievements()" id="toggle-achievements-btn">
+                            <i class="fas fa-trophy me-1"></i><span class="d-none d-sm-inline">Achievements</span><span class="d-sm-none">Awards</span>
+                        </button>
+                        {% endif %}
                 </div>
             </div>
         </div>

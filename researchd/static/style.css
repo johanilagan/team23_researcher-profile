@@ -1184,14 +1184,14 @@ body {
     background: transparent;
 }
 
-.btn-outline-primary.active,
-.btn-outline-primary:active,
+.btn-check:checked + .btn-outline-primary {
+    background-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+    color: #fff !important;
+}
+
 .btn-outline-primary:hover,
-.btn-outline-primary:focus,
-.btn-outline-primary.btn-check:checked,
-.btn-check:checked + .btn-outline-primary,
-.btn-outline-primary:not(:disabled):active,
-.btn-outline-primary:checked {
+.btn-outline-light:focus {
     background-color: var(--accent-color) !important;
     border-color: var(--accent-color) !important;
     color: #fff !important;

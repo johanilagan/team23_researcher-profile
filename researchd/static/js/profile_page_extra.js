@@ -52,7 +52,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     const order = Array.from(achList.querySelectorAll('.list-group-item[data-achid]'))
                         .map(item => item.dataset.achid)
                         .filter(id => id); // Filter out any undefined or null ids
-                    console.log("New order to send:", order);
 
                     if (order.length && typeof makeCSRFRequest === 'function') {
                         makeCSRFRequest('/update_achievement_order', {
@@ -75,14 +74,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize edit interests button
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Page loaded, initializing...');
     
     // Setup button
     const editBtn = document.getElementById('edit-interests-btn');
     if (editBtn) {
-        console.log('Edit button found, adding click listener');
         editBtn.addEventListener('click', function(e) {
-            console.log('Button clicked via event listener');
             e.preventDefault();
             if (typeof editInterests === 'function') {
                 editInterests();

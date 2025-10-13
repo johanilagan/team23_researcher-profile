@@ -761,12 +761,14 @@ def public_download_file(filename):
     """Publicly serve uploaded PDF files for download"""
     try:
         from urllib.parse import unquote
+        from flask import flash, render_template
         # URL decode the filename
         decoded_filename = unquote(filename)
         
         # Verify the file exists in the database
         file_record = File.query.filter_by(file_path=decoded_filename).first()
         if not file_record:
+            flash("File not found in database.", "error")
             return redirect(url_for("main.home"))
         
         # Check if it's a URL (external file) or local file
@@ -777,14 +779,38 @@ def public_download_file(filename):
             # It's a local file
             file_path = os.path.join(current_app.root_path, 'static', 'uploads')
             local_file_path = os.path.join(file_path, decoded_filename)
+            
             if os.path.exists(local_file_path):
                 # Use send_from_directory with as_attachment=True to force download
-                return send_from_directory(file_path, decoded_filename, as_attachment=True, mimetype='application/pdf')
+                from flask import Response
+                import mimetypes
+                
+                # Get the MIME type
+                mime_type, _ = mimetypes.guess_type(local_file_path)
+                if not mime_type:
+                    mime_type = 'application/pdf'
+                
+                # Read the file and create response with proper headers
+                with open(local_file_path, 'rb') as f:
+                    file_data = f.read()
+                
+                response = Response(
+                    file_data,
+                    mimetype=mime_type,
+                    headers={
+                        'Content-Disposition': f'attachment; filename="{decoded_filename}"',
+                        'Content-Length': str(len(file_data))
+                    }
+                )
+                return response
             else:
+                # File doesn't exist on disk, but record exists in database
+                flash("The requested file is no longer available for download.", "error")
                 return redirect(url_for("main.home"))
             
     except Exception as e:
         print(f"Error serving public file: {str(e)}")
+        flash("An error occurred while downloading the file.", "error")
         return redirect(url_for("main.home"))
 
 @auth.route("/login", methods=["GET", "POST"])

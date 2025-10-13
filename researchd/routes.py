@@ -607,6 +607,24 @@ def my_papers():
     papers = Publication.query.filter_by(pid=profile.pid).order_by(Publication.created_at.desc()).all()
     return render_template("my_papers.html", papers=papers)
 
+@main.route("/researcher-papers/<int:researcher_id>")
+def researcher_papers(researcher_id):
+    """Display papers for a specific researcher"""
+    researcher = User.query.get(researcher_id)
+    if not researcher:
+        from flask import abort
+        abort(404)
+    
+    # Ensure profile exists for the researcher
+    profile = Profile.query.filter_by(user_id=researcher.id).first()
+    if not profile:
+        profile = Profile(user_id=researcher.id)
+        db.session.add(profile)
+        db.session.commit()
+    
+    papers = Publication.query.filter_by(pid=profile.pid).order_by(Publication.created_at.desc()).all()
+    return render_template("researcher_papers.html", papers=papers, researcher=researcher, profile=profile)
+
 @main.route("/paper/<int:paper_id>")
 def paper_detail(paper_id):
     paper = Publication.query.get_or_404(paper_id)
@@ -737,6 +755,37 @@ def download_file(filename):
     except Exception as e:
         print(f"Error serving file: {str(e)}")
         return redirect(url_for("main.my_profile"))
+
+@main.route("/public-download/<path:filename>")
+def public_download_file(filename):
+    """Publicly serve uploaded PDF files for download"""
+    try:
+        from urllib.parse import unquote
+        # URL decode the filename
+        decoded_filename = unquote(filename)
+        
+        # Verify the file exists in the database
+        file_record = File.query.filter_by(file_path=decoded_filename).first()
+        if not file_record:
+            return redirect(url_for("main.home"))
+        
+        # Check if it's a URL (external file) or local file
+        if decoded_filename.startswith(('http://', 'https://')):
+            # It's an external URL, redirect to it
+            return redirect(decoded_filename)
+        else:
+            # It's a local file
+            file_path = os.path.join(current_app.root_path, 'static', 'uploads')
+            local_file_path = os.path.join(file_path, decoded_filename)
+            if os.path.exists(local_file_path):
+                # Use send_from_directory with as_attachment=True to force download
+                return send_from_directory(file_path, decoded_filename, as_attachment=True, mimetype='application/pdf')
+            else:
+                return redirect(url_for("main.home"))
+            
+    except Exception as e:
+        print(f"Error serving public file: {str(e)}")
+        return redirect(url_for("main.home"))
 
 @auth.route("/login", methods=["GET", "POST"])
 def login():

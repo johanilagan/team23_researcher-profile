@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}{{ researcher.first_name }} {{ researcher.last_name }}'s Papers - Academic Network{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2>
+                        <i class="fas fa-file-alt me-2"></i>{{ researcher.first_name }} {{ researcher.last_name }}'s Research Papers
+                    </h2>
+                    {% if profile.institution %}
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-university me-1"></i>{{ profile.institution }}
+                        {% if profile.position %}- {{ profile.position }}{% endif %}
+                    </p>
+                    {% endif %}
+                </div>
+                <a href="{{ url_for('main.researcher_profile', researcher_id=researcher.id) }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Profile
+                </a>
+            </div>
+            
+            {% if papers %}
+                <div class="row">
+                    {% for paper in papers %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fas fa-file-pdf text-danger me-2"></i>
+                                    {{ paper.title[:80] }}{% if paper.title|length > 80 %}...{% endif %}
+                                </h5>
+                                
+                                {% if paper.authors %}
+                                <p class="card-text">
+                                    <strong>Authors:</strong><br>
+                                    <small class="text-muted">{{ paper.authors[:100] }}{% if paper.authors|length > 100 %}...{% endif %}</small>
+                                </p>
+                                {% endif %}
+                                
+                                <div class="mb-2">
+                                    {% if paper.journal %}
+                                    <span class="badge bg-primary me-1">{{ paper.journal }}</span>
+                                    {% endif %}
+                                    {% if paper.year %}
+                                    <span class="badge bg-secondary me-1">{{ paper.year }}</span>
+                                    {% endif %}
+                                </div>
+                                
+                                {% if paper.abstract %}
+                                <p class="card-text">
+                                    <small class="text-muted">{{ paper.abstract[:150] }}{% if paper.abstract|length > 150 %}...{% endif %}</small>
+                                </p>
+                                {% endif %}
+                                
+                                <div class="d-flex flex-wrap gap-1 mb-3">
+                                    {% if paper.keywords %}
+                                        {% for keyword in paper.keywords.split(',')[:3] %}
+                                        <span class="badge bg-light text-dark">{{ keyword.strip() }}</span>
+                                        {% endfor %}
+                                        {% if paper.keywords.split(',')|length > 3 %}
+                                        <span class="badge bg-light text-dark">+{{ paper.keywords.split(',')|length - 3 }} more</span>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="card-footer bg-transparent">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        Uploaded {{ paper.created_at.strftime('%B %d, %Y') }}
+                                    </small>
+                                    <div class="d-flex gap-1">
+                                        <a href="{{ url_for('main.paper_detail', paper_id=paper.pubid) }}" 
+                                           class="btn btn-sm btn-outline-info" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        {% if paper.file %}
+                                        <a href="{{ url_for('main.public_download_file', filename=paper.file.file_path) }}" 
+                                           class="btn btn-sm btn-outline-primary" title="Download PDF">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                        {% endif %}
+                                        {% if paper.url %}
+                                        <a href="{{ paper.url }}" class="btn btn-sm btn-outline-secondary" target="_blank" title="View External Link">
+                                            <i class="fas fa-external-link-alt"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-file-alt fa-5x text-muted"></i>
+                    </div>
+                    <h4 class="text-muted">No papers uploaded yet</h4>
+                    <p class="text-muted">{{ researcher.first_name }} {{ researcher.last_name }} hasn't uploaded any research papers yet.</p>
+                    <a href="{{ url_for('main.researcher_profile', researcher_id=researcher.id) }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Profile
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -67,7 +67,7 @@
                         </a>
                         {% endif %}
                         {% if paper.file %}
-                        <a href = "{{ url_for('main.download_file', filename=paper.file.file_path) }}" target = "_blank" class = "btn btn-outline-primary">
+                        <a href = "{{ url_for('main.public_download_file', filename=paper.file.file_path) }}" class = "btn btn-outline-primary">
                             <i class = "fas fa-download me-1"></i> Download PDF
                         </a>
                         {% endif %}
